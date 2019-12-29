@@ -6,7 +6,7 @@ uses
   Classes
 {$IF CompilerVersion > 29}
   , Threading
-{$IFEND}
+{$ENDIF}
   ;
 
 type

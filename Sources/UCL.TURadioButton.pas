@@ -44,7 +44,7 @@ type
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF}); override;
       procedure Paint; override;
       procedure Resize; override;
 
@@ -89,7 +89,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$IFEND}
+    {$ENDIF}
 
       property OnCanResize;
       property OnClick;
@@ -264,7 +264,7 @@ end;
 
 //  CUSTOM METHODS
 
-procedure TUCustomRadioButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUCustomRadioButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF});
 begin
   inherited;
   IconFont.Height := MulDiv(IconFont.Height, M, D);

@@ -66,7 +66,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$IFEND}
+    {$ENDIF}
 
       property OnCanResize;
       property OnClick;

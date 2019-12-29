@@ -67,7 +67,7 @@ type
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
       procedure Resize; override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF}); override;
 
     public
       constructor Create(aOwner: TComponent); override;
@@ -112,7 +112,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$IFEND}
+    {$ENDIF}
 
       property OnCanResize;
       property OnClick;
@@ -355,7 +355,7 @@ begin
   UpdateRects;
 end;
 
-procedure TUCustomSlider.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUCustomSlider.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF});
 begin
   inherited;
   CurWidth := MulDiv(CurWidth, M, D);

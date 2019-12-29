@@ -19,7 +19,7 @@ uses
   SysUtils, Variants, Classes, Types,
 {$IF CompilerVersion > 29}
   ImageList,
-{$IFEND}
+{$ENDIF}
 
   //  VCL units
   Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls,

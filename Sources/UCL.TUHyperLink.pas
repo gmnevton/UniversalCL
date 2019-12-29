@@ -9,7 +9,7 @@ uses
   Dialogs,
 {$ELSE}
   UITypes,
-{$IFEND}
+{$ENDIF}
   Windows, Messages, Shellapi,
   Controls, StdCtrls, Graphics;
 

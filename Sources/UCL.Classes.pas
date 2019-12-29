@@ -38,7 +38,7 @@ type
   public
     property PixelsPerInch: Integer read GetPixelsPerInch;
   end;
-{$IFEND}
+{$ENDIF}
 
 type
   TUTheme = (utLight, utDark);
@@ -129,7 +129,7 @@ begin
     ReleaseDC(0, DC);
   end;
 end;
-{$IFEND}
+{$ENDIF}
 
 { TControlStateColors }
 

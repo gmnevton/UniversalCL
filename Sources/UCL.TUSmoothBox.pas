@@ -51,7 +51,7 @@ type
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF}); override;
 
     public
       constructor Create(aOwner: TComponent); override;
@@ -156,7 +156,7 @@ end;
 
 //  CUSTOM METHODS
 
-procedure TUSmoothBox.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUSmoothBox.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF});
 begin
   inherited;
   MINI_SB_THICKNESS := MulDiv(MINI_SB_THICKNESS, M, D);
@@ -331,7 +331,7 @@ begin
 
 {$IF CompilerVersion > 29}
   StyleElements :=[];
-{$IFEND}
+{$ENDIF}
   BevelOuter := bvNone;
   FullRepaint := false;
   DoubleBuffered := true;
