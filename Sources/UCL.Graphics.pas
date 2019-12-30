@@ -23,7 +23,7 @@ const
   DT_NOFULLWIDTHCHARBREAK = $0080000;
   // MASK for tfComposited
   MASK_TF_COMPOSITED      = $00800000;
-{$ENDIF}  
+{$IFEND}
 
 function PointInRect(const X, Y: Integer; const Rect: TRect): Boolean; overload;
 function PointInRect(const p: TPoint; const Rect: TRect): Boolean; overload;
@@ -61,14 +61,14 @@ type
 
 const
   COptions: Array[TStyleTextFlag] of Cardinal = (DTT_TEXTCOLOR, DTT_BORDERCOLOR, DTT_BORDERSIZE, DTT_SHADOWCOLOR, DTT_SHADOWOFFSET, DTT_GLOWSIZE);
-{$ENDIF}
+{$IFEND}
 
 const
   HAlignments: Array[TAlignment] of Longint = (DT_LEFT, DT_RIGHT, DT_CENTER);
   VAlignments: Array[TVerticalAlignment] of Longint = (DT_TOP, DT_BOTTOM, DT_VCENTER);
 {$IF CompilerVersion > 29}
   CStates: Array[Boolean] of TThemedTextLabel = (ttlTextLabelDisabled, ttlTextLabelNormal);
-{$ENDIF}
+{$IFEND}
 
 function PointInRect(const X, Y: Integer; const Rect: TRect): Boolean;
 begin
@@ -199,7 +199,7 @@ begin
     Format := Format or cTextFormats[F];
   DrawGlassText(Canvas, GlowSize, Rect, Text, Format, Options);
 end;
-{$ENDIF}
+{$IFEND}
 
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
 var
@@ -217,7 +217,7 @@ begin
       LFormat := TextFlagsToTextFormat(Flags);
     {$ELSE}
       LFormat := TTextFormatFlags(Flags);
-    {$ENDIF}
+    {$IFEND}
 
       LOptions.Flags := [stfTextColor, stfGlowSize];
       LOptions.TextColor := Canvas.Font.Color;
@@ -229,7 +229,7 @@ begin
     {$ELSE}
       Include(LFormat, tfComposited);
       StyleServices.DrawText(Canvas.Handle, StyleServices.GetElementDetails(ttlTextLabelNormal), Text, Rect, LFormat, LOptions);
-    {$ENDIF}
+    {$IFEND}
     end;
 end;
 

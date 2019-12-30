@@ -174,32 +174,24 @@ begin
   G := GetGValue(Color);
   B := GetBValue(Color);
 
-  for Y := 0 to Bmp.Height - 1 do
-    begin
-      Pixel := Bmp.ScanLine[Y];
-      for X := 0 to Bmp.Width - 1 do
-        begin
-          case Direction of
-            dTop:
-              Alpha := 1 - Y / Bmp.Height;
-            dLeft:
-              Alpha := 1 - X / Bmp.Width;
-            dRight:
-              Alpha := X / Bmp.Width;
-            dBottom:
-              Alpha := Y / Bmp.Height;
-            else
-              continue;
-          end;
+  for Y := 0 to Bmp.Height - 1 do begin
+    Pixel := Bmp.ScanLine[Y];
+    for X := 0 to Bmp.Width - 1 do begin
+      case Direction of
+        dTop   : Alpha := 1 - Y / Bmp.Height;
+        dLeft  : Alpha := 1 - X / Bmp.Width;
+        dRight : Alpha := X / Bmp.Width;
+        dBottom: Alpha := Y / Bmp.Height;
+      end;
 
-          A := Trunc(Alpha * 255);
-          Pixel.Alpha := A;
-          Pixel.Red := Trunc(R * Alpha);
-          Pixel.Green := Trunc(G * Alpha);
-          Pixel.Blue := Trunc(B * Alpha);
-          inc(Pixel);
-        end;
+      A := Trunc(Alpha * 255);
+      Pixel.Alpha := A;
+      Pixel.Red := Trunc(R * Alpha);
+      Pixel.Green := Trunc(G * Alpha);
+      Pixel.Blue := Trunc(B * Alpha);
+      inc(Pixel);
     end;
+  end;
 end;
 
 procedure PaintBlendBitmap(const Canvas: TCanvas; DestRect: TRect; const BlendBitmap: TBitmap; BlendFunc: BLENDFUNCTION);

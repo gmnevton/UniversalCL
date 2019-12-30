@@ -56,7 +56,7 @@ type
       FIsScaling: Boolean;
       function GetDesignDpi: Integer; virtual;
       function GetParentCurrentDpi: Integer; virtual;
-    {$ENDIF}
+    {$IFEND}
 
       procedure CreateParams(var Params: TCreateParams); override;
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -68,7 +68,7 @@ type
       procedure UpdateTheme;
     {$IF CompilerVersion < 30}
       procedure ScaleForPPI(NewPPI: Integer); virtual;
-    {$ENDIF}
+    {$IFEND}
 
     published
       property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -141,7 +141,7 @@ begin
 {$IF CompilerVersion < 30}
   with Params do
     WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
-{$ENDIF}
+{$IFEND}
 end;
 
 function TUForm.GetBorderSpace: Integer;
@@ -296,7 +296,7 @@ begin
     end;
   end;
 end;
-{$ENDIF}
+{$IFEND}
 
 procedure TUForm.Notification(AComponent: TComponent; Operation: TOperation);
 begin
@@ -324,7 +324,7 @@ begin
 {$IF CompilerVersion < 30}
   FIsScaling := False;
   FCurrentPPI := FPPI;
-{$ENDIF}
+{$IFEND}
 
   //  Common props
   Font.Name := 'Segoe UI';

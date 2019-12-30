@@ -14520,8 +14520,8 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 151
-    Height = 30
+    Width = 156
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14545,8 +14545,8 @@ object formImageBackground: TformImageBackground
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 64
-    Height = 30
+    Width = 69
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14569,8 +14569,8 @@ object formImageBackground: TformImageBackground
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 63
-    Height = 30
+    Width = 68
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
