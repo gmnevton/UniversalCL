@@ -14,7 +14,7 @@ object formLoginDialog: TformLoginDialog
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poMainFormCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 15

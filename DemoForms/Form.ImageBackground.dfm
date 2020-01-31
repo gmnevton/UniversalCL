@@ -14,7 +14,7 @@ object formImageBackground: TformImageBackground
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poMainFormCenter
   OnCreate = FormCreate
   DesignSize = (
     610
@@ -14496,7 +14496,7 @@ object formImageBackground: TformImageBackground
   object titlebarMain: TUTitleBar
     Left = 0
     Top = 0
-    Width = 475
+    Width = 509
     Height = 32
     ThemeManager = dmMain.AppTheme
     Anchors = [akLeft, akTop, akRight]
@@ -14507,7 +14507,6 @@ object formImageBackground: TformImageBackground
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    ExplicitWidth = 665
   end
   object sliderMain: TUSlider
     Left = 240
@@ -14520,8 +14519,8 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 151
-    Height = 30
+    Width = 156
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14545,8 +14544,8 @@ object formImageBackground: TformImageBackground
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 64
-    Height = 30
+    Width = 69
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14569,8 +14568,8 @@ object formImageBackground: TformImageBackground
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 63
-    Height = 30
+    Width = 68
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14590,6 +14589,21 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     OnClick = radioDarkThemeClick
   end
+  object entryChooseTheme: TUText
+    Left = 20
+    Top = 40
+    Width = 41
+    Height = 17
+    Caption = 'Theme'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Segoe UI Semibold'
+    Font.Style = []
+    ParentFont = False
+    ThemeManager = dmMain.AppTheme
+    TextKind = tkEntry
+  end
   object buttonWinClose: TUQuickButton
     Left = 565
     Top = 1
@@ -14601,7 +14615,6 @@ object formImageBackground: TformImageBackground
     DarkColor = 2298344
     PressBrightnessDelta = 32
     Transparent = True
-    Anchors = [akTop, akRight]
     Caption = #57606
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -14609,7 +14622,7 @@ object formImageBackground: TformImageBackground
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
     ParentFont = False
-    ExplicitLeft = 755
+    Visible = False
   end
   object buttonWinMin: TUQuickButton
     Left = 515
@@ -14630,21 +14643,7 @@ object formImageBackground: TformImageBackground
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
     ParentFont = False
-  end
-  object entryChooseTheme: TUText
-    Left = 20
-    Top = 40
-    Width = 41
-    Height = 17
-    Caption = 'Theme'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI Semibold'
-    Font.Style = []
-    ParentFont = False
-    ThemeManager = dmMain.AppTheme
-    TextKind = tkEntry
+    Visible = False
   end
   object progressMain: TUProgressBar
     Left = 240

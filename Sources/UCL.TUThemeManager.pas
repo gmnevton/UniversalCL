@@ -25,6 +25,7 @@ type
       FCompList: TList<TComponent>;
 
       //  Events
+      FOnBeforeColorLoading: TNotifyEvent;
       FOnBeforeUpdate: TNotifyEvent;
       FOnAfterUpdate: TNotifyEvent;
 
@@ -72,6 +73,7 @@ type
       property ColorOnBorder: Boolean read FColorOnBorder stored false;
 
       //  Events
+      property OnBeforeColorLoading: TNotifyEvent read FOnBeforeColorLoading write FOnBeforeColorLoading;
       property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
       property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
   end;
@@ -127,6 +129,8 @@ end;
 procedure TUThemeManager.Loaded;
 begin
   inherited;
+  if Assigned(OnBeforeColorLoading) then
+    FOnBeforeColorLoading(Self);
   Reload;
 end;
 

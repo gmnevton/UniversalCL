@@ -9,11 +9,6 @@ uses
   Forms, Controls, Graphics;
 
 type
-  TUFocusForm = class(TForm)
-    protected
-      procedure Paint; override;
-  end;
-
   TUForm = class(TForm, IUThemeComponent)
     const
       DEFAULT_BORDERCOLOR_ACTIVE_LIGHT = $707070;
@@ -56,7 +51,7 @@ type
       FIsScaling: Boolean;
       function GetDesignDpi: Integer; virtual;
       function GetParentCurrentDpi: Integer; virtual;
-    {$ENDIF}
+    {$IFEND}
 
       procedure CreateParams(var Params: TCreateParams); override;
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -68,7 +63,7 @@ type
       procedure UpdateTheme;
     {$IF CompilerVersion < 30}
       procedure ScaleForPPI(NewPPI: Integer); virtual;
-    {$ENDIF}
+    {$IFEND}
 
     published
       property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -86,16 +81,6 @@ implementation
 uses
   SysUtils,
   UCL.Types;
-
-{ TUFocusForm }
-
-procedure TUFocusForm.Paint;
-begin
-  inherited;
-  Canvas.Pen.Color := clblack;
-  Canvas.pen.Width := 2;
-  Canvas.Rectangle(1, 1, ClientWidth - 1, ClientHeight - 1);
-end;
 
 { TUForm }
 
@@ -141,7 +126,7 @@ begin
 {$IF CompilerVersion < 30}
   with Params do
     WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
-{$ENDIF}
+{$IFEND}
 end;
 
 function TUForm.GetBorderSpace: Integer;
@@ -173,9 +158,8 @@ end;
 
 procedure TUForm.UpdateBorderColor;
 begin
-  //  Not set theme manager
   if ThemeManager = nil then
-    BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT //  Not set ThemeManager
+    BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
 
   //  Active window
   else if IsActive then
@@ -241,7 +225,7 @@ begin
   if ThemeManager = nil then
     begin
       Color := $FFFFFF;
-      HintWindowClass := THintWindow; //  Default hint style
+      HintWindowClass := THintWindow;   //  Default
     end
   else if ThemeManager.Theme = utLight then
     begin
@@ -296,7 +280,7 @@ begin
     end;
   end;
 end;
-{$ENDIF}
+{$IFEND}
 
 procedure TUForm.Notification(AComponent: TComponent; Operation: TOperation);
 begin
@@ -324,7 +308,7 @@ begin
 {$IF CompilerVersion < 30}
   FIsScaling := False;
   FCurrentPPI := FPPI;
-{$ENDIF}
+{$IFEND}
 
   //  Common props
   Font.Name := 'Segoe UI';

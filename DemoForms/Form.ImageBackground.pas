@@ -27,11 +27,11 @@ type
     buttonSide: TUSymbolButton;
     panelBottom: TUPanel;
     editEmail: TUEdit;
-    buttonWinClose: TUQuickButton;
-    buttonWinMin: TUQuickButton;
     buttonCancel: TUButton;
     shadowMenu: TUShadow;
     entryChooseTheme: TUText;
+    buttonWinClose: TUQuickButton;
+    buttonWinMin: TUQuickButton;
     procedure FormCreate(Sender: TObject);
     procedure radioSystemThemeClick(Sender: TObject);
     procedure radioLightThemeClick(Sender: TObject);

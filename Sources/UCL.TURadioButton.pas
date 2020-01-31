@@ -1,4 +1,6 @@
-﻿unit UCL.TURadioButton;
+﻿{$LEGACYIFEND ON}
+
+unit UCL.TURadioButton;
 
 interface
 
@@ -44,7 +46,7 @@ type
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF}); override;
+      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
       procedure Paint; override;
       procedure Resize; override;
 
@@ -89,7 +91,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$ENDIF}
+    {$IFEND}
 
       property OnCanResize;
       property OnClick;
@@ -264,7 +266,7 @@ end;
 
 //  CUSTOM METHODS
 
-procedure TUCustomRadioButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF});
+procedure TUCustomRadioButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   IconFont.Height := MulDiv(IconFont.Height, M, D);

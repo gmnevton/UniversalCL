@@ -48,7 +48,7 @@ type
     function Subtract(const Point: TPoint): TPoint;
     function IsZero : Boolean;
   end;
-{$ENDIF}
+{$IFEND}
 
 implementation
 
@@ -219,6 +219,6 @@ begin
   Result := (X = 0) and (Y = 0);
 end;
 
-{$ENDIF}
+{$IFEND}
 
 end.

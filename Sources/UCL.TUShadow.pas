@@ -1,3 +1,5 @@
+{$LEGACYIFEND ON}
+
 unit UCL.TUShadow;
 
 interface
@@ -66,7 +68,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$ENDIF}
+    {$IFEND}
 
       property OnCanResize;
       property OnClick;

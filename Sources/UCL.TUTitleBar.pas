@@ -1,3 +1,5 @@
+{$LEGACYIFEND ON}
+
 unit UCL.TUTitleBar;
 
 interface
@@ -68,7 +70,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$ENDIF}
+    {$IFEND}
 
       property OnCanResize;
       property OnClick;

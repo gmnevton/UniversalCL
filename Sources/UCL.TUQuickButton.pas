@@ -1,4 +1,6 @@
-﻿unit UCL.TUQuickButton;
+﻿{$LEGACYIFEND ON}
+
+unit UCL.TUQuickButton;
 
 interface
 
@@ -85,7 +87,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$ENDIF}
+    {$IFEND}
 
       property OnCanResize;
       property OnClick;

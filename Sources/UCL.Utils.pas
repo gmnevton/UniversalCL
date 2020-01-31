@@ -164,7 +164,7 @@ procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; Direction
 var
   Alpha: Single;
   R, G, B, A: Byte;
-  X, Y: Integer;
+  X, Y, W, H: Integer;
   Pixel: PQuadColor;
 begin
   if Bmp = nil then exit;
@@ -173,33 +173,28 @@ begin
   R := GetRValue(Color);
   G := GetGValue(Color);
   B := GetBValue(Color);
+  
+  W := Bmp.Width;
+  H := Bmp.Height;
 
-  for Y := 0 to Bmp.Height - 1 do
-    begin
-      Pixel := Bmp.ScanLine[Y];
-      for X := 0 to Bmp.Width - 1 do
-        begin
-          case Direction of
-            dTop:
-              Alpha := 1 - Y / Bmp.Height;
-            dLeft:
-              Alpha := 1 - X / Bmp.Width;
-            dRight:
-              Alpha := X / Bmp.Width;
-            dBottom:
-              Alpha := Y / Bmp.Height;
-            else
-              continue;
-          end;
+  for Y := 0 to H - 1 do begin
+    Pixel := Bmp.ScanLine[Y];
+    for X := 0 to W - 1 do begin
+      case Direction of
+        dTop   : Alpha := 1 - Y / H;
+        dLeft  : Alpha := 1 - X / W;
+        dRight : Alpha := X / W;
+        dBottom: Alpha := Y / H;
+      end;
 
-          A := Trunc(Alpha * 255);
-          Pixel.Alpha := A;
-          Pixel.Red := Trunc(R * Alpha);
-          Pixel.Green := Trunc(G * Alpha);
-          Pixel.Blue := Trunc(B * Alpha);
-          inc(Pixel);
-        end;
+      A := Trunc(Alpha * 255);
+      Pixel.Alpha := A;
+      Pixel.Red := Trunc(R * Alpha);
+      Pixel.Green := Trunc(G * Alpha);
+      Pixel.Blue := Trunc(B * Alpha);
+      inc(Pixel);
     end;
+  end;
 end;
 
 procedure PaintBlendBitmap(const Canvas: TCanvas; DestRect: TRect; const BlendBitmap: TBitmap; BlendFunc: BLENDFUNCTION);

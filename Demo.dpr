@@ -1,6 +1,9 @@
 program Demo;
 
 uses
+  madExcept,
+  madLinkDisAsm,
+  madListModules,
   Forms,
   Form.Demo in 'DemoForms\Form.Demo.pas' {formDemo},
   Form.LoginDialog in 'DemoForms\Form.LoginDialog.pas' {formLoginDialog},

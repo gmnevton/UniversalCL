@@ -1,3 +1,5 @@
+{$LEGACYIFEND ON}
+
 unit UCL.Classes;
 
 interface
@@ -38,7 +40,7 @@ type
   public
     property PixelsPerInch: Integer read GetPixelsPerInch;
   end;
-{$ENDIF}
+{$IFEND}
 
 type
   TUTheme = (utLight, utDark);
@@ -129,7 +131,7 @@ begin
     ReleaseDC(0, DC);
   end;
 end;
-{$ENDIF}
+{$IFEND}
 
 { TControlStateColors }
 

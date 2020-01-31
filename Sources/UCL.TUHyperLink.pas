@@ -1,3 +1,5 @@
+{$LEGACYIFEND ON}
+
 unit UCL.TUHyperLink;
 
 interface
@@ -9,7 +11,7 @@ uses
   Dialogs,
 {$ELSE}
   UITypes,
-{$ENDIF}
+{$IFEND}
   Windows, Messages, Shellapi,
   Controls, StdCtrls, Graphics;
 

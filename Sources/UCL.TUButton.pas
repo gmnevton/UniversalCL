@@ -1,3 +1,5 @@
+{$LEGACYIFEND ON}
+
 unit UCL.TUButton;
 
 interface
@@ -79,7 +81,7 @@ type
       procedure Paint; override;
       procedure Resize; override;
       procedure CreateWindowHandle(const Params: TCreateParams); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF}); override;
+      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
       constructor Create(aOwner: TComponent); override;
@@ -128,7 +130,7 @@ type
       property Visible;
     {$IF CompilerVersion > 29}
       property StyleElements;
-    {$ENDIF}
+    {$IFEND}
 
       property OnCanResize;
       property OnClick;
@@ -381,7 +383,7 @@ begin
   UpdateRects;
 end;
 
-procedure TUCustomButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$ENDIF});
+procedure TUCustomButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   BorderThickness := MulDiv(BorderThickness, M, D);
