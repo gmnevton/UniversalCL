@@ -84,7 +84,7 @@ object formDemo: TformDemo
   object textDescription: TUText
     Left = 390
     Top = 210
-    Width = 94
+    Width = 95
     Height = 15
     Caption = 'This is description'
     Font.Charset = DEFAULT_CHARSET
@@ -113,7 +113,7 @@ object formDemo: TformDemo
   object textEntry: TUText
     Left = 390
     Top = 170
-    Width = 74
+    Width = 73
     Height = 17
     Caption = 'This is entry'
     Font.Charset = DEFAULT_CHARSET
@@ -192,8 +192,8 @@ object formDemo: TformDemo
   object check2State: TUCheckBox
     Left = 390
     Top = 340
-    Width = 134
-    Height = 30
+    Width = 139
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -214,8 +214,8 @@ object formDemo: TformDemo
   object check3State: TUCheckBox
     Left = 390
     Top = 368
-    Width = 134
-    Height = 30
+    Width = 139
+    Height = 33
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -237,8 +237,8 @@ object formDemo: TformDemo
   object radioA1: TURadioButton
     Left = 390
     Top = 240
-    Width = 89
-    Height = 30
+    Width = 94
+    Height = 33
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -264,8 +264,8 @@ object formDemo: TformDemo
   object radioA2: TURadioButton
     Left = 390
     Top = 270
-    Width = 89
-    Height = 30
+    Width = 94
+    Height = 33
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -292,8 +292,8 @@ object formDemo: TformDemo
   object radioA3: TURadioButton
     Left = 390
     Top = 300
-    Width = 89
-    Height = 30
+    Width = 94
+    Height = 33
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -320,8 +320,8 @@ object formDemo: TformDemo
   object radioB1: TURadioButton
     Left = 540
     Top = 240
-    Width = 88
-    Height = 30
+    Width = 93
+    Height = 33
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -347,8 +347,8 @@ object formDemo: TformDemo
   object radioB2: TURadioButton
     Left = 540
     Top = 270
-    Width = 88
-    Height = 30
+    Width = 93
+    Height = 33
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -1512,7 +1512,7 @@ object formDemo: TformDemo
       AlignWithMargins = True
       Left = 15
       Top = 5
-      Width = 203
+      Width = 71
       Height = 28
       Margins.Left = 0
       Margins.Top = 0
@@ -1529,13 +1529,12 @@ object formDemo: TformDemo
       Layout = tlCenter
       ThemeManager = dmMain.AppTheme
       TextKind = tkHeading
-      ExplicitWidth = 71
     end
     object entryAppTheme: TUText
       AlignWithMargins = True
       Left = 15
       Top = 43
-      Width = 203
+      Width = 68
       Height = 17
       Margins.Left = 0
       Margins.Top = 5
@@ -1552,13 +1551,12 @@ object formDemo: TformDemo
       Layout = tlCenter
       ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
-      ExplicitWidth = 68
     end
     object entryUserProfile: TUText
       AlignWithMargins = True
       Left = 15
       Top = 240
-      Width = 203
+      Width = 69
       Height = 17
       Margins.Left = 0
       Margins.Top = 10
@@ -1574,7 +1572,6 @@ object formDemo: TformDemo
       ParentFont = False
       ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
-      ExplicitWidth = 69
     end
     object imgAvatar: TImage
       Left = 15
@@ -1668,7 +1665,7 @@ object formDemo: TformDemo
       AlignWithMargins = True
       Left = 15
       Top = 473
-      Width = 203
+      Width = 50
       Height = 17
       Margins.Left = 0
       Margins.Top = 10
@@ -1684,13 +1681,12 @@ object formDemo: TformDemo
       ParentFont = False
       ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
-      ExplicitWidth = 50
     end
     object desAccountHint: TUText
       AlignWithMargins = True
       Left = 15
       Top = 672
-      Width = 203
+      Width = 198
       Height = 30
       Margins.Left = 0
       Margins.Top = 5
@@ -1707,13 +1703,12 @@ object formDemo: TformDemo
       WordWrap = True
       ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
-      ExplicitWidth = 198
     end
     object entryStorage: TUText
       AlignWithMargins = True
       Left = 15
       Top = 645
-      Width = 203
+      Width = 76
       Height = 17
       Margins.Left = 0
       Margins.Top = 10
@@ -1729,13 +1724,12 @@ object formDemo: TformDemo
       ParentFont = False
       ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
-      ExplicitWidth = 76
     end
     object desStorageHint: TUText
       AlignWithMargins = True
       Left = 15
       Top = 767
-      Width = 203
+      Width = 187
       Height = 30
       Margins.Left = 0
       Margins.Top = 0
@@ -1752,13 +1746,12 @@ object formDemo: TformDemo
       WordWrap = True
       ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
-      ExplicitWidth = 186
     end
     object headingAbout: TUText
       AlignWithMargins = True
       Left = 15
       Top = 827
-      Width = 203
+      Width = 55
       Height = 28
       Margins.Left = 0
       Margins.Top = 20
@@ -1774,13 +1767,12 @@ object formDemo: TformDemo
       ParentFont = False
       ThemeManager = dmMain.AppTheme
       TextKind = tkHeading
-      ExplicitWidth = 55
     end
     object desAppVersion: TUText
       AlignWithMargins = True
       Left = 15
       Top = 905
-      Width = 203
+      Width = 84
       Height = 15
       Margins.Left = 0
       Margins.Top = 0
@@ -1797,13 +1789,12 @@ object formDemo: TformDemo
       WordWrap = True
       ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
-      ExplicitWidth = 84
     end
     object desFlashVersion: TUText
       AlignWithMargins = True
       Left = 15
       Top = 925
-      Width = 203
+      Width = 119
       Height = 15
       Margins.Left = 0
       Margins.Top = 0
@@ -1820,13 +1811,12 @@ object formDemo: TformDemo
       WordWrap = True
       ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
-      ExplicitWidth = 119
     end
     object desChromiumVersion: TUText
       AlignWithMargins = True
       Left = 15
       Top = 945
-      Width = 203
+      Width = 126
       Height = 15
       Margins.Left = 0
       Margins.Top = 0
@@ -1843,13 +1833,12 @@ object formDemo: TformDemo
       WordWrap = True
       ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
-      ExplicitWidth = 126
     end
     object linkEmbarcadero: TUHyperLink
       AlignWithMargins = True
       Left = 15
       Top = 965
-      Width = 203
+      Width = 124
       Height = 17
       Cursor = crHandPoint
       Margins.Left = 0
@@ -1871,7 +1860,6 @@ object formDemo: TformDemo
       CustomTextColors.Disabled = clMedGray
       CustomTextColors.Focused = 14120960
       URL = 'https://example.com/'
-      ExplicitWidth = 124
     end
     object checkColorBorder: TUCheckBox
       Left = 15

@@ -1,4 +1,6 @@
-{$LEGACYIFEND ON}
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 unit UCL.IntAnimation;
 
