@@ -257,12 +257,10 @@ begin
   Font.Name := 'Segoe UI';
   Font.Size := 10;
 
-  if IsWin7 then
-    begin
-      SetWindowLong(Handle, GWL_STYLE,
-        GetWindowLong(Handle, GWL_STYLE) and not WS_CAPTION or WS_MINIMIZEBOX);
-      SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_DRAWFRAME);
-    end;
+  if IsWin7 then begin
+    SetWindowLong(Handle, GWL_STYLE, GetWindowLong(Handle, GWL_STYLE) and not WS_CAPTION or WS_MINIMIZEBOX);
+    SetWindowPos(handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_DRAWFRAME);
+  end;
 end;
 
 //  CUSTOM METHODS
@@ -335,23 +333,22 @@ var
   CaptionBarHeight: Integer;
 begin
   inherited;
-  if BorderStyle = bsNone then exit;
+  if BorderStyle = bsNone then
+    Exit;
 
-  if IsWin7 then
-    begin
-      if WindowState = wsNormal then
-        CaptionBarHeight := GetBorderSpaceWin7
-      else
-        CaptionBarHeight := 0;
-    end
-  else
-    begin
-      CaptionBarHeight := GetSystemMetrics(SM_CYCAPTION);
-      if WindowState = wsNormal then
-        inc(CaptionBarHeight, GetBorderSpace);
-    end;
+  if IsWin7 then begin
+    if WindowState = wsNormal then
+      CaptionBarHeight := GetBorderSpaceWin7
+    else
+      CaptionBarHeight := 0;
+  end
+  else begin
+    CaptionBarHeight := GetSystemMetrics(SM_CYCAPTION);
+    if WindowState = wsNormal then
+      Inc(CaptionBarHeight, GetBorderSpace);
+  end;
 
-  dec(Msg.CalcSize_Params.rgrc[0].Top, CaptionBarHeight);
+  Dec(Msg.CalcSize_Params.rgrc[0].Top, CaptionBarHeight);
 end;
 
 procedure TUBorderlessForm.WM_NCHitTest(var Msg: TWMNCHitTest);
@@ -362,19 +359,16 @@ begin
   inherited;
   ResizeSpace := GetBorderSpace;
 
-  AllowResize :=
-    (WindowState = wsNormal) and
-    (IsResizeable);
+  AllowResize := (WindowState = wsNormal) and IsResizeable;
 
-  if AllowResize and (Msg.YPos - BoundsRect.Top <= ResizeSpace) then  //  Resize top border
-    begin
-      if Msg.XPos - BoundsRect.Left <= 2 * ResizeSpace then
-        Msg.Result := HTTOPLEFT
-      else if BoundsRect.Right - Msg.XPos <= 2 * ResizeSpace then
-        Msg.Result := HTTOPRIGHT
-      else
-        Msg.Result := HTTOP;
-    end;
+  if AllowResize and (Msg.YPos - BoundsRect.Top <= ResizeSpace) then begin //  Resize top border
+    if Msg.XPos - BoundsRect.Left <= 2 * ResizeSpace then
+      Msg.Result := HTTOPLEFT
+    else if BoundsRect.Right - Msg.XPos <= 2 * ResizeSpace then
+      Msg.Result := HTTOPRIGHT
+    else
+      Msg.Result := HTTOP;
+  end;
 end;
 
 //  DPI
