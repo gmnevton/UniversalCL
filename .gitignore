@@ -11,3 +11,6 @@ Bin/Demo.exe
 *.stat
 *.mes
 *.dsk
+*.drc
+*.dcu
+*.zip
