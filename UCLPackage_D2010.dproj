@@ -49,22 +49,26 @@
 			<DelphiCompile Include="UCLPackage_D2010.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="*.dres"/>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="VclSmp.dcp"/>
 			<DCCReference Include="vclimg.dcp"/>
 			<DCCReference Include="RegisterPackage_UCL.pas"/>
 			<DCCReference Include="Sources\UCL.Classes.pas"/>
+			<DCCReference Include="Sources\UCL.Colors.pas"/>
 			<DCCReference Include="Sources\UCL.IntAnimation.Collection.pas"/>
 			<DCCReference Include="Sources\UCL.IntAnimation.Helpers.pas"/>
 			<DCCReference Include="Sources\UCL.IntAnimation.pas"/>
 			<DCCReference Include="Sources\UCL.SystemSettings.pas"/>
+			<DCCReference Include="Sources\UCL.ShellUIScaling.pas"/>
+			<DCCReference Include="Sources\UCL.Types.pas"/>
 			<DCCReference Include="Sources\UCL.TUButton.pas"/>
 			<DCCReference Include="Sources\UCL.TUCaptionBar.pas"/>
 			<DCCReference Include="Sources\UCL.TUCheckBox.pas"/>
 			<DCCReference Include="Sources\UCL.TUEdit.pas"/>
+			<DCCReference Include="Sources\UCL.TUWPForm.pas"/>
 			<DCCReference Include="Sources\UCL.TUForm.pas"/>
+			<DCCReference Include="Sources\UCL.TUBorderlessForm.pas"/>
 			<DCCReference Include="Sources\UCL.TUHyperLink.pas"/>
 			<DCCReference Include="Sources\UCL.TUItemButton.pas"/>
 			<DCCReference Include="Sources\UCL.TUPanel.pas"/>
@@ -84,72 +88,6 @@
 			<DCCReference Include="Sources\UCL.TUShadow.pas"/>
 			<DCCReference Include="Sources\UCL.TUTooltip.pas"/>
 			<DCCReference Include="Sources\UCL.TUSmoothBox.pas"/>
-			<DCCReference Include="Sources\UCL.Types.pas"/>
-			<DCCReference Include="Sources\UCL.ShellUIScaling.pas"/>
-			<RcItem Include="Resources\TUText.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUText</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUButton.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUButton</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUCaptionBar.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUCaptionBar</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUCheckBox.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUCheckBox</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUEdit.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUEdit</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUHyperLink.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUHyperLink</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUPanel.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUPanel</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUQuickButton.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUQuickButton</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TURadioButton.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TURadioButton</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUSeparator.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUSeparator</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUSlider.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUSlider</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUThemeManager.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUThemeManager</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUTitleBar.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUTitleBar</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUItemButton.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUItemButton</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUProgressBar.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUProgressBar</ResourceId>
-			</RcItem>
-			<RcItem Include="Resources\TUShadow.bmp">
-				<ResourceType>Bitmap</ResourceType>
-				<ResourceId>TUShadow</ResourceId>
-			</RcItem>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

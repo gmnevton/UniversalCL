@@ -1,0 +1,464 @@
+unit UCL.TUWPForm;
+
+interface
+
+uses
+  Classes,
+  SysUtils,
+  Windows,
+  Messages,
+  Forms,
+  Controls,
+  ExtCtrls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.TUTooltip;
+
+type
+  TUWPForm = class(TForm, IUThemeComponent)
+  public type
+    TBorderSide = (bsDefault, bsTop, bsLeft, bsBottom, bsRight);
+  public const
+    DEFAULT_BORDERCOLOR_ACTIVE_LIGHT = $707070;
+    DEFAULT_BORDERCOLOR_ACTIVE_DARK = $242424;
+    DEFAULT_BORDERCOLOR_INACTIVE_LIGHT = $9B9B9B;
+    DEFAULT_BORDERCOLOR_INACTIVE_DARK = $414141;
+
+  protected var
+    BorderColor: TColor;
+
+  protected
+    FThemeManager: TUThemeManager;
+    FResizable: Boolean;
+    FPPI: Integer;
+    FIsActive: Boolean;
+    FFitDesktopForPopup: Boolean;
+    FDrawBorder: Boolean;
+
+    //  Setters
+    procedure SetThemeManager(const Value: TUThemeManager);
+
+  private
+    //  Messages
+    procedure WM_Activate(var Msg: TWMActivate); message WM_ACTIVATE;
+    procedure WM_DPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
+    procedure WM_DWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
+    procedure WM_NCCalcSize(var Msg: TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+
+  protected
+    //  Internal
+    function IsLEWin7: Boolean; virtual; // LE - less equal than
+    function IsResizeable: Boolean; virtual;
+    function IsBorderless: Boolean; virtual;
+    function HasBorder: Boolean; virtual;
+    function GetBorderSpace(const Side: TBorderSide): Integer; virtual;
+    function GetBorderSpaceWin7(const Side: TBorderSide): Integer; virtual;
+
+    function CanDrawBorder: Boolean; virtual;
+    procedure UpdateBorderColor; virtual;
+    procedure DoDrawBorder; virtual;
+
+  protected
+  {$IF CompilerVersion < 30}
+    FCurrentPPI: Integer;
+    FIsScaling: Boolean;
+    function GetDesignDpi: Integer; virtual;
+    function GetParentCurrentDpi: Integer; virtual;
+  {$IFEND}
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Resize; override;
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure UpdateTheme; virtual;  //  IUThemeControl
+  {$IF CompilerVersion < 30}
+    procedure ScaleForPPI(NewPPI: Integer); virtual;
+  {$IFEND}
+
+  published
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    property PPI: Integer read FPPI write FPPI default 96;
+    property IsActive: Boolean read FIsActive default true;
+    property FitDesktopForPopup: Boolean read FFitDesktopForPopup write FFitDesktopForPopup default false;
+    property DrawBorder: Boolean read FDrawBorder write FDrawBorder default true;
+    property Padding stored false;
+    property Resizable: Boolean read FResizable write FResizable default true;
+  end;
+
+implementation
+
+uses
+  UCL.SystemSettings,
+  UCL.Types,
+  UCL.Utils;
+
+{ TUWPForm }
+
+constructor TUWPForm.Create(AOwner: TComponent);
+var
+  CurrentScreen: TMonitor;
+begin
+  inherited Create(AOwner);
+
+  //  New props
+  FIsActive := True;
+  FFitDesktopForPopup := False;
+  FDrawBorder := True;
+  FResizable := True;
+
+  //  Get PPI from current screen
+  CurrentScreen := Screen.MonitorFromWindow(Handle);
+  FPPI := CurrentScreen.PixelsPerInch;
+{$IF CompilerVersion < 30}
+  FIsScaling := False;
+  FCurrentPPI := FPPI;
+{$IFEND}
+
+  //  Common props
+  Font.Name := 'Segoe UI';
+  Font.Size := 10;
+
+  UpdateTheme;
+end;
+
+procedure TUWPForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  //Params.Style := Params.Style or WS_OVERLAPPEDWINDOW;  //  Enabled aerosnap
+{$IF CompilerVersion < 30}
+  with Params do
+    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
+{$IFEND}
+end;
+
+procedure TUWPForm.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FThemeManager) then
+    FThemeManager := Nil;
+end;
+
+procedure TUWPForm.Paint;
+begin
+  inherited;
+
+  if CanDrawBorder then
+    DoDrawBorder;
+end;
+
+procedure TUWPForm.Resize;
+var
+  Space: Integer;
+  CurrentScreen: TMonitor;
+begin
+  inherited;
+
+  if CanDrawBorder then begin
+    Padding.Top := 1;
+    if IsLEWin7 then begin
+      Padding.Left := 1;
+      Padding.Right := 1;
+      Padding.Bottom := 1;
+    end;
+  end
+  else begin
+    Padding.Top := 0;
+    if IsLEWin7 then begin
+      Padding.Left := 0;
+      Padding.Right := 0;
+      Padding.Bottom := 0;
+    end;
+  end;
+
+  //  Fit window to desktop - for WS_POPUP window style
+  //  If not, if not, window fill full screen when maximized
+  if FitDesktopForPopup and (WindowState = wsMaximized) and (BorderStyle in [bsDialog, bsSizeToolWin, bsToolWindow]) then begin
+    CurrentScreen := Screen.MonitorFromWindow(Handle);
+    Space := GetBorderSpace(bsTop);
+
+    Top := - Space;
+    Left :=  - Space;
+    Width := CurrentScreen.WorkareaRect.Width + 2 * Space;
+    Height := CurrentScreen.WorkAreaRect.Height + 2 * Space;
+  end;
+end;
+
+procedure TUWPForm.UpdateTheme;
+begin
+  //  Background color & tooltip
+  if ThemeManager = Nil then begin
+    Color := $FFFFFF;
+    HintWindowClass := TULightTooltip; //  Light tooltip
+  end
+  else if ThemeManager.Theme = utLight then begin
+    Color := $FFFFFF;
+    HintWindowClass := TULightTooltip;
+  end
+  else begin
+    Color := $000000;
+    HintWindowClass := TUDarkTooltip;
+  end;
+
+  UpdateBorderColor;
+  Invalidate;
+end;
+
+procedure TUWPForm.SetThemeManager(const Value: TUThemeManager);
+begin
+  if Value <> FThemeManager then begin
+    //  Disconnect current TM
+    if FThemeManager <> nil then
+      FThemeManager.Disconnect(Self);
+
+     FThemeManager := Value;
+    //  Connect to new TM
+    if Value <> Nil then begin
+      Value.Connect(Self);
+      Value.FreeNotification(Self);
+    end;
+    UpdateTheme;
+  end;
+end;
+
+{$REGION 'Messages handling'}
+procedure TUWPForm.WM_Activate(var Msg: TWMActivate);
+begin
+  inherited;
+  FIsActive := (Msg.Active <> WA_INACTIVE);
+
+  //  Redraw border
+  if CanDrawBorder then
+    DoDrawBorder;
+end;
+
+procedure TUWPForm.WM_DPIChanged(var Msg: TWMDpi);
+begin
+  PixelsPerInch := Msg.XDpi;
+  PPI := Msg.XDpi;
+  inherited;
+  ScaleForPPI(PPI);
+end;
+
+procedure TUWPForm.WM_DWMColorizationColorChanged(var Msg: TMessage);
+begin
+  if ThemeManager <> Nil then
+    ThemeManager.Reload;
+  inherited;
+end;
+
+procedure TUWPForm.WM_NCCalcSize(var Msg: TWMNCCalcSize);
+var
+  CaptionBarHeight: Integer;
+  BorderWidth: Integer;
+  BorderHeight: Integer;
+begin
+  inherited;
+
+  if BorderStyle = bsNone then exit;
+
+  CaptionBarHeight := GetSystemMetrics(SM_CYCAPTION);
+
+  if WindowState = wsNormal then
+    Inc(CaptionBarHeight, GetBorderSpace(bsTop));
+
+  Dec(Msg.CalcSize_Params.rgrc[0].Top, CaptionBarHeight); //  Hide caption bar
+  if IsLEWin7 then begin
+    BorderWidth := GetBorderSpace(bsDefault);
+    BorderHeight := GetBorderSpace(bsBottom);
+    //
+    Dec(Msg.CalcSize_Params.rgrc[0].Left, BorderWidth); //  Hide borders
+    Inc(Msg.CalcSize_Params.rgrc[0].Right, BorderWidth); //  Hide borders
+    Inc(Msg.CalcSize_Params.rgrc[0].Bottom, BorderHeight); //  Hide borders
+  end
+end;
+
+procedure TUWPForm.WM_NCHitTest(var Msg: TWMNCHitTest);
+var
+  ResizeSpace: Integer;
+begin
+  inherited;
+  ResizeSpace := GetBorderSpace(bsDefault);
+
+  if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) and (Msg.YPos - BoundsRect.Top <= ResizeSpace) then begin
+    if Msg.XPos - BoundsRect.Left <= 2 * ResizeSpace then
+      Msg.Result := HTTOPLEFT
+    else if BoundsRect.Right - Msg.XPos <= 2 * ResizeSpace then
+      Msg.Result := HTTOPRIGHT
+    else
+      Msg.Result := HTTOP;
+  end;
+end;
+{$ENDREGION}
+
+{$REGION 'Compatibility with Delphi 2010'}
+{$IF CompilerVersion < 30}
+function TUWPForm.GetDesignDpi: Integer;
+var
+  LForm: TCustomForm;
+begin
+  LForm := GetParentForm(Self);
+
+  if (LForm <> Nil) and (LForm is TForm) then
+    Result := TForm(LForm).PixelsPerInch
+  else
+    Result := Windows.USER_DEFAULT_SCREEN_DPI;
+end;
+
+function TUWPForm.GetParentCurrentDpi: Integer;
+begin
+//  if Parent <> nil then
+//    Result := Parent.GetParentCurrentDpi
+//  else
+    Result := FCurrentPPI;
+end;
+
+procedure TUWPForm.ScaleForPPI(NewPPI: Integer);
+begin
+  if not FIsScaling and (NewPPI > 0) then begin
+    FIsScaling := True;
+    try
+      if FCurrentPPI = 0 then
+        FCurrentPPI := GetDesignDpi;
+
+      if NewPPI <> FCurrentPPI then begin
+        ChangeScale(NewPPI, FCurrentPPI);
+        FCurrentPPI := NewPPI;
+      end
+    finally
+      FIsScaling := False;
+    end;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION 'Internal functions'}
+function TUWPForm.IsLEWin7: Boolean;
+begin
+  Result := CheckMaxWin32Version(6, 3);
+end;
+
+function TUWPForm.IsResizeable: Boolean;
+begin
+  Result := BorderStyle in [bsSizeable, bsSizeToolWin];
+end;
+
+function TUWPForm.IsBorderless: Boolean;
+begin
+  Result := BorderStyle in [bsNone, bsToolWindow, bsSizeToolWin];
+end;
+
+function TUWPForm.HasBorder: Boolean;
+begin
+  Result := BorderStyle in [bsDialog, bsSingle, bsSizeable];
+end;
+
+function TUWPForm.GetBorderSpace(const Side: TBorderSide): Integer;
+
+  function TopSize: Integer;
+  begin
+    Result := 0;
+    case BorderStyle of
+      bsSingle     : Result := GetSystemMetrics(SM_CYFIXEDFRAME);
+      bsDialog,
+      bsToolWindow : Result := GetSystemMetrics(SM_CYDLGFRAME);
+      bsSizeable,
+      bsSizeToolWin: Result := GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
+    end;
+  end;
+
+  function LeftRightSize: Integer;
+  begin
+    Result := 0;
+    case BorderStyle of
+      bsSingle     : Result := GetSystemMetrics(SM_CXFIXEDFRAME);
+      bsDialog,
+      bsToolWindow : Result := GetSystemMetrics(SM_CXDLGFRAME);
+      bsSizeable,
+      bsSizeToolWin: Result := GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
+    end;
+  end;
+
+  function BottomSize: Integer;
+  begin
+    Result := 0;
+    case BorderStyle of
+      bsSingle     : Result := GetSystemMetrics(SM_CYFIXEDFRAME);
+      bsDialog,
+      bsToolWindow : Result := GetSystemMetrics(SM_CYDLGFRAME);
+      bsSizeable,
+      bsSizeToolWin: Result := GetSystemMetrics(SM_CYSIZEFRAME);
+    end;
+  end;
+
+begin
+  Result := 0;
+  case Side of
+    bsDefault: Result := LeftRightSize;
+    bsTop    : Result := TopSize;
+    bsLeft,
+    bsRight  : Result := LeftRightSize;
+    bsBottom : Result := BottomSize;
+  end;
+end;
+
+function TUWPForm.GetBorderSpaceWin7(const Side: TBorderSide): Integer;
+begin
+  Result := 0;
+  case BorderStyle of
+    bsSingle     : Result := GetSystemMetrics(SM_CYFIXEDFRAME) - 3;
+    bsDialog,
+    bsToolWindow : Result := GetSystemMetrics(SM_CYDLGFRAME) - 3;
+    bsSizeable,
+    bsSizeToolWin: Result := GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER) - 2;
+  end;
+end;
+
+function TUWPForm.CanDrawBorder: Boolean;
+begin
+  Result := DrawBorder and (WindowState = wsNormal) and not IsBorderless;
+end;
+
+procedure TUWPForm.UpdateBorderColor;
+begin
+  if ThemeManager = Nil then
+    BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
+  else if IsActive then begin //  Active window
+    if ThemeManager.ColorOnBorder then
+      BorderColor := GetAccentColor
+    else if ThemeManager.Theme = utLight then
+      BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
+    else
+      BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_DARK;
+  end
+  else begin //  In active window
+    if ThemeManager.Theme = utLight then
+      BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_LIGHT
+    else
+      BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_DARK;
+  end;
+end;
+
+procedure TUWPForm.DoDrawBorder;
+begin
+  UpdateBorderColor;
+  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
+  Canvas.Pen.Color := BorderColor;
+  Canvas.MoveTo(0, 0);
+//  Canvas.LineTo(ClientWidth, 0);
+  Canvas.LineTo(Width, 0);  //  Paint top border
+  if IsLEWin7 then begin // paint other borders
+    Canvas.MoveTo(Width - 1, 0);
+    Canvas.LineTo(Width - 1, Height);
+    Canvas.MoveTo(Width - 1, Height - 1);
+    Canvas.LineTo(0, Height - 1);
+    Canvas.LineTo(0, 0);
+  end;
+end;
+{$ENDREGION}
+
+end.

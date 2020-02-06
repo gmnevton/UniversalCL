@@ -1,12 +1,10 @@
 package UCLPackage;
 
 {$R *.res}
-{$R *.dres}
-{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
-{$DEBUGINFO OFF}
+{$DEBUGINFO ON}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
@@ -24,8 +22,6 @@ package UCLPackage;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
-{$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
 requires
@@ -37,15 +33,20 @@ requires
 contains
   RegisterPackage_UCL in 'RegisterPackage_UCL.pas',
   UCL.Classes in 'Sources\UCL.Classes.pas',
+  UCL.Colors in 'Sources\UCL.Colors.pas',
   UCL.IntAnimation.Collection in 'Sources\UCL.IntAnimation.Collection.pas',
   UCL.IntAnimation.Helpers in 'Sources\UCL.IntAnimation.Helpers.pas',
   UCL.IntAnimation in 'Sources\UCL.IntAnimation.pas',
   UCL.SystemSettings in 'Sources\UCL.SystemSettings.pas',
+  UCL.ShellUIScaling in 'Sources\UCL.ShellUIScaling.pas',
+  UCL.Types in 'Sources\UCL.Types.pas',
   UCL.TUButton in 'Sources\UCL.TUButton.pas',
   UCL.TUCaptionBar in 'Sources\UCL.TUCaptionBar.pas',
   UCL.TUCheckBox in 'Sources\UCL.TUCheckBox.pas',
   UCL.TUEdit in 'Sources\UCL.TUEdit.pas',
+  UCL.TUWPForm in 'Sources\UCL.TUWPForm.pas',
   UCL.TUForm in 'Sources\UCL.TUForm.pas',
+  UCL.TUBorderlessForm in 'Sources\UCL.TUBorderlessForm.pas',
   UCL.TUHyperLink in 'Sources\UCL.TUHyperLink.pas',
   UCL.TUItemButton in 'Sources\UCL.TUItemButton.pas',
   UCL.TUPanel in 'Sources\UCL.TUPanel.pas',
@@ -64,13 +65,7 @@ contains
   UCL.TUTitleBar in 'Sources\UCL.TUTitleBar.pas',
   UCL.TUShadow in 'Sources\UCL.TUShadow.pas',
   UCL.TUTooltip in 'Sources\UCL.TUTooltip.pas',
-  UCL.TUSmoothBox in 'Sources\UCL.TUSmoothBox.pas',
-  UCL.Types in 'Sources\UCL.Types.pas',
-  UCL.ShellUIScaling in 'Sources\UCL.ShellUIScaling.pas';
+  UCL.TUSmoothBox in 'Sources\UCL.TUSmoothBox.pas';
 
 end.
-
-
-
-
 
