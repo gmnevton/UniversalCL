@@ -1,34 +1,58 @@
-﻿{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
-unit Form.Demo;
+﻿unit Form.Demo;
 
 interface
 
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
 uses
-  //  UCL units
-  UCL.TUThemeManager,
-  UCL.TUBorderlessForm,
-  UCL.IntAnimation, UCL.IntAnimation.Helpers,
-  UCL.Utils, UCL.Classes, UCL.SystemSettings,
-  UCL.TUForm, UCL.TUScrollBox, UCL.TUCheckBox, UCL.TUProgressBar, UCL.TUHyperLink,
-  UCL.TUPanel, UCL.TUSymbolButton, UCL.TUButton, UCL.TUText, UCL.TUCaptionBar,
-  UCL.TUSlider, UCL.TUSeparator, UCL.TUEdit, UCL.TUItemButton, UCL.TUQuickButton,
-  UCL.TUPopupMenu, UCL.TURadioButton, UCL.TUShadow, UCL.TUSmoothBox,
-
-  //  Winapi units
-  Windows, Messages,
-
-  //  System units
-  SysUtils, Variants, Classes, Types,
+  SysUtils,
+  Classes,
+  Types,
+  Windows,
+  Messages,
 {$IF CompilerVersion > 29}
   ImageList,
 {$IFEND}
-
-  //  VCL units
-  Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls,
-  Menus, Buttons, ImgList, pngimage, jpeg;
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  ExtCtrls,
+  Menus,
+  Buttons,
+  ImgList,
+  pngimage,
+  jpeg,
+  //  UCL units
+  UCL.TUThemeManager,
+  UCL.TUBorderlessForm,
+  UCL.IntAnimation,
+  UCL.IntAnimation.Helpers,
+  UCL.Utils,
+  UCL.Classes,
+  UCL.SystemSettings,
+  UCL.TUForm,
+  UCL.TUScrollBox,
+  UCL.TUCheckBox,
+  UCL.TUProgressBar,
+  UCL.TUHyperLink,
+  UCL.TUPanel,
+  UCL.TUSymbolButton,
+  UCL.TUButton,
+  UCL.TUText,
+  UCL.TUCaptionBar,
+  UCL.TUSlider,
+  UCL.TUSeparator,
+  UCL.TUEdit,
+  UCL.TUItemButton,
+  UCL.TUQuickButton,
+  UCL.TUPopupMenu,
+  UCL.TURadioButton,
+  UCL.TUShadow,
+  UCL.TUSmoothBox;
 
 type
   TformDemo = class(TUBorderlessForm)
@@ -151,7 +175,6 @@ type
     procedure buttonImageFormClick(Sender: TObject);
     procedure buttonHighlightClick(Sender: TObject);
     procedure buttonAppListFormClick(Sender: TObject);
-
   private
   public
   end;
@@ -163,7 +186,9 @@ implementation
 
 uses
   DataModule.Main,
-  Form.LoginDialog, Form.ImageBackground, Form.AppList;
+  Form.LoginDialog,
+  Form.ImageBackground,
+  Form.AppList;
 
 {$R *.dfm}
 
@@ -171,8 +196,6 @@ uses
 
 procedure TformDemo.FormCreate(Sender: TObject);
 begin
-//  EnableBlur(Handle, 3);
-
   ThemeManager := dmMain.AppTheme;
 end;
 

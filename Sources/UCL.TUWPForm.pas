@@ -82,16 +82,18 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property PPI: Integer read FPPI write FPPI default 96;
-    property IsActive: Boolean read FIsActive default true;
-    property FitDesktopForPopup: Boolean read FFitDesktopForPopup write FFitDesktopForPopup default false;
-    property DrawBorder: Boolean read FDrawBorder write FDrawBorder default true;
-    property Padding stored false;
-    property Resizable: Boolean read FResizable write FResizable default true;
+    property IsActive: Boolean read FIsActive default True;
+    property FitDesktopForPopup: Boolean read FFitDesktopForPopup write FFitDesktopForPopup default False;
+    property DrawBorder: Boolean read FDrawBorder write FDrawBorder default True;
+    property Padding stored False;
+    property Resizable: Boolean read FResizable write FResizable default True;
   end;
 
 implementation
 
 uses
+  Themes,
+  Dwmapi,
   UCL.SystemSettings,
   UCL.Types,
   UCL.Utils;
@@ -129,10 +131,10 @@ procedure TUWPForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   //Params.Style := Params.Style or WS_OVERLAPPEDWINDOW;  //  Enabled aerosnap
-{$IF CompilerVersion < 30}
-  with Params do
-    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
-{$IFEND}
+{.$IF CompilerVersion < 30}
+//  with Params do
+//    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
+{.$IFEND}
 end;
 
 procedure TUWPForm.Notification(AComponent: TComponent; Operation: TOperation);
@@ -146,7 +148,7 @@ procedure TUWPForm.Paint;
 begin
   inherited;
 
-  if CanDrawBorder then
+  if CanDrawBorder and not IsLEWin7 then
     DoDrawBorder;
 end;
 
@@ -157,7 +159,7 @@ var
 begin
   inherited;
 
-  if CanDrawBorder then begin
+  if CanDrawBorder and not IsLEWin7 then begin
     Padding.Top := 1;
     if IsLEWin7 then begin
       Padding.Left := 1;
@@ -231,7 +233,7 @@ begin
   FIsActive := (Msg.Active <> WA_INACTIVE);
 
   //  Redraw border
-  if CanDrawBorder then
+  if CanDrawBorder and not IsLEWin7 then
     DoDrawBorder;
 end;
 
@@ -255,33 +257,63 @@ var
   CaptionBarHeight: Integer;
   BorderWidth: Integer;
   BorderHeight: Integer;
+  defMargin: Integer;
+  R: TRect;
 begin
   inherited;
 
-  if BorderStyle = bsNone then exit;
+  if (BorderStyle = bsNone) or not Msg.CalcValidRects then
+    Exit;
 
   CaptionBarHeight := GetSystemMetrics(SM_CYCAPTION);
+  defMargin:=0;
+  if ThemeServices.ThemesEnabled and DwmCompositionEnabled and IsLEWin7 then
+    defMargin:=-1;
 
   if WindowState = wsNormal then
-    Inc(CaptionBarHeight, GetBorderSpace(bsTop));
+    Inc(CaptionBarHeight, GetBorderSpace(bsTop) + defMargin);
 
-  Dec(Msg.CalcSize_Params.rgrc[0].Top, CaptionBarHeight); //  Hide caption bar
+  R:=Msg.CalcSize_Params.rgrc[0]; // store values
+
+  Dec(R.Top, CaptionBarHeight); //  Hide caption bar
   if IsLEWin7 then begin
     BorderWidth := GetBorderSpace(bsDefault);
     BorderHeight := GetBorderSpace(bsBottom);
     //
-    Dec(Msg.CalcSize_Params.rgrc[0].Left, BorderWidth); //  Hide borders
-    Inc(Msg.CalcSize_Params.rgrc[0].Right, BorderWidth); //  Hide borders
-    Inc(Msg.CalcSize_Params.rgrc[0].Bottom, BorderHeight); //  Hide borders
-  end
+    Dec(R.Left, BorderWidth + defMargin); //  Hide borders
+    Inc(R.Right, BorderWidth + defMargin); //  Hide borders
+    Inc(R.Bottom, BorderHeight + defMargin); //  Hide borders
+  end;
+
+  Msg.CalcSize_Params.rgrc[0]:=R;
 end;
 
 procedure TUWPForm.WM_NCHitTest(var Msg: TWMNCHitTest);
 var
   ResizeSpace: Integer;
+  ClientPos: TPoint;
 begin
   inherited;
+
+  case Msg.Result of
+    HTCLIENT: {to be dealt with below};
+    HTMINBUTTON,
+    HTMAXBUTTON,
+    HTCLOSE: begin
+      Msg.Result := HTNOWHERE; //slay ghost btns when running on Win64
+      Exit;
+    end;
+  else
+    Exit;
+  end;
+
   ResizeSpace := GetBorderSpace(bsDefault);
+
+  ClientPos := ScreenToClient(Point(Msg.XPos, Msg.YPos));
+  if ClientPos.Y > ResizeSpace then
+    Exit;
+  if ControlAtPos(ClientPos, True) <> Nil then
+    Exit;
 
   if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) and (Msg.YPos - BoundsRect.Top <= ResizeSpace) then begin
     if Msg.XPos - BoundsRect.Left <= 2 * ResizeSpace then
