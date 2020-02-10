@@ -26,6 +26,9 @@ type
       procedure SetCustomBackColor(const Value: TColor);
       procedure SetCustomTextColor(const Value: TColor);
 
+      //  Messages
+      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
@@ -43,45 +46,92 @@ type
 
 implementation
 
+uses
+  Forms,
+  UCL.TUWPForm;
+
+type
+  TUWPFormAccess = class(TUWPForm);
+
 { TUPanel }
 
 //  THEME
 
 procedure TUPanel.SetThemeManager(const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
+  if Value <> FThemeManager then begin
+    if FThemeManager <> Nil then
+      FThemeManager.Disconnect(Self);
 
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
+    FThemeManager := Value;
 
-      FThemeManager := Value;
-      UpdateTheme;
+    if Value <> Nil then begin
+      Value.Connect(Self);
+      Value.FreeNotification(Self);
     end;
+
+    UpdateTheme;
+  end;
 end;
 
 procedure TUPanel.UpdateTheme;
 begin
-  if ThemeManager = nil then
-    begin
-      Color := CustomBackColor;
-      Font.Color := CustomTextColor;
-    end
-  else if ThemeManager.Theme = utLight then
-    begin
-      Color := $00E6E6E6;
-      Font.Color := GetTextColorFromBackground(Color);
-    end
-  else
-    begin
-      Color := $001F1F1F;
-      Font.Color := GetTextColorFromBackground(Color);
+  if ThemeManager = Nil then begin
+    Color := CustomBackColor;
+    Font.Color := CustomTextColor;
+  end
+  else if ThemeManager.Theme = utLight then begin
+    Color := $00E6E6E6;
+    Font.Color := GetTextColorFromBackground(Color);
+  end
+  else begin
+    Color := $001F1F1F;
+    Font.Color := GetTextColorFromBackground(Color);
+  end;
+end;
+
+procedure TUPanel.WM_NCHitTest(var Msg: TWMNCHitTest);
+var
+  P: TPoint;
+  ParentForm: TCustomForm;
+  BorderSpace: Integer;
+begin
+  inherited;
+
+  ParentForm := GetParentForm(Self, True);
+  if (ParentForm.WindowState = wsNormal) and (Align <> alNone) then begin
+    if Align = alCustom then
+      Exit;
+    //
+    P := Point(Msg.Pos.x, Msg.Pos.y);
+    P := ScreenToClient(P);
+    BorderSpace:=5;
+    if ParentForm is TUWPForm then
+      BorderSpace:=TUWPFormAccess(ParentForm).GetBorderSpace(bsDefault);
+    //  Send event to parent
+    case Align of
+      alTop: begin
+        // we need to check top, left and right borders
+        if (P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then
+          Msg.Result := HTTRANSPARENT;
+      end;
+      alBottom: begin
+        // we need to check bottom, left and right borders
+        if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then
+          Msg.Result := HTTRANSPARENT;
+      end;
+      alLeft: begin
+        // we need to check left, top and bottom borders
+        if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then
+          Msg.Result := HTTRANSPARENT;
+      end;
+      alRight: begin
+        // we need to check right, top and bottom borders
+        if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then
+          Msg.Result := HTTRANSPARENT;
+      end;
     end;
+  end;
 end;
 
 procedure TUPanel.Notification(AComponent: TComponent; Operation: TOperation);

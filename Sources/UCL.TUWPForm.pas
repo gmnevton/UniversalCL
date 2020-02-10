@@ -310,18 +310,44 @@ begin
   ResizeSpace := GetBorderSpace(bsDefault);
 
   ClientPos := ScreenToClient(Point(Msg.XPos, Msg.YPos));
-  if ClientPos.Y > ResizeSpace then
-    Exit;
-  if ControlAtPos(ClientPos, True) <> Nil then
-    Exit;
+//  if ClientPos.Y > ResizeSpace then
+//    Exit;
+//  if ControlAtPos(ClientPos, True) <> Nil then
+//    Exit;
 
-  if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) and (Msg.YPos - BoundsRect.Top <= ResizeSpace) then begin
-    if Msg.XPos - BoundsRect.Left <= 2 * ResizeSpace then
-      Msg.Result := HTTOPLEFT
-    else if BoundsRect.Right - Msg.XPos <= 2 * ResizeSpace then
-      Msg.Result := HTTOPRIGHT
-    else
-      Msg.Result := HTTOP;
+  if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) then begin
+    if (ClientPos.Y <= ResizeSpace) then begin
+      if ClientPos.X <= 2 * ResizeSpace then
+        Msg.Result := HTTOPLEFT
+      else if Width - ClientPos.X <= 2 * ResizeSpace then
+        Msg.Result := HTTOPRIGHT
+      else
+        Msg.Result := HTTOP;
+    end
+    else if (ClientPos.Y >= Height - ResizeSpace) then begin
+      if ClientPos.X <= 2 * ResizeSpace then
+        Msg.Result := HTBOTTOMLEFT
+      else if Width - ClientPos.X <= 2 * ResizeSpace then
+        Msg.Result := HTBOTTOMRIGHT
+      else
+        Msg.Result := HTBOTTOM;
+    end
+    else if (ClientPos.X <= ResizeSpace) then begin
+      if ClientPos.Y <= 2 * ResizeSpace then
+        Msg.Result := HTTOPLEFT
+      else if Height - ClientPos.Y <= 2 * ResizeSpace then
+        Msg.Result := HTBOTTOMLEFT
+      else
+        Msg.Result := HTLEFT;
+    end
+    else if (Width - ClientPos.X <= 2 * ResizeSpace) then begin
+      if ClientPos.Y <= 2 * ResizeSpace then
+        Msg.Result := HTTOPRIGHT
+      else if Height - ClientPos.Y <= 2 * ResizeSpace then
+        Msg.Result := HTBOTTOMRIGHT
+      else
+        Msg.Result := HTRIGHT;
+    end;
   end;
 end;
 {$ENDREGION}

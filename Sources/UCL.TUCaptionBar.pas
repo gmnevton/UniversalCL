@@ -43,26 +43,31 @@ type
 
 implementation
 
+uses
+  UCL.TUWPForm;
+
+type
+  TUWPFormAccess = class(TUWPForm);
+
 { TUCustomCaptionBar }
 
 //  THEME
 
 procedure TUCaptionBar.SetThemeManager(const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
+  if Value <> FThemeManager then begin
+    if FThemeManager <> Nil then
+      FThemeManager.Disconnect(Self);
 
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
+    FThemeManager := Value;
 
-      FThemeManager := Value;
-      UpdateTheme;
+    if Value <> Nil then begin
+      Value.Connect(Self);
+      Value.FreeNotification(Self);
     end;
+
+    UpdateTheme;
+  end;
 end;
 
 procedure TUCaptionBar.UpdateTheme;
@@ -117,24 +122,21 @@ begin
   inherited;
 
   ParentForm := GetParentForm(Self, true);
-  if ParentForm is TForm then
-    if biMaximize in (ParentForm as TForm).BorderIcons then
-      begin
-        if ParentForm.WindowState = wsMaximized then
-          ParentForm.WindowState := wsNormal
-        else if ParentForm.WindowState = wsNormal then
-          ParentForm.WindowState := wsMaximized;
-      end;
+  if (ParentForm is TForm) and (biMaximize in (ParentForm as TForm).BorderIcons) then begin
+    if ParentForm.WindowState = wsMaximized then
+      ParentForm.WindowState := wsNormal
+    else if ParentForm.WindowState = wsNormal then
+      ParentForm.WindowState := wsMaximized;
+  end;
 end;
 
 procedure TUCaptionBar.WM_LButtonDown(var Msg: TWMLButtonDown);
 begin
   inherited;
-  if DragMovement then
-    begin
-      ReleaseCapture;
-      Parent.Perform(WM_SYSCOMMAND, $F012, 0);
-    end;
+  if DragMovement then begin
+    ReleaseCapture;
+    Parent.Perform(WM_SYSCOMMAND, $F012, 0);
+  end;
 end;
 
 procedure TUCaptionBar.WM_RButtonUp(var Msg: TMessage);
@@ -144,32 +146,34 @@ var
   P: TPoint;
 begin
   inherited;
-  if SystemMenuEnabled then
-    begin
-      P.X := Msg.LParamLo;
-      P.Y := Msg.LParamHi;
-      P := ClientToScreen(P);
-      Msg.LParamLo := P.X;
-      Msg.LParamHi := P.Y;
-      PostMessage(Parent.Handle, WM_SYSMENU, 0, Msg.LParam);
-    end;
+  if SystemMenuEnabled then begin
+    P.X := Msg.LParamLo;
+    P.Y := Msg.LParamHi;
+    P := ClientToScreen(P);
+    Msg.LParamLo := P.X;
+    Msg.LParamHi := P.Y;
+    PostMessage(Parent.Handle, WM_SYSMENU, 0, Msg.LParam);
+  end;
 end;
 
 procedure TUCaptionBar.WM_NCHitTest(var Msg: TWMNCHitTest);
 var
   P: TPoint;
   ParentForm: TCustomForm;
+  BorderSpace: Integer;
 begin
   inherited;
 
-  ParentForm := GetParentForm(Self, true);
-  if (ParentForm.WindowState = wsNormal) and (Align = alTop) then
-    begin
-      P := Point(Msg.Pos.x, Msg.Pos.y);
-      P := ScreenToClient(P);
-      if P.Y < 5 then
-        Msg.Result := HTTRANSPARENT;  //  Send event to parent
-    end;
+  ParentForm := GetParentForm(Self, True);
+  if (ParentForm.WindowState = wsNormal) and (Align = alTop) then begin
+    P := Point(Msg.Pos.x, Msg.Pos.y);
+    P := ScreenToClient(P);
+    BorderSpace:=8;
+    if ParentForm is TUWPForm then
+      BorderSpace:=TUWPFormAccess(ParentForm).GetBorderSpace(bsTop);
+    if P.Y < BorderSpace then
+      Msg.Result := HTTRANSPARENT;  //  Send event to parent
+  end;
 end;
 
 end.
