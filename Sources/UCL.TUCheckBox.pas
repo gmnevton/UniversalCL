@@ -48,8 +48,8 @@ type
       procedure SetState(const Value: TUCheckBoxState);
 
       //  Messages
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -344,7 +344,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomCheckBox.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomCheckBox.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     if AllowGrayed then   //  Unchecked > Checked > Grayed > ...
@@ -369,7 +369,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomCheckBox.CM_EnabledChanged(var Msg: TMessage);
+procedure TUCustomCheckBox.CMEnabledChanged(var Msg: TMessage);
 begin
   UpdateColors;
   Repaint;

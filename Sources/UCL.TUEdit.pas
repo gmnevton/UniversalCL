@@ -19,8 +19,8 @@ const
 type
   TUSubEdit = class(TEdit)
     private
-      procedure WM_SetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-      procedure WM_KillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+      procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
   end;
 
   TUEdit = class(TPanel, IUThemeComponent)
@@ -51,17 +51,17 @@ type
       procedure SetTransparent(const Value: Boolean);
 
       //  Messages
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure WM_SetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-      procedure WM_KillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
 
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
-      procedure UM_SubEditSetFocus(var Msg: TMessage); message UM_SUBEDIT_SETFOCUS;
-      procedure UM_SubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
+      procedure UMSubEditSetFocus(var Msg: TMessage); message UM_SUBEDIT_SETFOCUS;
+      procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -88,13 +88,13 @@ implementation
 
 //  MESSAGES
 
-procedure TUSubEdit.WM_SetFocus(var Msg: TWMSetFocus);
+procedure TUSubEdit.WMSetFocus(var Msg: TWMSetFocus);
 begin
   PostMessage(Parent.Handle, UM_SUBEDIT_SETFOCUS, 0, 0);
   inherited;
 end;
 
-procedure TUSubEdit.WM_KillFocus(var Msg: TWMKillFocus);
+procedure TUSubEdit.WMKillFocus(var Msg: TWMKillFocus);
 begin
   PostMessage(Parent.Handle, UM_SUBEDIT_KILLFOCUS, 0, 0);
   inherited;
@@ -281,7 +281,7 @@ end;
 
 //  MESSAGES
 
-procedure TUEdit.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUEdit.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled and HitTest then
     begin
@@ -291,7 +291,7 @@ begin
     end;
 end;
 
-procedure TUEdit.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUEdit.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     begin
@@ -303,7 +303,7 @@ begin
     end;
 end;
 
-procedure TUEdit.WM_SetFocus(var Msg: TWMSetFocus);
+procedure TUEdit.WMSetFocus(var Msg: TWMSetFocus);
 begin
   if Enabled and HitTest then
     begin
@@ -312,7 +312,7 @@ begin
     end;
 end;
 
-procedure TUEdit.WM_KillFocus(var Msg: TWMKillFocus);
+procedure TUEdit.WMKillFocus(var Msg: TWMKillFocus);
 begin
   if Enabled and HitTest then
     begin
@@ -321,19 +321,19 @@ begin
     end;
 end;
 
-procedure TUEdit.UM_SubEditSetFocus(var Msg: TMessage);
+procedure TUEdit.UMSubEditSetFocus(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     ControlState := csFocused;
 end;
 
-procedure TUEdit.UM_SubEditKillFocus(var Msg: TMessage);
+procedure TUEdit.UMSubEditKillFocus(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     ControlState := csNone;
 end;
 
-procedure TUEdit.CM_MouseEnter(var Msg: TMessage);
+procedure TUEdit.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -345,7 +345,7 @@ begin
     end;
 end;
 
-procedure TUEdit.CM_MouseLeave(var Msg: TMessage);
+procedure TUEdit.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -358,7 +358,7 @@ begin
     end;
 end;
 
-procedure TUEdit.CM_EnabledChanged(var Msg: TMessage);
+procedure TUEdit.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then

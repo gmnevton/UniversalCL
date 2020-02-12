@@ -59,13 +59,13 @@ type
       procedure SetValue(const Value: Integer);
 
       //  Messages
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_MouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -371,7 +371,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomSlider.CM_EnabledChanged(var Msg: TMessage);
+procedure TUCustomSlider.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then
@@ -380,7 +380,7 @@ begin
     ControlState := csNone;
 end;
 
-procedure TUCustomSlider.CM_MouseEnter(var Msg: TMessage);
+procedure TUCustomSlider.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -389,7 +389,7 @@ begin
     end;
 end;
 
-procedure TUCustomSlider.CM_MouseLeave(var Msg: TMessage);
+procedure TUCustomSlider.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -398,7 +398,7 @@ begin
     end;
 end;
 
-procedure TUCustomSlider.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCustomSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
 begin
@@ -436,7 +436,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomSlider.WM_MouseMove(var Msg: TWMMouseMove);
+procedure TUCustomSlider.WMMouseMove(var Msg: TWMMouseMove);
 var
   TempValue: Integer;
 begin
@@ -461,7 +461,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomSlider.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomSlider.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     begin

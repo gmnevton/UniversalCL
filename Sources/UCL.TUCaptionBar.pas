@@ -21,10 +21,10 @@ type
       procedure SetThemeManager(const Value: TUThemeManager);
 
       //  Messages
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_RButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -115,7 +115,7 @@ end;
 
 // MESSAGES
 
-procedure TUCaptionBar.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUCaptionBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 var
   ParentForm: TCustomForm;
 begin
@@ -130,7 +130,7 @@ begin
   end;
 end;
 
-procedure TUCaptionBar.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCaptionBar.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   inherited;
   if DragMovement then begin
@@ -139,7 +139,7 @@ begin
   end;
 end;
 
-procedure TUCaptionBar.WM_RButtonUp(var Msg: TMessage);
+procedure TUCaptionBar.WMRButtonUp(var Msg: TMessage);
 const
   WM_SYSMENU = 787;
 var
@@ -156,7 +156,7 @@ begin
   end;
 end;
 
-procedure TUCaptionBar.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUCaptionBar.WMNCHitTest(var Msg: TWMNCHitTest);
 var
   P: TPoint;
   ParentForm: TCustomForm;

@@ -26,10 +26,10 @@ type
       procedure SetThemeManager(const Value: TUThemeManager);
 
       //  Mesages
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_RButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -175,7 +175,7 @@ begin
   DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, true);
 end;
 
-procedure TUCustomTitleBar.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUCustomTitleBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 var
   ParentForm: TCustomForm;
 begin
@@ -192,7 +192,7 @@ begin
       end;
 end;
 
-procedure TUCustomTitleBar.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCustomTitleBar.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   inherited;
   if DragMovement then
@@ -202,7 +202,7 @@ begin
     end;
 end;
 
-procedure TUCustomTitleBar.WM_RButtonUp(var Msg: TMessage);
+procedure TUCustomTitleBar.WMRButtonUp(var Msg: TMessage);
 const
   WM_SYSMENU = 787;
 var
@@ -220,7 +220,7 @@ begin
     end;
 end;
 
-procedure TUCustomTitleBar.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUCustomTitleBar.WMNCHitTest(var Msg: TWMNCHitTest);
 var
   P: TPoint;
   ParentForm: TCustomForm;

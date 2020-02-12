@@ -43,8 +43,8 @@ type
       procedure SetTextOnGlass(const Value: Boolean);
 
       //  Messages
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -330,7 +330,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomRadioButton.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomRadioButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     IsChecked := true;
@@ -338,7 +338,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomRadioButton.CM_EnabledChanged(var Msg: TMessage);
+procedure TUCustomRadioButton.CMEnabledChanged(var Msg: TMessage);
 begin
   UpdateColors;
   Repaint;

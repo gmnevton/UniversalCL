@@ -39,11 +39,11 @@ type
       procedure SetTransparent(const Value: Boolean);
 
       //  Messages
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -321,7 +321,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomQuickButton.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUCustomQuickButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then
     begin
@@ -330,7 +330,7 @@ begin
     end;
 end;
 
-procedure TUCustomQuickButton.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCustomQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then
     begin
@@ -339,7 +339,7 @@ begin
     end;
 end;
 
-procedure TUCustomQuickButton.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomQuickButton.WMLButtonUp(var Msg: TWMLButtonUp);
 var
   ParentForm: TCustomForm;
 begin
@@ -366,7 +366,7 @@ begin
     end;
 end;
 
-procedure TUCustomQuickButton.CM_MouseEnter(var Msg: TMessage);
+procedure TUCustomQuickButton.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled then
     begin
@@ -375,7 +375,7 @@ begin
     end;
 end;
 
-procedure TUCustomQuickButton.CM_MouseLeave(var Msg: TMessage);
+procedure TUCustomQuickButton.CMMouseLeave(var Msg: TMessage);
 begin
    if Enabled then
     begin

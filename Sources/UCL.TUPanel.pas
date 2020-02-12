@@ -27,7 +27,7 @@ type
       procedure SetCustomTextColor(const Value: TColor);
 
       //  Messages
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -90,7 +90,7 @@ begin
   end;
 end;
 
-procedure TUPanel.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUPanel.WMNCHitTest(var Msg: TWMNCHitTest);
 var
   P: TPoint;
   ParentForm: TCustomForm;

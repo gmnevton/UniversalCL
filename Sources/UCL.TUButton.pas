@@ -61,17 +61,17 @@ type
       procedure SetTransparent(const Value: Boolean);
 
       //  Messages
-      procedure WM_SetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-      procedure WM_KillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+      procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
 
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-      procedure CM_DialogKey(var Msg: TCMDialogKey); message CM_DIALOGKEY;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure CMDialogKey(var Msg: TCMDialogKey); message CM_DIALOGKEY;
 
       //  Group property change
       procedure DoCustomBorderColorsChange(Sender: TObject);
@@ -394,7 +394,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomButton.WM_SetFocus(var Msg: TWMSetFocus);
+procedure TUCustomButton.WMSetFocus(var Msg: TWMSetFocus);
 begin
   if Enabled and HitTest then
     if AllowFocus then
@@ -404,7 +404,7 @@ begin
       end;
 end;
 
-procedure TUCustomButton.WM_KillFocus(var Msg: TWMKillFocus);
+procedure TUCustomButton.WMKillFocus(var Msg: TWMKillFocus);
 begin
   if Enabled and HitTest then
     begin
@@ -413,7 +413,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUCustomButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled and HitTest then
     begin
@@ -422,7 +422,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCustomButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled and HitTest then
     begin
@@ -433,7 +433,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     begin
@@ -444,7 +444,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.CM_MouseEnter(var Msg: TMessage);
+procedure TUCustomButton.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -453,7 +453,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.CM_MouseLeave(var Msg: TMessage);
+procedure TUCustomButton.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -471,7 +471,7 @@ begin
     end;
 end;
 
-procedure TUCustomButton.CM_EnabledChanged(var Msg: TMessage);
+procedure TUCustomButton.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then
@@ -482,7 +482,7 @@ begin
   Repaint;
 end;
 
-procedure TUCustomButton.CM_DialogKey(var Msg: TWMKey);
+procedure TUCustomButton.CMDialogKey(var Msg: TWMKey);
 begin
   if AllowFocus and Focused and (Msg.CharCode = VK_RETURN) then
     begin

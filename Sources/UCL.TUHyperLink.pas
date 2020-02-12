@@ -40,12 +40,12 @@ type
       procedure SetEnabled(const Value: Boolean); reintroduce;
 
       //  Messages
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
       //  Group property change
       procedure DoCustomTextColorsChange(Sender: TObject);
@@ -177,7 +177,7 @@ end;
 
 //  MESSAGES
 
-procedure TUHyperLink.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUHyperLink.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled and HitTest then
     begin
@@ -186,7 +186,7 @@ begin
     end;
 end;
 
-procedure TUHyperLink.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUHyperLink.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled and HitTest then
     begin
@@ -195,7 +195,7 @@ begin
     end;
 end;
 
-procedure TUHyperLink.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUHyperLink.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     begin
@@ -206,7 +206,7 @@ begin
     end;
 end;
 
-procedure TUHyperLink.CM_MouseEnter(var Msg: TMessage);
+procedure TUHyperLink.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -215,7 +215,7 @@ begin
     end;
 end;
 
-procedure TUHyperLink.CM_MouseLeave(var Msg: TMessage);
+procedure TUHyperLink.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin

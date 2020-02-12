@@ -72,14 +72,14 @@ type
       procedure SetImageKind(const Value: TUImageKind);
 
       //  Messages
-      procedure WM_LButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WM_LButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WM_LButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure CM_FontChanged(var Msg: TMessage); message CM_FONTCHANGED;
-      procedure CM_EnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure CMFontChanged(var Msg: TMessage); message CM_FONTCHANGED;
+      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -542,7 +542,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomSymbolButton.WM_LButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUCustomSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled and HitTest then
     begin
@@ -551,7 +551,7 @@ begin
     end;
 end;
 
-procedure TUCustomSymbolButton.WM_LButtonDown(var Msg: TWMLButtonDown);
+procedure TUCustomSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled and HitTest then
     begin
@@ -560,7 +560,7 @@ begin
     end;
 end;
 
-procedure TUCustomSymbolButton.WM_LButtonUp(var Msg: TWMLButtonUp);
+procedure TUCustomSymbolButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled and HitTest then
     begin
@@ -571,7 +571,7 @@ begin
     end;
 end;
 
-procedure TUCustomSymbolButton.CM_MouseEnter(var Msg: TMessage);
+procedure TUCustomSymbolButton.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -580,7 +580,7 @@ begin
     end;
 end;
 
-procedure TUCustomSymbolButton.CM_MouseLeave(var Msg: TMessage);
+procedure TUCustomSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled and HitTest then
     begin
@@ -589,12 +589,12 @@ begin
     end;
 end;
 
-procedure TUCustomSymbolButton.CM_FontChanged(var Msg: TMessage);
+procedure TUCustomSymbolButton.CMFontChanged(var Msg: TMessage);
 begin
   Repaint;
 end;
 
-procedure TUCustomSymbolButton.CM_EnabledChanged(var Msg: TMessage);
+procedure TUCustomSymbolButton.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then

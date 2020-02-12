@@ -39,10 +39,10 @@ type
       procedure SetThemeManager(const Value: TUThemeManager);
 
       //  Messages
-      procedure WM_Size(var Msg: TWMSize); message WM_SIZE;
-      procedure WM_MouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+      procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -307,14 +307,14 @@ end;
 
 //  MESSAGES
 
-procedure TUScrollBox.WM_Size(var Msg: TWMSize);
+procedure TUScrollBox.WMSize(var Msg: TWMSize);
 begin
   inherited;
   if ScrollBarStyle <> sbsFull then
     SetOldSBVisible(false);
 end;
 
-procedure TUScrollBox.WM_MouseWheel(var Msg: TWMMouseWheel);
+procedure TUScrollBox.WMMouseWheel(var Msg: TWMMouseWheel);
 begin
   inherited;
 
@@ -336,14 +336,14 @@ begin
     Inc(ScrollCount);
 end;
 
-procedure TUScrollBox.CM_MouseEnter(var Msg: TMessage);
+procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
 begin
   inherited;
   if ScrollBarStyle = sbsMini then
     PaintMiniSB;
 end;
 
-procedure TUScrollBox.CM_MouseLeave(var Msg: TMessage);
+procedure TUScrollBox.CMMouseLeave(var Msg: TMessage);
 begin
   if ScrollBarStyle = sbsMini then
     ClearMiniSB;

@@ -14,13 +14,13 @@ type
 
   TUMiniScrollBar = class(TCustomPanel)
     private
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
 
     published
-      property Visible default false;
+      property Visible default False;
   end;
 
   TUSmoothBox = class(TScrollBox, IUThemeComponent)
@@ -44,11 +44,11 @@ type
       procedure SetThemeManager(const Value: TUThemeManager);
 
       //  Messages
-      procedure WM_Size(var Msg: TWMSize); message WM_SIZE;
-      procedure CM_MouseWheel(var Msg: TCMMouseWheel); message CM_MOUSEWHEEL;
-      procedure CM_MouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CM_MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+      procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+      procedure CMMouseWheel(var Msg: TCMMouseWheel); message CM_MOUSEWHEEL;
+      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -143,7 +143,7 @@ begin
   inherited;
 
   //  Internal
-  MouseLeave := true;
+  MouseLeave := True;
   MINI_SB_THICKNESS := 2;
   MINI_SB_MARGIN := 3;
   //MINI_SB_COLOR := $7A7A7A;
@@ -165,7 +165,7 @@ begin
   MiniSB.Color := MINI_SB_COLOR_NIL;
   MiniSB.Parent := Self;
   MiniSB.SetSubComponent(true);
-  MiniSB.Visible := false;
+  MiniSB.Visible := False;
   MiniSB.Width := 0;
 
   //  Custom AniSet
@@ -215,8 +215,8 @@ begin
   end;
 
   if (SB.Range = 0) or (SB.Range < ControlSize) then begin
-    MiniSB.Visible := false;
-    exit;
+    MiniSB.Visible := False;
+    Exit;
   end;
 
   ThumbSize := Round(ControlSize * ControlSize / SB.Range);
@@ -239,7 +239,13 @@ end;
 
 //  MESSAGES
 
-procedure TUSmoothBox.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUSmoothBox.WMNCHitTest(var Msg: TWMNCHitTest);
+
+  procedure SendLeavingMsg;
+  begin
+    PostMessage(Self.Handle, CM_MOUSELEAVE, 0, 1);
+  end;
+
 var
   P: TPoint;
   ParentForm: TCustomForm;
@@ -261,36 +267,44 @@ begin
     case Align of
       alTop: begin
         // we need to check top, left and right borders
-        if (P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then
+        if (P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
+          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
+        end;
       end;
       alBottom: begin
         // we need to check bottom, left and right borders
-        if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then
+        if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
+          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
+        end;
       end;
       alLeft: begin
         // we need to check left, top and bottom borders
-        if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then
+        if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
+          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
+        end;
       end;
       alRight: begin
         // we need to check right, top and bottom borders
-        if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then
+        if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
+          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
+        end;
       end;
     end;
   end;
 end;
 
-procedure TUSmoothBox.WM_Size(var Msg: TWMSize);
+procedure TUSmoothBox.WMSize(var Msg: TWMSize);
 begin
   inherited;
   if ScrollBarStyle <> sbsFull then
     SetOldSBVisible(false);
 end;
 
-procedure TUSmoothBox.CM_MouseEnter(var Msg: TMessage);
+procedure TUSmoothBox.CMMouseEnter(var Msg: TMessage);
 begin
   if Win32MajorVersion <> 10 then
     SetFocus;
@@ -305,9 +319,11 @@ begin
   inherited;
 end;
 
-procedure TUSmoothBox.CM_MouseLeave(var Msg: TMessage);
+procedure TUSmoothBox.CMMouseLeave(var Msg: TMessage);
 begin
-  if (ScrollBarStyle = sbsMini) and not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+  if (ScrollBarStyle = sbsMini) and (not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) or (Msg.LParam = 1)) then begin
+    if Msg.LParam = 1 then
+      Msg.LParam := 0;
     MouseLeave := true;
     SetMiniSBVisible(false);
   end;
@@ -315,7 +331,7 @@ begin
   inherited;
 end;
 
-procedure TUSmoothBox.CM_MouseWheel(var Msg: TCMMouseWheel);
+procedure TUSmoothBox.CMMouseWheel(var Msg: TCMMouseWheel);
 var
   SB: TControlScrollBar;
   Ani: TIntAni;
@@ -390,7 +406,7 @@ end;
 
 { TUMiniScrollBar }
 
-constructor TUMiniScrollBar.Create(aOwner: TComponent);
+constructor TUMiniScrollBar.Create(AOwner: TComponent);
 begin
   inherited;
 
@@ -398,13 +414,16 @@ begin
   StyleElements :=[];
 {$IFEND}
   BevelOuter := bvNone;
-  FullRepaint := false;
-  DoubleBuffered := true;
+  BevelInner := bvNone;
+  FullRepaint := False;
+  DoubleBuffered := True;
+  ParentBackground := False;
+  ParentColor := False;
 
   Visible := false;
 end;
 
-procedure TUMiniScrollBar.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUMiniScrollBar.WMNCHitTest(var Msg: TWMNCHitTest);
 begin
   Msg.Result := HTTRANSPARENT;
 end;

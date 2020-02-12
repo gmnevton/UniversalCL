@@ -41,11 +41,11 @@ type
 
   private
     //  Messages
-    procedure WM_Activate(var Msg: TWMActivate); message WM_ACTIVATE;
-    procedure WM_DPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
-    procedure WM_DWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
-    procedure WM_NCCalcSize(var Msg: TWMNCCalcSize); message WM_NCCALCSIZE;
-    procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
+    procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
+    procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
+    procedure WMNCCalcSize(var Msg: TWMNCCalcSize); message WM_NCCALCSIZE;
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   protected
     //  Internal
@@ -227,7 +227,7 @@ begin
 end;
 
 {$REGION 'Messages handling'}
-procedure TUWPForm.WM_Activate(var Msg: TWMActivate);
+procedure TUWPForm.WMActivate(var Msg: TWMActivate);
 begin
   inherited;
   FIsActive := (Msg.Active <> WA_INACTIVE);
@@ -237,7 +237,7 @@ begin
     DoDrawBorder;
 end;
 
-procedure TUWPForm.WM_DPIChanged(var Msg: TWMDpi);
+procedure TUWPForm.WMDPIChanged(var Msg: TWMDpi);
 begin
   PixelsPerInch := Msg.XDpi;
   PPI := Msg.XDpi;
@@ -245,14 +245,14 @@ begin
   ScaleForPPI(PPI);
 end;
 
-procedure TUWPForm.WM_DWMColorizationColorChanged(var Msg: TMessage);
+procedure TUWPForm.WMDWMColorizationColorChanged(var Msg: TMessage);
 begin
   if ThemeManager <> Nil then
     ThemeManager.Reload;
   inherited;
 end;
 
-procedure TUWPForm.WM_NCCalcSize(var Msg: TWMNCCalcSize);
+procedure TUWPForm.WMNCCalcSize(var Msg: TWMNCCalcSize);
 var
   CaptionBarHeight: Integer;
   BorderWidth: Integer;
@@ -288,7 +288,7 @@ begin
   Msg.CalcSize_Params.rgrc[0]:=R;
 end;
 
-procedure TUWPForm.WM_NCHitTest(var Msg: TWMNCHitTest);
+procedure TUWPForm.WMNCHitTest(var Msg: TWMNCHitTest);
 var
   ResizeSpace: Integer;
   ClientPos: TPoint;
