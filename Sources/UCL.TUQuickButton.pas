@@ -1,25 +1,32 @@
-﻿{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
-unit UCL.TUQuickButton;
+﻿unit UCL.TUQuickButton;
 
 interface
 
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
-  Classes, Types,
+  Classes,
+  Types,
   Messages,
-  Controls, Graphics, Forms;
+  Controls,
+  Graphics,
+  Forms,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils,
+  UCL.Graphics;
 
 type
   TUQuickButtonStyle = (sbsNone, sbsQuit, sbsMax, sbsMin, sbsSysButton, sbsHighlight);
 
   TUCustomQuickButton = class(TGraphicControl, IUThemeComponent)
-    private
-      var BackColor: TColor;
-      var TextColor: TColor;
+    private var
+      BackColor: TColor;
+      TextColor: TColor;
 
+    private
       FThemeManager: TUThemeManager;
       FButtonState: TUControlState;
       FButtonStyle: TUQuickButtonStyle;
@@ -120,20 +127,19 @@ implementation
 
 procedure TUCustomQuickButton.SetThemeManager(const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
+  if Value <> FThemeManager then begin
+    if FThemeManager <> nil then
+      FThemeManager.Disconnect(Self);
 
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
+    FThemeManager := Value;
 
-      FThemeManager := Value;
-      UpdateTheme;
+    if Value <> nil then begin
+      Value.Connect(Self);
+      Value.FreeNotification(Self);
     end;
+
+    UpdateTheme;
+  end;
 end;
 
 procedure TUCustomQuickButton.UpdateTheme;
@@ -154,46 +160,43 @@ end;
 procedure TUCustomQuickButton.UpdateColors;
 begin
   case ButtonState of
-    csNone:
-      if not Transparent then
-        begin
-          ParentColor := true;
-          BackColor := Color;
-        end
-      else
-        begin
-          TextColor := Font.Color;
-          exit;
-        end;
-
-    csHover:
-      if ThemeManager = nil then
+    csNone:  begin
+      if not Transparent then begin
+        ParentColor := True;
+        BackColor := Color;
+      end
+      else begin
+        TextColor := Font.Color;
+      end;
+    end;
+    csHover: begin
+      if ThemeManager = Nil then
         BackColor := CustomAccentColor
       else if ThemeManager.Theme = utLight then
         BackColor := LightColor
       else
         BackColor := DarkColor;
-
-    csPress:
-      if ThemeManager = nil then
+    end;
+    csPress: begin
+      if ThemeManager = Nil then
         BackColor := BrightenColor(LightColor, PressBrightnessDelta)
       else if ThemeManager.Theme = utLight then
         BackColor := BrightenColor(LightColor, PressBrightnessDelta)
       else
         BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
-
-    csDisabled:
+    end;
+    csDisabled: begin
       BackColor := $666666;
-
-    csFocused:
-      if ThemeManager = nil then
+    end;
+    csFocused: begin
+      if ThemeManager = Nil then
         BackColor := LightColor
       else if ThemeManager.Theme = utLight then
         BackColor := LightColor
       else
         BackColor := DarkColor;
+    end;
   end;
-
   TextColor := GetTextColorFromBackground(BackColor);
 end;
 
@@ -201,74 +204,63 @@ end;
 
 procedure TUCustomQuickButton.SetButtonState(const Value: TUControlState);
 begin
-  if Value <> FButtonState then
-    begin
-      FButtonState := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FButtonState then begin
+    FButtonState := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomQuickButton.SetButtonStyle(const Value: TUQuickButtonStyle);
 begin
-  if Value <> FButtonStyle then
-    begin
-      FButtonStyle := Value;
+  if Value <> FButtonStyle then begin
+    FButtonStyle := Value;
 
-      case FButtonStyle of
-        sbsNone:
-          begin
-            FLightColor := $CFCFCF;
-            FDarkColor := $3C3C3C;
-          end;
-
-        sbsQuit:
-          begin
-            FLightColor := $002311E8;
-            FDarkColor := $002311E8;
-            FPressBrightnessDelta := 32;
-            Caption := ''; //  Close icon
-          end;
-
-        sbsSysButton, sbsMax, sbsMin:
-          begin
-            FLightColor := $CFCFCF;
-            FDarkColor := $3C3C3C;
-            FPressBrightnessDelta := -32;
-            case FButtonStyle of
-              sbsMax:
-                Caption := '';
-              sbsMin:
-                Caption := '';
-              sbsSysButton:
-                Caption := '';
-            end;
-          end;
-
-        sbsHighlight:
-          begin
-            if ThemeManager = nil then
-              FLightColor := FCustomAccentColor
-            else
-              FLightColor := ThemeManager.AccentColor;
-            FDarkColor := FLightColor;
-            FPressBrightnessDelta := 25;
-            Caption := '';
-          end;
+    case FButtonStyle of
+      sbsNone: begin
+        FLightColor := $CFCFCF;
+        FDarkColor := $3C3C3C;
       end;
-
-      UpdateTheme;
+      sbsQuit: begin
+        FLightColor := $002311E8;
+        FDarkColor := $002311E8;
+        FPressBrightnessDelta := 32;
+        Caption := ''; //  Close icon
+      end;
+      sbsSysButton,
+      sbsMax,
+      sbsMin: begin
+        FLightColor := $CFCFCF;
+        FDarkColor := $3C3C3C;
+        FPressBrightnessDelta := -32;
+        case FButtonStyle of
+          sbsMax      : Caption := '';
+          sbsMin      : Caption := '';
+          sbsSysButton: Caption := '';
+        end;
+      end;
+      sbsHighlight: begin
+        if ThemeManager = Nil then
+          FLightColor := FCustomAccentColor
+        else
+          FLightColor := ThemeManager.AccentColor;
+        FDarkColor := FLightColor;
+        FPressBrightnessDelta := 25;
+        Caption := '';
+      end;
     end;
+
+    UpdateTheme;
+  end;
 end;
 
 procedure TUCustomQuickButton.SetTransparent(const Value: Boolean);
 begin
-  if Value <> FTransparent then
-    begin
-      FTransparent := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FTransparent then begin
+    FTransparent := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
@@ -303,12 +295,11 @@ var
 begin
   inherited;
 
-  if (not Transparent) or (ButtonState <> csNone) then //  Paint background
-    begin
-      Canvas.Brush.Style := bsSolid;
-      Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
-      Canvas.FillRect(Rect(0, 0, Width, Height));
-    end;
+  if (not Transparent) or (ButtonState <> csNone) then begin //  Paint background
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+    Canvas.FillRect(Rect(0, 0, Width, Height));
+  end;
 
   //  Draw text
   Canvas.Brush.Style := bsClear;
@@ -316,72 +307,75 @@ begin
   Canvas.Font.Color := TextColor;
 
   TextRect := Rect(0, 0, Width, Height);
-  DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, true);
+  DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, True);
 end;
 
 //  MESSAGES
 
 procedure TUCustomQuickButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled then
-    begin
-      ButtonState := csPress;
-      inherited;
-    end;
+  if Enabled then begin
+    ButtonState := csPress;
+    inherited;
+  end;
 end;
 
 procedure TUCustomQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled then
-    begin
-      ButtonState := csPress;
-      inherited;
-    end;
+  if Enabled then begin
+    ButtonState := csPress;
+    inherited;
+  end;
 end;
 
 procedure TUCustomQuickButton.WMLButtonUp(var Msg: TWMLButtonUp);
 var
   ParentForm: TCustomForm;
 begin
-  if Enabled then
-    begin
-      ButtonState := csHover;
+  if Enabled then begin
+    ButtonState := csHover;
 
-      case ButtonStyle of
-        sbsQuit:
-          GetParentForm(Self, true).Close;
-        sbsMax:
-          begin
-            ParentForm := GetParentForm(Self, true);
-            if ParentForm.WindowState = wsMaximized then
-              ParentForm.WindowState := wsNormal
-            else
-              ParentForm.WindowState := wsMaximized;
-          end;
-        sbsMin:
-          GetParentForm(Self, true).WindowState := wsMinimized;
+    case ButtonStyle of
+      sbsQuit: begin
+        ParentForm := GetParentForm(Self, True);
+        if ParentForm = Nil then
+          Exit;
+        ParentForm.Close;
       end;
-
-      inherited;
+      sbsMax: begin
+        ParentForm := GetParentForm(Self, True);
+        if ParentForm = Nil then
+          Exit;
+        if ParentForm.WindowState = wsMaximized then
+          ParentForm.WindowState := wsNormal
+        else
+          ParentForm.WindowState := wsMaximized;
+      end;
+      sbsMin: begin
+        ParentForm := GetParentForm(Self, True);
+        if ParentForm = Nil then
+          Exit;
+        ParentForm.WindowState := wsMinimized;
+      end;
     end;
+    inherited;
+  end;
 end;
 
 procedure TUCustomQuickButton.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled then
-    begin
-      ButtonState := csHover;
-      inherited;
-    end;
+  if Enabled then begin
+    ButtonState := csHover;
+    inherited;
+  end;
 end;
 
 procedure TUCustomQuickButton.CMMouseLeave(var Msg: TMessage);
 begin
-   if Enabled then
-    begin
-      ButtonState := csNone;
-      inherited;
-    end;
+  if Enabled then begin
+    ButtonState := csNone;
+    inherited;
+  end;
 end;
 
 end.

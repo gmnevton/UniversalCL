@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.Classes;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   Classes,
@@ -108,6 +108,9 @@ type
       property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
+function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
+function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
+
 implementation
 
 {$IF CompilerVersion <= 30}
@@ -192,5 +195,45 @@ begin
     end;
   end;
 end;
+
+function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
+var
+  ResStream: TResourceStream;
+  FontsCount: DWORD;
+begin
+  try
+    ResStream := TResourceStream.Create(hInstance, ResourceName, ResType);
+    try
+      Result := (AddFontMemResourceEx(ResStream.Memory, ResStream.Size, Nil, @FontsCount) <> 0);
+    finally
+      ResStream.Free;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
+var
+  ResStream: TResourceStream;
+  FontsCount: DWORD;
+begin
+  try
+    ResStream := TResourceStream.CreateFromID(hInstance, ResourceID, ResType);
+    try
+      Result := (AddFontMemResourceEx(ResStream.Memory, ResStream.Size, Nil, @FontsCount) <> 0);
+    finally
+      ResStream.Free;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+initialization
+  LoadResourceFontByName('SEGOEUI', RT_RCDATA);
+  LoadResourceFontByName('SEGOEMDL2ASSETS', RT_RCDATA);
+  LoadResourceFontByName('SEGOEUISEMIBOLD', RT_RCDATA);
+//  LoadResourceFontByID(2, RT_FONT);
 
 end.

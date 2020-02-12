@@ -49,6 +49,7 @@
 			<DelphiCompile Include="UCLPackage_D2010.dpk">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="UCLPackage_D2010Resource.res"/>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="vcl.dcp"/>
 			<DCCReference Include="VclSmp.dcp"/>

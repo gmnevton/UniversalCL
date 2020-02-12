@@ -1,6 +1,7 @@
 package UCLPackage;
 
 {$R *.res}
+{$R 'UCLPackage_D2010Resource.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}

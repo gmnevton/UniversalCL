@@ -24,13 +24,15 @@ type
   end;
 
   TUSmoothBox = class(TScrollBox, IUThemeComponent)
+    private var
+      MiniSB: TUMiniScrollBar;
+      MINI_SB_THICKNESS: Byte;
+      MINI_SB_MARGIN: Byte;
+      //MINI_SB_COLOR: TColor;
+      MouseLeave: Boolean;
+      canMouseEnter: Boolean;
+
     private
-      var MiniSB: TUMiniScrollBar;
-      var MINI_SB_THICKNESS: Byte;
-      var MINI_SB_MARGIN: Byte;
-      //var MINI_SB_COLOR: TColor;
-      var MouseLeave: Boolean;
-  
       FThemeManager: TUThemeManager;
       FAniSet: TIntAniSet;
 
@@ -144,6 +146,7 @@ begin
 
   //  Internal
   MouseLeave := True;
+  canMouseEnter := True;
   MINI_SB_THICKNESS := 2;
   MINI_SB_MARGIN := 3;
   //MINI_SB_COLOR := $7A7A7A;
@@ -241,10 +244,10 @@ end;
 
 procedure TUSmoothBox.WMNCHitTest(var Msg: TWMNCHitTest);
 
-  procedure SendLeavingMsg;
-  begin
-    PostMessage(Self.Handle, CM_MOUSELEAVE, 0, 1);
-  end;
+//  procedure SendLeavingMsg;
+//  begin
+//    PostMessage(Self.Handle, CM_MOUSELEAVE, 0, 1);
+//  end;
 
 var
   P: TPoint;
@@ -261,35 +264,37 @@ begin
     P := Point(Msg.Pos.x, Msg.Pos.y);
     P := ScreenToClient(P);
     BorderSpace:=5;
-    if ParentForm is TUWPForm then
+    if MiniSB.Visible then
+      BorderSpace := MINI_SB_MARGIN
+    else if ParentForm is TUWPForm then
       BorderSpace:=TUWPFormAccess(ParentForm).GetBorderSpace(bsDefault);
     //  Send event to parent
     case Align of
       alTop: begin
         // we need to check top, left and right borders
         if (P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
-          SendLeavingMsg;
+//          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
         end;
       end;
       alBottom: begin
         // we need to check bottom, left and right borders
         if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
-          SendLeavingMsg;
+//          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
         end;
       end;
       alLeft: begin
         // we need to check left, top and bottom borders
         if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
-          SendLeavingMsg;
+//          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
         end;
       end;
       alRight: begin
         // we need to check right, top and bottom borders
         if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
-          SendLeavingMsg;
+//          SendLeavingMsg;
           Msg.Result := HTTRANSPARENT;
         end;
       end;
@@ -311,9 +316,9 @@ begin
 
   if MouseLeave and PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
     if ScrollBarStyle <> sbsFull then
-      SetOldSBVisible(false);
+      SetOldSBVisible(False);
     if ScrollBarStyle = sbsMini then
-      SetMiniSBVisible(true);
+      SetMiniSBVisible(True);
   end;
 
   inherited;

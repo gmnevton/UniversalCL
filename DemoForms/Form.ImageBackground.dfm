@@ -14519,8 +14519,8 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 156
-    Height = 33
+    Width = 151
+    Height = 30
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14544,8 +14544,8 @@ object formImageBackground: TformImageBackground
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 69
-    Height = 33
+    Width = 64
+    Height = 30
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14568,8 +14568,8 @@ object formImageBackground: TformImageBackground
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 68
-    Height = 33
+    Width = 63
+    Height = 30
     ThemeManager = dmMain.AppTheme
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14615,6 +14615,7 @@ object formImageBackground: TformImageBackground
     DarkColor = 2298344
     PressBrightnessDelta = 32
     Transparent = True
+    Anchors = [akTop, akRight]
     Caption = #57606
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -14622,7 +14623,6 @@ object formImageBackground: TformImageBackground
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
     ParentFont = False
-    Visible = False
   end
   object buttonWinMin: TUQuickButton
     Left = 515
@@ -14643,7 +14643,6 @@ object formImageBackground: TformImageBackground
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
     ParentFont = False
-    Visible = False
   end
   object progressMain: TUProgressBar
     Left = 240
@@ -14651,6 +14650,11 @@ object formImageBackground: TformImageBackground
     Width = 181
     Height = 11
     ThemeManager = dmMain.AppTheme
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkQuartic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 250
+    AniSet.Step = 25
     Value = 45
     Orientation = oHorizontal
     CustomFillColor = 2469894

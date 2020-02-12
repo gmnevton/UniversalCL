@@ -12,10 +12,11 @@ uses
   Form.AppList in 'DemoForms\Form.AppList.pas' {formAppList};
 
 {$R *.res}
+{$R 'UCLPackage_D2010Resource.res'}
 
 begin
   {$IFDEF DEBUG}
-    ReportMemoryLeaksOnShutdown := true;
+    ReportMemoryLeaksOnShutdown := True;
   {$ENDIF}
 
   Application.Initialize;

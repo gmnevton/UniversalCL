@@ -44,6 +44,8 @@ type
     procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
     procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
     procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
+    //procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMNCPaint(var Msg: TWMNCPaint); message WM_NCPAINT;
     procedure WMNCCalcSize(var Msg: TWMNCCalcSize); message WM_NCCALCSIZE;
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
@@ -130,11 +132,14 @@ end;
 procedure TUWPForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
+  //
   //Params.Style := Params.Style or WS_OVERLAPPEDWINDOW;  //  Enabled aerosnap
 {.$IF CompilerVersion < 30}
 //  with Params do
 //    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
 {.$IFEND}
+  //
+  Params.WindowClass.style := Params.WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
 end;
 
 procedure TUWPForm.Notification(AComponent: TComponent; Operation: TOperation);
@@ -252,6 +257,61 @@ begin
   inherited;
 end;
 
+//procedure TUWPForm.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
+//begin
+//  Msg.Result := 0;
+//end;
+
+procedure TUWPForm.WMNCPaint(var Msg: TWMNCPaint);
+var
+  DC: HDC;
+  R: TRect;
+  WindowStyle: Integer;
+begin
+  inherited;
+  //
+  if IsLEWin7 then begin
+    DC := GetWindowDC(Handle);
+    try
+      R := ClientRect;
+      OffsetRect(R, 1, 1);
+      ExcludeClipRect(DC, R.Left, R.Top, R.Right, R.Bottom);
+      WindowStyle := GetWindowLong(Handle, GWL_STYLE);
+      if WindowStyle and WS_VSCROLL <> 0 then
+        ExcludeClipRect(DC, R.Right, R.Top, R.Right + GetSystemMetrics(SM_CXVSCROLL), R.Bottom);
+      if WindowStyle and WS_HSCROLL <> 0 then
+        ExcludeClipRect(DC, R.Left, R.Bottom, R.Right, R.Bottom + GetSystemMetrics(SM_CXHSCROLL));
+      SetRect(R, 0, 0, Width + BorderWidth, Height + BorderWidth);
+      if IsColorOnBorderEnabled then begin
+        UpdateBorderColor;
+        Brush.Color := BorderColor;
+      end
+      else
+        Brush.Color := Self.Color;
+      FillRect(DC, R, Brush.Handle);
+    finally
+      ReleaseDC(Handle, DC);
+    end;
+  end;
+  Msg.Result := 0;
+end;
+
+//  if IsLEWin7 then begin
+//    dc := GetWindowDc(Handle);
+//    try
+//      if Msg.RGN = 1 then begin
+//        FillRect(dc, Rect(0, 0, Width, Height), GetStockObject(BLACK_BRUSH));
+//      end
+//      else begin
+//        OffsetRgn(Msg.RGN, -Left, -Top);
+//        FillRgn(dc, Msg.RGN, GetStockObject(BLACK_BRUSH));
+//        OffsetRgn(Msg.RGN, Left, Top);
+//      end;
+//    finally
+//      ReleaseDC(Handle, dc);
+//    end;
+//  end;
+
 procedure TUWPForm.WMNCCalcSize(var Msg: TWMNCCalcSize);
 var
   CaptionBarHeight: Integer;
@@ -296,7 +356,8 @@ begin
   inherited;
 
   case Msg.Result of
-    HTCLIENT: {to be dealt with below};
+    HTCLIENT,
+    HTTRANSPARENT: {to be dealt with below};
     HTMINBUTTON,
     HTMAXBUTTON,
     HTCLOSE: begin
@@ -312,8 +373,8 @@ begin
   ClientPos := ScreenToClient(Point(Msg.XPos, Msg.YPos));
 //  if ClientPos.Y > ResizeSpace then
 //    Exit;
-//  if ControlAtPos(ClientPos, True) <> Nil then
-//    Exit;
+  if ControlAtPos(ClientPos, True) <> Nil then
+    Exit;
 
   if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) then begin
     if (ClientPos.Y <= ResizeSpace) then begin
@@ -349,6 +410,8 @@ begin
         Msg.Result := HTRIGHT;
     end;
   end;
+  if Msg.Result = HTTRANSPARENT then
+    Msg.Result := HTCLIENT;
 end;
 {$ENDREGION}
 

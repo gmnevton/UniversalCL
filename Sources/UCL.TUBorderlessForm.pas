@@ -35,8 +35,6 @@ var
 begin
   inherited Create(AOwner);
 
-  BorderStyle:=bsSizeable;
-
   // TIP: how to maintain DWM shadow
   // Source: https://stackoverflow.com/a/50580016/2111514
 
@@ -60,7 +58,7 @@ procedure TUBorderlessForm.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
 
-  Params.Style := Params.Style and not WS_DLGFRAME;
+//  Params.Style := Params.Style and not WS_DLGFRAME;
 end;
 
 end.

@@ -30,6 +30,11 @@ object formAppList: TformAppList
     ParentColor = False
     TabOrder = 0
     ThemeManager = dmMain.AppTheme
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkCubic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 120
+    AniSet.Step = 10
     ScrollOrientation = oHorizontal
     object USymbolButton1: TUSymbolButton
       Left = 555
@@ -302,7 +307,11 @@ object formAppList: TformAppList
     ParentColor = False
     TabOrder = 2
     ThemeManager = dmMain.AppTheme
-    LengthPerStep = 4
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkCubic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 120
+    AniSet.Step = 10
     object UItemButton1: TUItemButton
       Left = 0
       Top = 1160
