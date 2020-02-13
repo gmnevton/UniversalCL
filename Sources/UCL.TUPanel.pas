@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUPanel;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.Utils, UCL.SystemSettings, UCL.TUThemeManager,
@@ -22,7 +22,7 @@ type
       FCustomBackColor: TColor;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetCustomBackColor(const Value: TColor);
       procedure SetCustomTextColor(const Value: TColor);
 
@@ -37,7 +37,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property HitTest: Boolean read FHitTest write FHitTest default true;
       property CustomTextColor: TColor read FCustomTextColor write SetCustomTextColor;
@@ -57,21 +57,22 @@ type
 
 //  THEME
 
-procedure TUPanel.SetThemeManager(const Value: TUThemeManager);
+procedure TUPanel.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then begin
-    if FThemeManager <> Nil then
-      FThemeManager.Disconnect(Self);
-
-    FThemeManager := Value;
-
-    if Value <> Nil then begin
-      Value.Connect(Self);
-      Value.FreeNotification(Self);
-    end;
-
-    UpdateTheme;
-  end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> Nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    FThemeManager := Value;
+//
+//    if Value <> Nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUPanel.UpdateTheme;

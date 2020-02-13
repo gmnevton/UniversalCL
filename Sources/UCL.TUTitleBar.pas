@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUTitleBar;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
@@ -23,7 +23,7 @@ type
       FEnableSystemMenu: Boolean;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
 
       //  Mesages
       procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
@@ -40,7 +40,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property TextPosition: Integer read FTextPosition write FTextPosition default 12;
       property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
@@ -101,22 +101,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomTitleBar.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomTitleBar.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomTitleBar.UpdateTheme;

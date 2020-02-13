@@ -43,7 +43,7 @@ type
       FMaxScrollCount: Integer;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; //(const Value: TUThemeManager);
 
       //  Messages
       procedure WMSize(var Msg: TWMSize); message WM_SIZE;
@@ -66,7 +66,7 @@ type
       procedure SetMiniSBVisible(IsVisible: Boolean);
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property AniSet: TIntAniSet read FAniSet write FAniSet;
 
       property ScrollCount: Integer read FScrollCount;
@@ -90,21 +90,22 @@ type
 
 //  THEME
 
-procedure TUSmoothBox.SetThemeManager(const Value: TUThemeManager);
+procedure TUSmoothBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then begin
-    if FThemeManager <> Nil then
-      FThemeManager.Disconnect(Self);
-
-    FThemeManager := Value;
-
-    if Value <> Nil then begin
-      Value.Connect(Self);
-      Value.FreeNotification(Self);
-    end;
-
-    UpdateTheme;
-  end;
+  FThemeManager := GetCommonThemeManager;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> Nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    FThemeManager := Value;
+//
+//    if Value <> Nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//
+//    UpdateTheme;
+//  end;
 end;
 
 procedure TUSmoothBox.UpdateTheme;

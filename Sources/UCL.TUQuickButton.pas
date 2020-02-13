@@ -40,7 +40,7 @@ type
       procedure UpdateColors;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetButtonState(const Value: TUControlState);
       procedure SetButtonStyle(const Value: TUQuickButtonStyle);
       procedure SetTransparent(const Value: Boolean);
@@ -61,7 +61,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
       property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
 
@@ -125,21 +125,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomQuickButton.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomQuickButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then begin
-    if FThemeManager <> nil then
-      FThemeManager.Disconnect(Self);
-
-    FThemeManager := Value;
-
-    if Value <> nil then begin
-      Value.Connect(Self);
-      Value.FreeNotification(Self);
-    end;
-
-    UpdateTheme;
-  end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    FThemeManager := Value;
+//
+//    if Value <> nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomQuickButton.UpdateTheme;

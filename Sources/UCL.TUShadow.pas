@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUShadow;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.Utils, UCL.Graphics, UCL.TUThemeManager,
@@ -26,7 +26,7 @@ type
       FDirection: TUDirection;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetDirection(const Value: TUDirection);
 
     protected
@@ -39,7 +39,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property LightColor: TColor read FLightColor write FLightColor default $F2F2F2;
       property DarkColor: TColor read FDarkColor write FDarkColor default $2B2B2B;
@@ -99,22 +99,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomShadow.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomShadow.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomShadow.UpdateTheme;

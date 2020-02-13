@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUSeparator;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.TUThemeManager, UCL.Utils,
@@ -29,7 +29,7 @@ type
       procedure UpdateColors;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetCustomColor(const Value: TColor);
       procedure SetOrientation(const Value: TUOrientation);
       procedure SetAlignSpace(const Value: Integer);
@@ -45,7 +45,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property CustomColor: TColor read FCustomColor write SetCustomColor default $999999;
       property Orientation: TUOrientation read FOrientation write SetOrientation default oVertical;
@@ -107,22 +107,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomSeparator.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomSeparator.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomSeparator.UpdateTheme;

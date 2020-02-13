@@ -36,7 +36,7 @@ type
       procedure DoTimer(Sender: TObject);
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
 
       //  Messages
       procedure WMSize(var Msg: TWMSize); message WM_SIZE;
@@ -60,7 +60,7 @@ type
       procedure SetOldSBVisible(IsVisible: Boolean);
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property AniSet: TIntAniSet read FAniSet write FAniSet;
       property IsScrolling: Boolean read FIsScrolling;
       property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
@@ -209,22 +209,22 @@ end;
 
 //  THEME
 
-procedure TUScrollBox.SetThemeManager(const Value: TUThemeManager);
+procedure TUScrollBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUScrollBox.UpdateTheme;

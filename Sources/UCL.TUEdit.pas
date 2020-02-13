@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUEdit;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.TUThemeManager, UCL.Utils,
@@ -46,7 +46,7 @@ type
       procedure UpdateColors;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetControlState(const Value: TUControlState);
       procedure SetTransparent(const Value: Boolean);
 
@@ -74,7 +74,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property Edit: TUSubEdit read FEdit write FEdit;
       property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
@@ -104,22 +104,22 @@ end;
 
 //  THEME
 
-procedure TUEdit.SetThemeManager(const Value: TUThemeManager);
+procedure TUEdit.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUEdit.UpdateTheme;

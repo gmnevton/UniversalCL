@@ -53,7 +53,7 @@ type
       procedure UpdateRects;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetButtonState(const Value: TUControlState);
       procedure SetAlignment(const Value: TAlignment);
       procedure SetImageIndex(const Value: Integer);
@@ -91,7 +91,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property CustomBorderColors: TControlStateColors read FCustomBorderColors write FCustomBorderColors;
       property CustomBackColors: TControlStateColors read FCustomBackColors write FCustomBackColors;
       property CustomTextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
@@ -161,22 +161,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomButton.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> Nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    FThemeManager := Value;
+//
+//    if Value <> Nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomButton.UpdateTheme;

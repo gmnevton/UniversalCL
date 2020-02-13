@@ -1,10 +1,10 @@
-﻿{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
-unit UCL.TUCheckBox;
+﻿unit UCL.TUCheckBox;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
@@ -41,7 +41,7 @@ type
       procedure UpdateRects;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetAutoSize(const Value: Boolean); reintroduce;
       procedure SetTextOnGlass(const Value: Boolean);
       procedure SetAllowGrayed(const Value: Boolean);
@@ -63,7 +63,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property IconFont: TFont read FIconFont write FIconFont;
 
       property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
@@ -128,22 +128,22 @@ implementation
 
 //  THEME
 
-procedure TUCustomCheckBox.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomCheckBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomCheckBox.UpdateTheme;

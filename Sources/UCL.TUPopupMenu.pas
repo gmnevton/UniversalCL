@@ -1,10 +1,10 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.TUPopupMenu;
 
 interface
+
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
 
 uses
   UCL.IntAnimation, UCL.IntAnimation.Helpers,
@@ -30,7 +30,7 @@ type
       FImageKind: TUImageKind;
       FCloseAnimation: Boolean;
 
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
 
       procedure PopupForm_OnDeactivate(Sender: TObject);
       procedure PopupItem_OnClick(Sender: TObject);
@@ -50,7 +50,7 @@ type
       procedure ExtractPackedContent(Input: string; out Icon, Text, Detail: string);
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property AniSet: TIntAniSet read FAniSet write FAniSet;
       property OnItemClick: TIndexNotifyEvent read FOnItemClick write FOnItemClick;
 
@@ -104,22 +104,22 @@ end;
 
 //  THEME
 
-procedure TUPopupMenu.SetThemeManager(const Value: TUThemeManager);
+procedure TUPopupMenu.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUPopupMenu.UpdateTheme;
@@ -228,7 +228,7 @@ begin
       UItem.Tag := i;
       UItem.Parent := Form;
       UItem.Enabled := MenuItem.Enabled;
-      UItem.ThemeManager := Self.ThemeManager;
+      //UItem.ThemeManager := Self.ThemeManager;
       UItem.OnClick := PopupItem_OnClick;
 
       if i = 0 then

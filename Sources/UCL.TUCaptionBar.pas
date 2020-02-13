@@ -18,7 +18,7 @@ type
       FCustomColor: TColor;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
 
       //  Messages
       procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
@@ -34,7 +34,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property DragMovement: Boolean read FDragMovement write FDragMovement default true;
       property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default true;
@@ -53,21 +53,22 @@ type
 
 //  THEME
 
-procedure TUCaptionBar.SetThemeManager(const Value: TUThemeManager);
+procedure TUCaptionBar.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then begin
-    if FThemeManager <> Nil then
-      FThemeManager.Disconnect(Self);
-
-    FThemeManager := Value;
-
-    if Value <> Nil then begin
-      Value.Connect(Self);
-      Value.FreeNotification(Self);
-    end;
-
-    UpdateTheme;
-  end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> Nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    FThemeManager := Value;
+//
+//    if Value <> Nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCaptionBar.UpdateTheme;

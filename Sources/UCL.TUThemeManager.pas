@@ -16,6 +16,7 @@ uses
 
 type
   IUThemeComponent = interface ['{C9D5D479-2F52-4BB9-8023-6EA00B5084F0}']
+    procedure SetThemeManager;
     procedure UpdateTheme;
   end;
 
@@ -199,11 +200,15 @@ end;
 procedure TUThemeManager.Connect(const Comp: TComponent);
 var
   ConnectedYet: Boolean;
+  ThemedComponent: IUThemeComponent;
 begin
   if IsThemeAvailable(Comp) then begin
     ConnectedYet := (FCompList.IndexOf(Comp) <> -1);
-    if not ConnectedYet then
+    if not ConnectedYet then begin
       FCompList.Add(Comp);
+      if Supports(Comp, IUThemeComponent, ThemedComponent) then
+        ThemedComponent.SetThemeManager;
+    end;
   end;
 end;
 

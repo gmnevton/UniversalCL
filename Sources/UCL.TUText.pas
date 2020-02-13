@@ -17,7 +17,7 @@ type
       FTextKind: TUTextKind;
       FUseAccentColor: Boolean;
 
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetTextKind(const Value: TUTextKind);
       procedure SetUseAccentColor(const Value: Boolean);
 
@@ -29,7 +29,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property TextKind: TUTextKind read FTextKind write SetTextKind default tkNormal;
       property UseAccentColor: Boolean read FUseAccentColor write SetUseAccentColor default false;
   end;
@@ -40,22 +40,22 @@ implementation
 
 //  THEME
 
-procedure TUText.SetThemeManager(const Value: TUThemeManager);
+procedure TUText.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then begin
+//    if FThemeManager <> nil then
+//      FThemeManager.Disconnect(Self);
+//
+//    if Value <> nil then
+//      begin
+//        Value.Connect(Self);
+//        Value.FreeNotification(Self);
+//      end;
+//
+//    FThemeManager := Value;
+//    UpdateTheme;
+//  end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUText.UpdateTheme;

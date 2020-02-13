@@ -37,7 +37,7 @@ type
     FDrawBorder: Boolean;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
+    //procedure SetThemeManager(const Value: TUThemeManager);
 
   private
     //  Messages
@@ -58,6 +58,8 @@ type
     function GetBorderSpace(const Side: TBorderSide): Integer; virtual;
     function GetBorderSpaceWin7(const Side: TBorderSide): Integer; virtual;
 
+    procedure SetThemeManager; virtual; // IUThemeControl
+
     function CanDrawBorder: Boolean; virtual;
     procedure UpdateBorderColor; virtual;
     procedure DoDrawBorder; virtual;
@@ -76,13 +78,13 @@ type
 
   public
     constructor Create(AOwner: TComponent); override;
-    procedure UpdateTheme; virtual;  //  IUThemeControl
+    procedure UpdateTheme; virtual; // IUThemeControl
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
     property PPI: Integer read FPPI write FPPI default 96;
     property IsActive: Boolean read FIsActive default True;
     property FitDesktopForPopup: Boolean read FFitDesktopForPopup write FFitDesktopForPopup default False;
@@ -126,6 +128,8 @@ begin
   Font.Name := 'Segoe UI';
   Font.Size := 10;
 
+  TUThemeManager.Create(Self);
+  FThemeManager := GetCommonThemeManager;
   UpdateTheme;
 end;
 
@@ -194,6 +198,11 @@ begin
   end;
 end;
 
+procedure TUWPForm.SetThemeManager;
+begin
+  // do nothing here
+end;
+
 procedure TUWPForm.UpdateTheme;
 begin
   //  Background color & tooltip
@@ -213,24 +222,24 @@ begin
   UpdateBorderColor;
   Invalidate;
 end;
-
+{
 procedure TUWPForm.SetThemeManager(const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then begin
-    //  Disconnect current TM
-    if FThemeManager <> nil then
-      FThemeManager.Disconnect(Self);
-
-     FThemeManager := Value;
-    //  Connect to new TM
-    if Value <> Nil then begin
-      Value.Connect(Self);
-      Value.FreeNotification(Self);
-    end;
-    UpdateTheme;
-  end;
+//  if Value <> FThemeManager then begin
+//    //  Disconnect current TM
+//    if FThemeManager <> Nil then
+//      FThemeManager.Disconnect(Self);
+//    //
+//    FThemeManager := Value;
+//    //  Connect to new TM
+//    if Value <> Nil then begin
+//      Value.Connect(Self);
+//      Value.FreeNotification(Self);
+//    end;
+//    UpdateTheme;
+//  end;
 end;
-
+}
 {$REGION 'Messages handling'}
 procedure TUWPForm.WMActivate(var Msg: TWMActivate);
 begin
@@ -355,13 +364,19 @@ var
 begin
   inherited;
 
+  ClientPos := ScreenToClient(Point(Msg.XPos, Msg.YPos));
+
   case Msg.Result of
     HTCLIENT,
     HTTRANSPARENT: {to be dealt with below};
     HTMINBUTTON,
     HTMAXBUTTON,
     HTCLOSE: begin
-      Msg.Result := HTNOWHERE; //slay ghost btns when running on Win64
+      if ControlAtPos(ClientPos, True) <> Nil then begin
+        Msg.Result := HTTRANSPARENT; //
+        Exit;
+      end;
+      Msg.Result := HTNOWHERE; // prevent ghost buttons showing when there is no caption bar on form
       Exit;
     end;
   else
@@ -370,11 +385,8 @@ begin
 
   ResizeSpace := GetBorderSpace(bsDefault);
 
-  ClientPos := ScreenToClient(Point(Msg.XPos, Msg.YPos));
 //  if ClientPos.Y > ResizeSpace then
 //    Exit;
-  if ControlAtPos(ClientPos, True) <> Nil then
-    Exit;
 
   if (WindowState = wsNormal) and (BorderStyle in [bsSizeable, bsSizeToolWin]) then begin
     if (ClientPos.Y <= ResizeSpace) then begin
@@ -415,7 +427,7 @@ begin
 end;
 {$ENDREGION}
 
-{$REGION 'Compatibility with Delphi 2010'}
+{$REGION 'Compatibility with Delphi 2010 plus'}
 {$IF CompilerVersion < 30}
 function TUWPForm.GetDesignDpi: Integer;
 var

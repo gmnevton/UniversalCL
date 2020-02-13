@@ -56,7 +56,7 @@ type
       procedure UpdateRects;
 
       //  Setters
-      procedure SetThemeManager(const Value: TUThemeManager);
+      procedure SetThemeManager; // (const Value: TUThemeManager);
       procedure SetButtonState(const Value: TUControlState);
       procedure SetOrientation(const Value: TUOrientation);
       procedure SetSymbolChar(const Value: string);
@@ -94,7 +94,7 @@ type
       procedure UpdateTheme;
 
     published
-      property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
       property SymbolFont: TFont read FSymbolFont write FSymbolFont;
       property TextFont: TFont read FTextFont write FTextFont;
@@ -175,22 +175,23 @@ uses
 
 //  THEME
 
-procedure TUCustomSymbolButton.SetThemeManager(const Value: TUThemeManager);
+procedure TUCustomSymbolButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  if Value <> FThemeManager then
-    begin
-      if FThemeManager <> nil then
-        FThemeManager.Disconnect(Self);
-
-      if Value <> nil then
-        begin
-          Value.Connect(Self);
-          Value.FreeNotification(Self);
-        end;
-
-      FThemeManager := Value;
-      UpdateTheme;
-    end;
+//  if Value <> FThemeManager then
+//    begin
+//      if FThemeManager <> nil then
+//        FThemeManager.Disconnect(Self);
+//
+//      if Value <> nil then
+//        begin
+//          Value.Connect(Self);
+//          Value.FreeNotification(Self);
+//        end;
+//
+//      FThemeManager := Value;
+//      UpdateTheme;
+//    end;
+  FThemeManager := GetCommonThemeManager;
 end;
 
 procedure TUCustomSymbolButton.UpdateTheme;
