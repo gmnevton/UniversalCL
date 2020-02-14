@@ -7,10 +7,18 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils,
+  SysUtils,
   Classes,
-  Windows, Messages,
-  Controls, StdCtrls, ExtCtrls, Graphics, Forms;
+  Windows,
+  Messages,
+  Controls,
+  StdCtrls,
+  ExtCtrls,
+  Graphics,
+  Forms,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils;
 
 const
   UM_SUBEDIT_SETFOCUS = WM_USER + 1;
@@ -18,13 +26,13 @@ const
 
 type
   TUSubEdit = class(TEdit)
-    private
-      procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+  private
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
   end;
 
   TUEdit = class(TPanel, IUThemeComponent)
-    const
+    private const
       DefBorderColor: TDefColor = (
         ($999999, $666666, $D77800, $CCCCCC, $D77800),
         ($666666, $999999, $D77800, $CCCCCC, $D77800));
@@ -64,13 +72,15 @@ type
       procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
       procedure CreateWindowHandle(const Params: TCreateParams); override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
       constructor Create(aOwner: TComponent); override;
+      destructor Destroy; override;
+
       procedure UpdateTheme;
 
     published
@@ -106,20 +116,8 @@ end;
 
 procedure TUEdit.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUEdit.UpdateTheme;
@@ -127,77 +125,71 @@ begin
   UpdateColors;
   Repaint;
 end;
-
+{
 procedure TUEdit.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUEdit.UpdateColors;
 begin
   //  Border & background color
-  if ThemeManager = nil then
-    begin
-      BorderColor := DefBorderColor[utLight, ControlState];
-      BackColor := $FFFFFF;
-    end
-  else
-    begin
-      case ControlState of
-        csPress, csFocused:
-          BorderColor := ThemeManager.AccentColor;
-        else
-          BorderColor := DefBorderColor[ThemeManager.Theme, ControlState];
-      end;
-
-      if (ThemeManager.Theme = utLight) or (ControlState in [csPress, csFocused]) then
-        BackColor := $FFFFFF
-      else
-        BackColor := $000000;
+  if ThemeManager = Nil then begin
+    BorderColor := DefBorderColor[utLight, ControlState];
+    BackColor := $FFFFFF;
+  end
+  else begin
+    case ControlState of
+      csPress, csFocused:
+        BorderColor := ThemeManager.AccentColor;
+    else
+      BorderColor := DefBorderColor[ThemeManager.Theme, ControlState];
     end;
+
+    if (ThemeManager.Theme = utLight) or (ControlState in [csPress, csFocused]) then
+      BackColor := $FFFFFF
+    else
+      BackColor := $000000;
+  end;
 
   //  Transparent edit
-  if Transparent and (ControlState = csNone) then
-    begin
-      ParentColor := true;
-      BackColor := Color;
-    end;
+  if Transparent and (ControlState = csNone) then begin
+    ParentColor := true;
+    BackColor := Color;
+  end;
 
   //  Text color
   TextColor := GetTextColorFromBackground(BackColor);
 
   //  Disabled edit
-  if ControlState = csDisabled then
-    begin
-      BackColor := $CCCCCC;
-      BorderColor := $CCCCCC;
-      TextColor := clGray;
-    end;
+  if ControlState = csDisabled then begin
+    BackColor := $CCCCCC;
+    BorderColor := $CCCCCC;
+    TextColor := clGray;
+  end;
 end;
 
 //  SETTERS
 
 procedure TUEdit.SetControlState(const Value: TUControlState);
 begin
-  if Value <> FControlState then
-    begin
-      FControlState := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FControlState then begin
+    FControlState := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUEdit.SetTransparent(const Value: Boolean);
 begin
-  if Value <> FTransparent then
-    begin
-      FTransparent := Value;
-      Repaint;
-    end;
+  if Value <> FTransparent then begin
+    FTransparent := Value;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
@@ -205,6 +197,7 @@ end;
 constructor TUEdit.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
+  FThemeManager := Nil;
 
   BorderThickness := 2;
 
@@ -237,6 +230,9 @@ begin
 
   FEdit.Align := alClient;
   FEdit.SetSubComponent(true);
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 end;
 
 //  CUSTOM METHODS
@@ -273,6 +269,13 @@ begin
   UpdateColors;
 end;
 
+destructor TUEdit.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
+end;
+
 procedure TUEdit.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
@@ -283,42 +286,38 @@ end;
 
 procedure TUEdit.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then
-    begin
-      FEdit.SetFocus;
-      ControlState := csPress;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    FEdit.SetFocus;
+    ControlState := csPress;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then
-    begin
-      if (Focused) or (FEdit.Focused) then
-        ControlState := csFocused
-      else
-        ControlState := csNone;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    if (Focused) or (FEdit.Focused) then
+      ControlState := csFocused
+    else
+      ControlState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.WMSetFocus(var Msg: TWMSetFocus);
 begin
-  if Enabled and HitTest then
-    begin
-      ControlState := csFocused;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ControlState := csFocused;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.WMKillFocus(var Msg: TWMKillFocus);
 begin
-  if Enabled and HitTest then
-    begin
-      ControlState := csNone;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ControlState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.UMSubEditSetFocus(var Msg: TMessage);
@@ -335,27 +334,24 @@ end;
 
 procedure TUEdit.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      if (Focused) or (FEdit.Focused) then
-        ControlState := csFocused
-      else
-        ControlState := csHover;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    if (Focused) or (FEdit.Focused) then
+      ControlState := csFocused
+    else
+      ControlState := csHover;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      if (Focused) or (FEdit.Focused) then
-        ControlState := csFocused
-      else
-        ControlState := csNone;
-
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    if (Focused) or (FEdit.Focused) then
+      ControlState := csFocused
+    else
+      ControlState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUEdit.CMEnabledChanged(var Msg: TMessage);

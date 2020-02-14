@@ -3,42 +3,51 @@ unit UCL.TUCaptionBar;
 interface
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils,
-  Windows, Messages,
+  SysUtils,
   Classes,
-  Controls, ExtCtrls, Forms, Graphics;
+  Windows,
+  Messages,
+  Controls,
+  ExtCtrls,
+  Forms,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils;
 
 type
   TUCaptionBar = class(TPanel, IUThemeComponent)
-    private
-      FThemeManager: TUThemeManager;
+  private
+    FThemeManager: TUThemeManager;
 
-      FDragMovement: Boolean;
-      FSystemMenuEnabled: Boolean;
-      FCustomColor: TColor;
+    FDragMovement: Boolean;
+    FSystemMenuEnabled: Boolean;
+    FCustomColor: TColor;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
 
-      //  Messages
-      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
-      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    //  Messages
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
-    protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    public
-      constructor Create(aOwner: TComponent); override;
-      procedure UpdateTheme;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    procedure UpdateTheme;
 
-      property DragMovement: Boolean read FDragMovement write FDragMovement default true;
-      property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default true;
-      property CustomColor: TColor read FCustomColor write FCustomColor default $D77800;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+
+    property DragMovement: Boolean read FDragMovement write FDragMovement default true;
+    property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default true;
+    property CustomColor: TColor read FCustomColor write FCustomColor default $D77800;
   end;
 
 implementation
@@ -55,20 +64,8 @@ type
 
 procedure TUCaptionBar.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> Nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    FThemeManager := Value;
-//
-//    if Value <> Nil then begin
-//      Value.Connect(Self);
-//      Value.FreeNotification(Self);
-//    end;
-//
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCaptionBar.UpdateTheme;
@@ -85,18 +82,27 @@ begin
   Font.Color := GetTextColorFromBackground(Color);
 end;
 
+destructor TUCaptionBar.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
+end;
+{
 procedure TUCaptionBar.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 // MAIN CLASS
 
 constructor TUCaptionBar.Create(aOwner: TComponent);
 begin
   inherited;
+  FThemeManager := Nil;
+
   FDragMovement := true;
   FSystemMenuEnabled := true;
   FCustomColor := $D77800;
@@ -110,6 +116,9 @@ begin
   Font.Name := 'Segoe UI';
   Font.Size := 9;
   FullRepaint := true;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 
   UpdateTheme;
 end;

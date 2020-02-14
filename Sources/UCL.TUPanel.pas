@@ -7,10 +7,17 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.Utils, UCL.SystemSettings, UCL.TUThemeManager,
-  Windows, Messages,
-  Classes, SysUtils,
-  Controls, ExtCtrls, Graphics;
+  SysUtils,
+  Classes,
+  Windows,
+  Messages,
+  Controls,
+  ExtCtrls,
+  Graphics,
+  UCL.Classes,
+  UCL.Utils,
+  UCL.SystemSettings,
+  UCL.TUThemeManager;
 
 type
   TUPanel = class(TPanel, IUThemeComponent)
@@ -30,10 +37,12 @@ type
       procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
+      destructor Destroy; override;
+
       procedure UpdateTheme;
 
     published
@@ -59,20 +68,8 @@ type
 
 procedure TUPanel.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> Nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    FThemeManager := Value;
-//
-//    if Value <> Nil then begin
-//      Value.Connect(Self);
-//      Value.FreeNotification(Self);
-//    end;
-//
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUPanel.UpdateTheme;
@@ -134,39 +131,38 @@ begin
     end;
   end;
 end;
-
+{
 procedure TUPanel.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  SETTERS
 
 procedure TUPanel.SetCustomBackColor(const Value: TColor);
 begin
-  if FCustomBackColor <> Value then
-    begin
-      FCustomBackColor := Value;
-      UpdateTheme;
-    end;
+  if FCustomBackColor <> Value then begin
+    FCustomBackColor := Value;
+    UpdateTheme;
+  end;
 end;
 
 procedure TUPanel.SetCustomTextColor(const Value: TColor);
 begin
-  if FCustomTextColor <> Value then
-    begin
-      FCustomTextColor := Value;
-      UpdateTheme;
-    end;
+  if FCustomTextColor <> Value then begin
+    FCustomTextColor := Value;
+    UpdateTheme;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUPanel.Create(aOwner: TComponent);
+constructor TUPanel.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   //  Old properties
   BevelOuter := bvNone;
@@ -177,7 +173,17 @@ begin
   FCustomTextColor := $00000000;
   FCustomBackColor := $00E6E6E6;
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
+end;
+
+destructor TUPanel.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
 end;
 
 end.

@@ -30,11 +30,11 @@ type
       procedure SetDirection(const Value: TUDirection);
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
       procedure UpdateTheme;
 
@@ -101,28 +101,16 @@ implementation
 
 procedure TUCustomShadow.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomShadow.UpdateTheme;
 var
   IsLightTheme: Boolean;
 begin
-  if ThemeManager = nil then
-    IsLightTheme := true
+  if ThemeManager = Nil then
+    IsLightTheme := True
   else
     IsLightTheme := ThemeManager.Theme = utLight;
 
@@ -133,43 +121,48 @@ begin
 
   Repaint;
 end;
-
+{
 procedure TUCustomShadow.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  SETTERS
 
 procedure TUCustomShadow.SetDirection(const Value: TUDirection);
 begin
-  if Value <> FDirection then
-    begin
-      FDirection := Value;
-      Repaint;
-    end;
+  if Value <> FDirection then begin
+    FDirection := Value;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomShadow.Create(aOwner: TComponent);
+constructor TUCustomShadow.Create(AOwner: TComponent);
 begin
   inherited;
+  FThemeManager := Nil;
 
   FLightColor := $F2F2F2;
   FDarkColor := $2B2B2B;
   FDirection := dLeft;
 
   Color := $D77800;
-  BlendFunc := CreateBlendFunc(255, true);
+  BlendFunc := CreateBlendFunc(255, True);
   BlendBmp := TBitmap.Create;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUCustomShadow.Destroy;
 begin
   BlendBmp.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 

@@ -7,10 +7,17 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
-  Classes, Types,
-  Windows, Messages,
-  Controls, Graphics, ImgList;
+  Classes,
+  Types,
+  Windows,
+  Messages,
+  Controls,
+  Graphics,
+  ImgList,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils,
+  UCL.Graphics;
 
 type
   TUItemObjectKind = (iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon);
@@ -103,15 +110,16 @@ type
       procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
       procedure Resize; override;
       procedure CreateWindowHandle(const Params: TCreateParams); override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
+
       procedure UpdateTheme;
 
       property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
@@ -214,20 +222,8 @@ uses
 
 procedure TUCustomItemButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomItemButton.UpdateTheme;
@@ -236,56 +232,47 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 procedure TUCustomItemButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUCustomItemButton.UpdateColors;
 var
   TempTheme: TUTheme;
 begin
-  if ThemeManager = nil then
+  if ThemeManager = Nil then
     TempTheme := utLight
   else
     TempTheme := ThemeManager.Theme;
 
   //  Transparent enabled
-  if (ButtonState = csNone) and (Transparent) then
-    begin
-      ParentColor := true;
-      BackColor := Color;
-      TextColor := GetTextColorFromBackground(Color);
-      DetailColor := $808080;
-    end
-
+  if (ButtonState = csNone) and Transparent then begin
+    ParentColor := true;
+    BackColor := Color;
+    TextColor := GetTextColorFromBackground(Color);
+    DetailColor := $808080;
+  end
   //  Highlight enabled
-  else if
-    (ThemeManager <> nil)
-    and ((IsToggleButton) and (IsToggled))
-    and (ButtonState in [csNone, csHover, csFocused])
-  then
-    begin
-      BackColor := ThemeManager.AccentColor;
-      TextColor := GetTextColorFromBackground(BackColor);
-      DetailColor := clSilver;
-    end
-
+  else if (ThemeManager <> Nil) and (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
+    BackColor := ThemeManager.AccentColor;
+    TextColor := GetTextColorFromBackground(BackColor);
+    DetailColor := clSilver;
+  end
   //  Default colors
-  else
-    begin
-      BackColor := DefBackColor[TempTheme, ButtonState];
-      TextColor := DefTextColor[TempTheme, ButtonState];
-      DetailColor := $808080;
-    end;
+  else begin
+    BackColor := DefBackColor[TempTheme, ButtonState];
+    TextColor := DefTextColor[TempTheme, ButtonState];
+    DetailColor := $808080;
+  end;
 
   //  Active color
-  if ThemeManager = nil then
+  if ThemeManager = Nil then
     ActiveColor := CustomActiveColor
   else
     ActiveColor := ThemeManager.AccentColor;
@@ -296,7 +283,8 @@ var
   LPos, RPos: Integer;
   TempWidth: Integer;
 begin
-  if not HandleAllocated then exit;
+  if not HandleAllocated then
+    Exit;
 
   LPos := 0;
   RPos := Width;
@@ -305,29 +293,28 @@ begin
     CheckBoxRect := Rect(0, 0, CheckBoxWidth, Height)
   else
     CheckBoxRect := TRect.Empty;
-  inc(LPos, CheckBoxRect.Width);
+  Inc(LPos, CheckBoxRect.Width);
 
   if iokLeftIcon in ObjectsVisible then
     LeftIconRect := Rect(LPos, 0, LPos + LeftIconWidth, Height)
   else
     LeftIconRect := TRect.Empty;
-  inc(LPos, LeftIconRect.Width);
+  Inc(LPos, LeftIconRect.Width);
 
   if iokRightIcon in ObjectsVisible then
     RightIconRect := Rect(RPos - RightIconWidth, 0, RPos, Height)
   else
     RightIconRect := TRect.Empty;
-  dec(RPos, RightIconRect.Width);
+  Dec(RPos, RightIconRect.Width);
 
-  if iokDetail in ObjectsVisible then
-    begin
-      Canvas.Font := DetailFont;
-      TempWidth := Canvas.TextWidth(Detail);
-      DetailRect := Rect(RPos - AlignSpace - TempWidth, 0, RPos, Height);
-    end
+  if iokDetail in ObjectsVisible then begin
+    Canvas.Font := DetailFont;
+    TempWidth := Canvas.TextWidth(Detail);
+    DetailRect := Rect(RPos - AlignSpace - TempWidth, 0, RPos, Height);
+  end
   else
     DetailRect := TRect.Empty;
-  dec(RPos, DetailRect.Width);
+  Dec(RPos, DetailRect.Width);
 
   if iokText in ObjectsVisible then
     TextRect := Rect(LPos + AlignSpace, 0, RPos - AlignSpace, Height)
@@ -339,177 +326,159 @@ end;
 
 procedure TUCustomItemButton.SetButtonState(const Value: TUControlState);
 begin
-  if Value <> FButtonState then
-    begin
-      FButtonState := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FButtonState then begin
+    FButtonState := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetImageLeftIndex(const Value: Integer);
 begin
-  if Value <> FImageLeftIndex then
-    begin
-      FImageLeftIndex := Value;
-      Repaint;
-    end;
+  if Value <> FImageLeftIndex then begin
+    FImageLeftIndex := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetImageRightIndex(const Value: Integer);
 begin
-  if Value <> FImageRightIndex then
-    begin
-      FImageRightIndex := Value;
-      Repaint;
-    end;
+  if Value <> FImageRightIndex then begin
+    FImageRightIndex := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetObjectsVisible(const Value: TUItemButtonObjects);
 begin
-  if Value <> FObjectsVisible then
-    begin
-      FObjectsVisible := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if Value <> FObjectsVisible then begin
+    FObjectsVisible := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetObjectWidth(const Index: Integer; const Value: Integer);
 begin
   case Index of
-    0:
-      if Value <> FCheckBoxWidth then
-        begin
-          FCheckBoxWidth := Value;
-          UpdateRects;
-          Repaint;
-        end;
-    1:
-      if Value <> FLeftIconWidth then
-        begin
-          FLeftIconWidth := Value;
-          UpdateRects;
-          Repaint;
-        end;
-    2:
-      if Value <> FRightIconWidth then
-        begin
-          FRightIconWidth := Value;
-          UpdateRects;
-          Repaint;
-        end;
+    0: if Value <> FCheckBoxWidth then begin
+      FCheckBoxWidth := Value;
+      UpdateRects;
+      Repaint;
+    end;
+
+    1: if Value <> FLeftIconWidth then begin
+      FLeftIconWidth := Value;
+      UpdateRects;
+      Repaint;
+    end;
+
+    2: if Value <> FRightIconWidth then begin
+      FRightIconWidth := Value;
+      UpdateRects;
+      Repaint;
+    end;
   end;
 end;
 
 procedure TUCustomItemButton.SetIsChecked(const Value: Boolean);
 begin
-  if Value <> FIsChecked then
-    begin
-      FIsChecked := Value;
-      Repaint;
-    end;
+  if Value <> FIsChecked then begin
+    FIsChecked := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetLeftIcon(const Value: string);
 begin
-  if Value <> FLeftIcon then
-    begin
-      FLeftIcon := Value;
-      Repaint;
-    end;
+  if Value <> FLeftIcon then begin
+    FLeftIcon := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetText(const Value: string);
 begin
-  if Value <> FText then
-    begin
-      FText := Value;
-      Repaint;
-    end;
+  if Value <> FText then begin
+    FText := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetDetail(const Value: string);
 begin
-  if Value <> FDetail then
-    begin
-      FDetail := Value;
-      Repaint;
-    end;
+  if Value <> FDetail then begin
+    FDetail := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetRightIcon(Const Value: string);
 begin
-  if Value <> FRightIcon then
-    begin
-      FRightIcon := Value;
-      Repaint;
-    end;
+  if Value <> FRightIcon then begin
+    FRightIcon := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetAlignSpace(const Value: Integer);
 begin
-  if Value <> FAlignSpace then
-    begin
-      FAlignSpace := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if Value <> FAlignSpace then begin
+    FAlignSpace := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetCustomActiveColor(const Value: TColor);
 begin
-  if Value <> FCustomActiveColor then
-    begin
-      FCustomActiveColor := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FCustomActiveColor then begin
+    FCustomActiveColor := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetTransparent(const Value: Boolean);
 begin
-  if Value <> FTransparent then
-    begin
-      FTransparent := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FTransparent then begin
+    FTransparent := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetLeftIconKind(const Value: TUImageKind);
 begin
-  if Value <> FLeftIconKind then
-    begin
-      FLeftIconKind := Value;
-      Repaint;
-    end;
+  if Value <> FLeftIconKind then begin
+    FLeftIconKind := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetRightIconKind(const Value: TUImageKind);
 begin
-  if Value <> FRightIconKind then
-    begin
-      FRightIconKind := Value;
-      Repaint;
-    end;
+  if Value <> FRightIconKind then begin
+    FRightIconKind := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomItemButton.SetIsToggled(const Value: Boolean);
 begin
-  if Value <> FIsToggled then
-    begin
-      FIsToggled := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FIsToggled then begin
+    FIsToggled := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomItemButton.Create(aOwner: TComponent);
+constructor TUCustomItemButton.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   FObjectSelected := iokNone;
   FButtonState := csNone;
@@ -554,13 +523,18 @@ begin
   FIsToggled := false;
 
   //  Common properties
-  TabStop := true;
+  TabStop := True;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUCustomItemButton.Destroy;
 begin
   FIconFont.Free;
   FDetailFont.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -580,55 +554,52 @@ begin
   Canvas.Font := IconFont;
 
   //  Paint checkbox
-  if iokCheckBox in ObjectsVisible then
-    if IsChecked then
-      begin
-        Canvas.Font.Color := ActiveColor;
-        DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_CHECKED, false);
-      end
-    else
-      begin
-        Canvas.Font.Color := TextColor;
-        DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_UNCHECKED, false);
-      end;
+  if iokCheckBox in ObjectsVisible then begin
+    if IsChecked then begin
+      Canvas.Font.Color := ActiveColor;
+      DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_CHECKED, false);
+    end
+    else begin
+      Canvas.Font.Color := TextColor;
+      DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_UNCHECKED, false);
+    end;
+  end;
 
   Canvas.Font.Color := TextColor;
 
   //  Paint left icon
-  if iokLeftIcon in ObjectsVisible then
+  if iokLeftIcon in ObjectsVisible then begin
     if LeftIconKind = ikFontIcon then
       DrawTextRect(Canvas, taCenter, taVerticalCenter, LeftIconRect, LeftIcon, false)
-    else if Images <> nil then
-      begin
-        GetCenterPos(Images.Width, Images.Height, LeftIconRect, ImgX, ImgY);
-        Images.Draw(Canvas, ImgX, ImgY, ImageLeftIndex, Enabled);
-      end;
+    else if Images <> Nil then begin
+      GetCenterPos(Images.Width, Images.Height, LeftIconRect, ImgX, ImgY);
+      Images.Draw(Canvas, ImgX, ImgY, ImageLeftIndex, Enabled);
+    end;
+  end;
 
   //  Paint right icon
-  if iokRightIcon in ObjectsVisible then
+  if iokRightIcon in ObjectsVisible then begin
     if RightIconKind = ikFontIcon then
       DrawTextRect(Canvas, taCenter, taVerticalCenter, RightIconRect, RightIcon, false)
-    else if Images <> nil then
-      begin
-        GetCenterPos(Images.Width, Images.Height, RightIconRect, ImgX, ImgY);
-        Images.Draw(Canvas, ImgX, ImgY, ImageRightIndex, Enabled);
-      end;
+    else if Images <> Nil then begin
+      GetCenterPos(Images.Width, Images.Height, RightIconRect, ImgX, ImgY);
+      Images.Draw(Canvas, ImgX, ImgY, ImageRightIndex, Enabled);
+    end;
+  end;
 
   //  Paint detail
-  if iokDetail in ObjectsVisible then
-    begin
-      Canvas.Font := DetailFont;
-      Canvas.Font.Color := DetailColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
-    end;
+  if iokDetail in ObjectsVisible then begin
+    Canvas.Font := DetailFont;
+    Canvas.Font.Color := DetailColor;
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
+  end;
 
   //  Paint text
-  if iokText in ObjectsVisible then
-    begin
-      Canvas.Font := Font;
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
-    end;
+  if iokText in ObjectsVisible then begin
+    Canvas.Font := Font;
+    Canvas.Font.Color := TextColor;
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
+  end;
 end;
 
 procedure TUCustomItemButton.Resize;
@@ -662,26 +633,23 @@ end;
 
 procedure TUCustomItemButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled and HitTest then
-    begin
-      ButtonState := csPress;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ButtonState := csPress;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then
-    begin
-      ButtonState := csPress;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ButtonState := csPress;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then
-    begin
+  if Enabled and HitTest then begin
 //      if Msg.XPos < CheckBoxWidth then
 //        FObjectSelected := iokCheckBox
 //      else if Msg.XPos < CheckBoxWidth + LeftIconWidth then
@@ -693,54 +661,52 @@ begin
 //      else
 //        FObjectSelected := iokText;
 
-      if PointInRect(Msg.Pos, CheckBoxRect) then
-        FObjectSelected := iokCheckBox
-      else if PointInRect(Msg.Pos, LeftIconRect) then
-        FObjectSelected := iokLeftIcon
-      else if PointInRect(Msg.Pos, RightIconRect) then
-        FObjectSelected := iokRightIcon
-      else if PointInRect(Msg.Pos, DetailRect) then
-        FObjectSelected := iokDetail
-      else if PointInRect(Msg.Pos, TextRect) then
-        FObjectSelected := iokText
-      else
-        FObjectSelected := iokNone;
+    if PointInRect(Msg.Pos, CheckBoxRect) then
+      FObjectSelected := iokCheckBox
+    else if PointInRect(Msg.Pos, LeftIconRect) then
+      FObjectSelected := iokLeftIcon
+    else if PointInRect(Msg.Pos, RightIconRect) then
+      FObjectSelected := iokRightIcon
+    else if PointInRect(Msg.Pos, DetailRect) then
+      FObjectSelected := iokDetail
+    else if PointInRect(Msg.Pos, TextRect) then
+      FObjectSelected := iokText
+    else
+      FObjectSelected := iokNone;
 
-      case FObjectSelected of
-        iokNone: ;
-        iokCheckBox: 
-          IsChecked := not IsChecked;
-        iokLeftIcon: ;
-        iokText: ;
-        iokDetail: ;
-        iokRightIcon: ;
-      end;
-
-      //  Switch toggle state
-      if (IsToggleButton) and (FObjectSelected <> iokCheckBox) then
-        FIsToggled := not FIsToggled;
-
-      ButtonState := csHover;
-      inherited;
+    case FObjectSelected of
+      iokNone: ;
+      iokCheckBox:
+        IsChecked := not IsChecked;
+      iokLeftIcon: ;
+      iokText: ;
+      iokDetail: ;
+      iokRightIcon: ;
     end;
+
+    //  Switch toggle state
+    if (IsToggleButton) and (FObjectSelected <> iokCheckBox) then
+      FIsToggled := not FIsToggled;
+
+    ButtonState := csHover;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      ButtonState := csHover;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ButtonState := csHover;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      ButtonState := csNone;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ButtonState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.CMEnabledChanged(var Msg: TMessage);

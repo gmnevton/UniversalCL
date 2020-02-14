@@ -7,11 +7,22 @@ interface
 {$IFEND}
 
 uses
-  UCL.IntAnimation, UCL.IntAnimation.Helpers,
-  UCL.Classes, UCL.Utils, UCL.Graphics, UCL.TUThemeManager, UCL.TUForm, UCL.TUSymbolButton,
-  Classes, Types,
+  Classes,
+  Types,
   Windows,
-  Forms, Controls, Menus, Graphics, Dialogs;
+  Forms,
+  Controls,
+  Menus,
+  Graphics,
+  Dialogs,
+  UCL.IntAnimation,
+  UCL.IntAnimation.Helpers,
+  UCL.Classes,
+  UCL.Utils,
+  UCL.Graphics,
+  UCL.TUThemeManager,
+  UCL.TUForm,
+  UCL.TUSymbolButton;
 
 type
   TIndexNotifyEvent = procedure (Sender: TObject; Index: Integer) of object;
@@ -36,11 +47,12 @@ type
       procedure PopupItem_OnClick(Sender: TObject);
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
     public
       constructor Create(aOwner: TComponent); override;
       destructor Destroy; override;
+
       procedure UpdateTheme;
 
       procedure Popup(X, Y: Integer); override;
@@ -70,15 +82,15 @@ var
   Form: TUForm;
   Ani: TIntAni;
 begin
-  if not ((Sender is TForm) and (Sender <> nil)) then exit;
+  if not ((Sender <> Nil) and (Sender is TForm)) then
+    Exit;
 
   Form := (Sender as TUForm);
 
-  if not CloseAnimation then
-    begin
-      Form.Free;
-      exit;
-    end;
+  if not CloseAnimation then begin
+    Form.Free;
+    Exit;
+  end;
 
   Ani := TIntAni.Create(Form.ClientHeight, -Form.ClientHeight,
     procedure (Value: Integer)
@@ -95,9 +107,8 @@ end;
 
 procedure TUPopupMenu.PopupItem_OnClick(Sender: TObject);
 begin
-  if Sender is TUSymbolButton then
-    if Assigned(FOnItemClick) then
-      FOnItemClick(Self, (Sender as TUSymbolButton).Tag);
+  if (Sender is TUSymbolButton) and Assigned(FOnItemClick) then
+    FOnItemClick(Self, (Sender as TUSymbolButton).Tag);
 end;
 
 { TUPopupMenu }
@@ -106,20 +117,8 @@ end;
 
 procedure TUPopupMenu.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUPopupMenu.UpdateTheme;
@@ -131,19 +130,20 @@ begin
   else
     BackColor := $1F1F1F;
 end;
-
+{
 procedure TUPopupMenu.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
+    FThemeManager := Nil;
 end;
-
+}
 //  MAIN CLASS
 
 constructor TUPopupMenu.Create(aOwner: TComponent);
 begin
   inherited;
+  FThemeManager := Nil;
 
   BackColor := $E6E6E6;
 
@@ -155,11 +155,16 @@ begin
 
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkQuartic, 0, 120, 20);
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUPopupMenu.Destroy;
 begin
   FAniSet.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -169,28 +174,24 @@ procedure TUPopupMenu.ExtractPackedContent(Input: string; out Icon, Text, Detail
 var
   SeparatorPos: Integer;
 begin
-  if Length(Input) = 0 then
-    begin
-      Icon := '';
-      Text := '';
+  if Length(Input) = 0 then begin
+    Icon := '';
+    Text := '';
+    Detail := '';
+  end
+  else begin
+    Icon := Input[1];
+    Input := Copy(Input, 2, Length(Input) - 1);
+    SeparatorPos := Pos('|', Input);
+    if SeparatorPos = 0 then begin
+      Text := Input;
       Detail := '';
     end
-  else
-    begin
-      Icon := Input[1];
-      Input := Copy(Input, 2, Length(Input) - 1);
-      SeparatorPos := Pos('|', Input);
-      if SeparatorPos = 0 then
-        begin
-          Text := Input;
-          Detail := '';
-        end
-      else
-        begin
-          Text := Copy(Input, 1, SeparatorPos - 1);
-          Detail := Copy(Input, SeparatorPos + 1, Length(Input) - SeparatorPos);
-        end;
+    else begin
+      Text := Copy(Input, 1, SeparatorPos - 1);
+      Detail := Copy(Input, SeparatorPos + 1, Length(Input) - SeparatorPos);
     end;
+  end;
 end;
 
 procedure TUPopupMenu.Popup(X, Y: Integer);
@@ -205,7 +206,8 @@ begin
   //  Getting something
   ItemCount := Self.Items.Count;
 
-  if ItemCount = 0 then exit;
+  if ItemCount = 0 then
+    Exit;
 
   //  Create popup form
   Form := TUForm.CreateNew(Self);
@@ -220,38 +222,37 @@ begin
   Form.ClientHeight := 0;
 
     //  Build items
-  for i := ItemCount - 1 downto 0 do
-    begin
-      MenuItem := Self.Items[i];
+  for i := ItemCount - 1 downto 0 do begin
+    MenuItem := Self.Items[i];
 
-      UItem := TUSymbolButton.Create(Form);
-      UItem.Tag := i;
-      UItem.Parent := Form;
-      UItem.Enabled := MenuItem.Enabled;
-      //UItem.ThemeManager := Self.ThemeManager;
-      UItem.OnClick := PopupItem_OnClick;
+    UItem := TUSymbolButton.Create(Form);
+    UItem.Tag := i;
+    UItem.Parent := Form;
+    UItem.Enabled := MenuItem.Enabled;
+    //UItem.ThemeManager := Self.ThemeManager;
+    UItem.OnClick := PopupItem_OnClick;
 
-      if i = 0 then
-        begin
-          UItem.Margins.SetBounds(0, TopSpace, 0, 0);
-          UItem.AlignWithMargins := true;
-        end;
+    if i = 0 then
+      begin
+        UItem.Margins.SetBounds(0, TopSpace, 0, 0);
+        UItem.AlignWithMargins := true;
+      end;
 
-      UItem.Hint := MenuItem.Hint;
-      UItem.Images := Self.Images;
-      UItem.ImageIndex := MenuItem.ImageIndex;
+    UItem.Hint := MenuItem.Hint;
+    UItem.Images := Self.Images;
+    UItem.ImageIndex := MenuItem.ImageIndex;
 
-      ExtractPackedContent(MenuItem.Caption, Icon, Text, Detail);
-      UItem.SymbolChar := Icon;
-      UItem.Text := Text;
-      UItem.Detail := Detail;
-      UItem.ImageKind := Self.ImageKind;
+    ExtractPackedContent(MenuItem.Caption, Icon, Text, Detail);
+    UItem.SymbolChar := Icon;
+    UItem.Text := Text;
+    UItem.Detail := Detail;
+    UItem.ImageKind := Self.ImageKind;
 
-      UItem.Align := alTop;
-      UItem.Width := ItemWidth;
-      UItem.Height := ItemHeight;
-      UItem.ShowHint := true;
-    end;
+    UItem.Align := alTop;
+    UItem.Width := ItemWidth;
+    UItem.Height := ItemHeight;
+    UItem.ShowHint := true;
+  end;
 
   Form.Show;
 

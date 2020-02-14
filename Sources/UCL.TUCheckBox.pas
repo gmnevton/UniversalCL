@@ -7,10 +7,15 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
   Classes,
-  Messages, Windows,
-  Controls, Graphics;
+  Messages,
+  Windows,
+  Controls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils,
+  UCL.Graphics;
 
 type
   TUCheckBoxState = (cbsChecked, cbsUnchecked, cbsGrayed);
@@ -52,14 +57,15 @@ type
       procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
       procedure Resize; override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
+
       procedure UpdateTheme;
 
     published
@@ -130,20 +136,8 @@ implementation
 
 procedure TUCustomCheckBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomCheckBox.UpdateTheme;
@@ -152,40 +146,36 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 procedure TUCustomCheckBox.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUCustomCheckBox.UpdateColors;
 begin
-  if ThemeManager = nil then
-    begin
-      ActiveColor := CustomActiveColor;
-      TextColor := $000000;
-    end
-  else if ThemeManager.Theme = utLight then
-    begin
-      ActiveColor := ThemeManager.AccentColor;
-      TextColor := $000000;
-    end
-  else
-    begin
-      ActiveColor := ThemeManager.AccentColor;
-      TextColor := $FFFFFF;
-    end;
+  if ThemeManager = Nil then begin
+    ActiveColor := CustomActiveColor;
+    TextColor := $000000;
+  end
+  else if ThemeManager.Theme = utLight then begin
+    ActiveColor := ThemeManager.AccentColor;
+    TextColor := $000000;
+  end
+  else begin
+    ActiveColor := ThemeManager.AccentColor;
+    TextColor := $FFFFFF;
+  end;
 
   //  Disabled
-  if not Enabled then
-    begin
-      ActiveColor := $808080;
-      TextColor := $808080;
-    end;
+  if not Enabled then begin
+    ActiveColor := $808080;
+    TextColor := $808080;
+  end;
 end;
 
 procedure TUCustomCheckBox.UpdateRects;
@@ -198,50 +188,47 @@ end;
 
 procedure TUCustomCheckBox.SetState(const Value: TUCheckBoxState);
 begin
-  if Value <> FState then
-    begin
-      if (not AllowGrayed) and (Value = cbsGrayed) then
-        FState := cbsUnchecked
-      else
-        FState := Value;
-      Repaint;
-    end;
+  if Value <> FState then begin
+    if (not AllowGrayed) and (Value = cbsGrayed) then
+      FState := cbsUnchecked
+    else
+      FState := Value;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomCheckBox.SetAllowGrayed(const Value: Boolean);
 begin
-  if Value <> FAllowGrayed then
-    begin
-      FAllowGrayed := Value;
-      if (not FAllowGrayed) and (FState = cbsGrayed) then
-        FState := cbsUnchecked;
-      Repaint;
-    end;
+  if Value <> FAllowGrayed then begin
+    FAllowGrayed := Value;
+    if (not FAllowGrayed) and (FState = cbsGrayed) then
+      FState := cbsUnchecked;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomCheckBox.SetAutoSize(const Value: Boolean);
 begin
-  if Value <> FAutoSize then
-    begin
-      FAutoSize := Value;
-      Resize;
-    end;
+  if Value <> FAutoSize then begin
+    FAutoSize := Value;
+    Resize;
+  end;
 end;
 
 procedure TUCustomCheckBox.SetTextOnGlass(const Value: Boolean);
 begin
-  if Value <> FTextOnGlass then
-    begin
-      FTextOnGlass := Value;
-      Repaint;
-    end;
+  if Value <> FTextOnGlass then begin
+    FTextOnGlass := Value;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomCheckBox.Create(aOwner: TComponent);
+constructor TUCustomCheckBox.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
@@ -261,6 +248,9 @@ begin
   Height := 30;
   Width := 180;
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateColors;
   UpdateRects;
 end;
@@ -268,6 +258,8 @@ end;
 destructor TUCustomCheckBox.Destroy;
 begin
   FIconFont.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -278,12 +270,11 @@ begin
   inherited;
 
   //  Paint background
-  if not TextOnGlass then
-    begin
-      Canvas.Brush.Style := bsSolid;
-      Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
-      Canvas.FillRect(Rect(0, 0, Width, Height));
-    end;
+  if not TextOnGlass then begin
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
+    Canvas.FillRect(Rect(0, 0, Width, Height));
+  end;
 
   //  Paint text
   Canvas.Brush.Style := bsClear;
@@ -294,26 +285,23 @@ begin
   //  Paint icon
   Canvas.Font := IconFont;
   case State of
-    cbsChecked:
-      begin
-        Canvas.Font.Color := ActiveColor;
-        DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CHECKED, TextOnGlass);
-      end;
+    cbsChecked: begin
+      Canvas.Font.Color := ActiveColor;
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CHECKED, TextOnGlass);
+    end;
 
-    cbsUnchecked:
-      begin
-        Canvas.Font.Color := TextColor;
-        DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
-      end;
+    cbsUnchecked: begin
+      Canvas.Font.Color := TextColor;
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
+    end;
 
-    cbsGrayed:
-      begin
-        Canvas.Font.Color := ActiveColor;
-        DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
+    cbsGrayed: begin
+      Canvas.Font.Color := ActiveColor;
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
 
-        Canvas.Font.Color := TextColor;
-        DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_GRAYED, TextOnGlass);
-      end;
+      Canvas.Font.Color := TextColor;
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_GRAYED, TextOnGlass);
+    end;
   end;
 end;
 
@@ -321,14 +309,13 @@ procedure TUCustomCheckBox.Resize;
 var
   Space: Integer;
 begin
-  if AutoSize and (Align = alNone) then
-    begin
-      Space := 5;
-      Canvas.Font := IconFont;
-      Height := 2 * Space + Canvas.TextHeight(ICON_UNCHECKED);
-      Canvas.Font := Font;
-      Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
-    end
+  if AutoSize and (Align = alNone) then begin
+    Space := 5;
+    Canvas.Font := IconFont;
+    Height := 2 * Space + Canvas.TextHeight(ICON_UNCHECKED);
+    Canvas.Font := Font;
+    Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
+  end
   else
     inherited;
   UpdateRects;
@@ -349,21 +336,15 @@ begin
   if Enabled and HitTest then
     if AllowGrayed then   //  Unchecked > Checked > Grayed > ...
       case State of
-        cbsUnchecked:
-          State := cbsChecked;
-        cbsChecked:
-          State := cbsGrayed;
-        cbsGrayed:
-          State := cbsUnchecked;
+        cbsUnchecked: State := cbsChecked;
+        cbsChecked  : State := cbsGrayed;
+        cbsGrayed   : State := cbsUnchecked;
       end
     else
       case State of
-        cbsUnchecked:
-          State := cbsChecked;
-        cbsChecked:
-          State := cbsUnchecked;
-        cbsGrayed:
-          State := cbsUnchecked;
+        cbsUnchecked: State := cbsChecked;
+        cbsChecked  : State := cbsUnchecked;
+        cbsGrayed   : State := cbsUnchecked;
       end;
 
   inherited;
