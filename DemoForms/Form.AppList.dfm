@@ -14,7 +14,6 @@ object formAppList: TformAppList
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 15
   object boxHorizontal: TUSmoothBox
@@ -29,7 +28,6 @@ object formAppList: TformAppList
     Color = 15132390
     ParentColor = False
     TabOrder = 0
-    ThemeManager = dmMain.AppTheme
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
@@ -41,7 +39,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -68,7 +65,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -95,7 +91,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -122,7 +117,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -149,7 +143,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -176,7 +169,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -203,7 +195,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 111
       Height = 73
-      ThemeManager = dmMain.AppTheme
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -246,14 +237,12 @@ object formAppList: TformAppList
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
-    ThemeManager = dmMain.AppTheme
     object buttonWinClose: TUQuickButton
       Left = 395
       Top = 0
       Width = 45
       Height = 32
       Hint = 'Close'
-      ThemeManager = dmMain.AppTheme
       ButtonStyle = sbsQuit
       LightColor = 2298344
       DarkColor = 2298344
@@ -276,7 +265,6 @@ object formAppList: TformAppList
       Width = 45
       Height = 32
       Hint = 'Minimize'
-      ThemeManager = dmMain.AppTheme
       ButtonStyle = sbsMin
       LightColor = 13619151
       DarkColor = 3947580
@@ -306,7 +294,6 @@ object formAppList: TformAppList
     Color = 15132390
     ParentColor = False
     TabOrder = 2
-    ThemeManager = dmMain.AppTheme
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
@@ -317,7 +304,6 @@ object formAppList: TformAppList
       Top = 1160
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -347,7 +333,6 @@ object formAppList: TformAppList
       Top = 1080
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -377,7 +362,6 @@ object formAppList: TformAppList
       Top = 1040
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -407,7 +391,6 @@ object formAppList: TformAppList
       Top = 1000
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -437,7 +420,6 @@ object formAppList: TformAppList
       Top = 960
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -467,7 +449,6 @@ object formAppList: TformAppList
       Top = 920
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -497,7 +478,6 @@ object formAppList: TformAppList
       Top = 1120
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -527,7 +507,6 @@ object formAppList: TformAppList
       Top = 680
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -557,7 +536,6 @@ object formAppList: TformAppList
       Top = 720
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -587,7 +565,6 @@ object formAppList: TformAppList
       Top = 760
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -617,7 +594,6 @@ object formAppList: TformAppList
       Top = 800
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -647,7 +623,6 @@ object formAppList: TformAppList
       Top = 840
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -677,7 +652,6 @@ object formAppList: TformAppList
       Top = 880
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -707,7 +681,6 @@ object formAppList: TformAppList
       Top = 440
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -737,7 +710,6 @@ object formAppList: TformAppList
       Top = 480
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -767,7 +739,6 @@ object formAppList: TformAppList
       Top = 520
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -797,7 +768,6 @@ object formAppList: TformAppList
       Top = 560
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -827,7 +797,6 @@ object formAppList: TformAppList
       Top = 600
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -857,7 +826,6 @@ object formAppList: TformAppList
       Top = 640
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -887,7 +855,6 @@ object formAppList: TformAppList
       Top = 200
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -917,7 +884,6 @@ object formAppList: TformAppList
       Top = 240
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -947,7 +913,6 @@ object formAppList: TformAppList
       Top = 280
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -977,7 +942,6 @@ object formAppList: TformAppList
       Top = 320
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1007,7 +971,6 @@ object formAppList: TformAppList
       Top = 360
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1037,7 +1000,6 @@ object formAppList: TformAppList
       Top = 400
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1067,7 +1029,6 @@ object formAppList: TformAppList
       Top = 0
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1097,7 +1058,6 @@ object formAppList: TformAppList
       Top = 40
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1127,7 +1087,6 @@ object formAppList: TformAppList
       Top = 80
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1157,7 +1116,6 @@ object formAppList: TformAppList
       Top = 120
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1187,7 +1145,6 @@ object formAppList: TformAppList
       Top = 160
       Width = 423
       Height = 40
-      ThemeManager = dmMain.AppTheme
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20

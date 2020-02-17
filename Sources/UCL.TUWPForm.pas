@@ -78,6 +78,8 @@ type
 
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
     procedure UpdateTheme; virtual; // IUThemeControl
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
@@ -128,9 +130,19 @@ begin
   Font.Name := 'Segoe UI';
   Font.Size := 10;
 
-  TUThemeManager.Create(Self);
+  if GetCommonThemeManager = Nil then
+    TUThemeManager.Create(Self);
   FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
+  FThemeManager.Connect(Self);
+
+//  UpdateTheme;
+end;
+
+destructor TUWPForm.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
 end;
 
 procedure TUWPForm.CreateParams(var Params: TCreateParams);

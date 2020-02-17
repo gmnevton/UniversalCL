@@ -7,11 +7,15 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils,
-  UCL.IntAnimation,
-  Classes, Types,
+  Classes,
+  Types,
   Messages,
-  Controls, Graphics;
+  Controls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils,
+  UCL.IntAnimation;
 
 type
   TUCustomProgressBar = class(TCustomControl, IUThemeComponent)
@@ -39,14 +43,15 @@ type
       procedure SetOrientation(const Value: TUOrientation);
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure Paint; override;
       procedure Resize; override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
-      constructor Create(aOnwer: TComponent); override;
+      constructor Create(AOnwer: TComponent); override;
       destructor Destroy; override;
+
       procedure UpdateTheme;
 
       procedure GoToValue(Value: Integer);
@@ -116,20 +121,8 @@ implementation
 
 procedure TUCustomProgressBar.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomProgressBar.UpdateTheme;
@@ -138,78 +131,72 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 procedure TUCustomProgressBar.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUCustomProgressBar.UpdateColors;
 begin
   //  Background & fill color
-  if ThemeManager = nil then
-    begin
-      BackColor := FCustomBackColor;
-      FillColor := FCustomFillColor;
-    end
-  else if ThemeManager.Theme = utLight then
-    begin
-      BackColor := $CCCCCC;
-      FillColor := ThemeManager.AccentColor;
-    end
-  else
-    begin
-      BackColor := $333333;
-      FillColor := ThemeManager.AccentColor;
-    end;
+  if ThemeManager = Nil then begin
+    BackColor := FCustomBackColor;
+    FillColor := FCustomFillColor;
+  end
+  else if ThemeManager.Theme = utLight then begin
+    BackColor := $CCCCCC;
+    FillColor := ThemeManager.AccentColor;
+  end
+  else begin
+    BackColor := $333333;
+    FillColor := ThemeManager.AccentColor;
+  end;
 end;
 
 procedure TUCustomProgressBar.UpdateRects;
 begin
   //  Background & fill area
-  if Orientation = oHorizontal then
-    begin
-      FillRect := Rect(0, 0, Round(Value / 100 * Width), Height);
-      BackRect := Rect(FillRect.Right, 0, Width, Height);
-    end
-  else
-    begin
-      BackRect := Rect(0, 0, Width, Round(Value / 100 * Height));
-      FillRect := Rect(0, BackRect.Bottom, Width, Height);
-    end;
+  if Orientation = oHorizontal then begin
+    FillRect := Rect(0, 0, Round(Value / 100 * Width), Height);
+    BackRect := Rect(FillRect.Right, 0, Width, Height);
+  end
+  else begin
+    BackRect := Rect(0, 0, Width, Round(Value / 100 * Height));
+    FillRect := Rect(0, BackRect.Bottom, Width, Height);
+  end;
 end;
 
 //  SETTERS
 
 procedure TUCustomProgressBar.SetValue(const Value: Integer);
 begin
-  if FValue <> Value then
-    begin
-      FValue := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if FValue <> Value then begin
+    FValue := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomProgressBar.SetOrientation(const Value: TUOrientation);
 begin
-  if FOrientation <> Value then
-    begin
-      FOrientation := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if FOrientation <> Value then begin
+    FOrientation := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomProgressBar.Create(aOnwer: TComponent);
+constructor TUCustomProgressBar.Create(AOnwer: TComponent);
 begin
-  inherited Create(aOnwer);
+  inherited Create(AOnwer);
+  FThemeManager := Nil;
 
   //  Parent properties
   Height := 5;
@@ -224,6 +211,9 @@ begin
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateColors;
   UpdateRects;
 end;
@@ -231,6 +221,8 @@ end;
 destructor TUCustomProgressBar.Destroy;
 begin
   FAniSet.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -238,13 +230,14 @@ procedure TUCustomProgressBar.GoToValue(Value: Integer);
 var
   Ani: TIntAni;
 begin
-  if not Enabled then exit;
+  if not Enabled then
+    Exit;
 
   Ani := TIntAni.Create(FValue, Value - FValue,
     procedure (V: Integer)
     begin
       Self.Value := V;
-    end, nil);
+    end, Nil);
   Ani.AniSet.Assign(Self.AniSet);
   Ani.Start;
 end;

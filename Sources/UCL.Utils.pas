@@ -50,18 +50,17 @@ begin
   apiHandle := LoadLibrary('user32.dll');
   try
     @SetWindowCompositionAttribute := GetProcAddress(apiHandle, 'SetWindowCompositionAttribute');
-    if @SetWindowCompositionAttribute = nil then
+    if @SetWindowCompositionAttribute = Nil then
       Result := -1
-    else
-      begin
-        Accent.AccentState := AccentState;
+    else begin
+      Accent.AccentState := AccentState;
 
-        Data.Attribute := WCA_ACCENT_POLICY;
-        Data.SizeOfData := SizeOf(Accent);
-        Data.Data := @Accent;
+      Data.Attribute := WCA_ACCENT_POLICY;
+      Data.SizeOfData := SizeOf(Accent);
+      Data.Data := @Accent;
 
-        Result := SetWindowCompositionAttribute(FormHandle, Data);
-      end;
+      Result := SetWindowCompositionAttribute(FormHandle, Data);
+    end;
   finally
     FreeLibrary(apiHandle);
   end;
@@ -83,15 +82,14 @@ var
   Info: TBitmapInfo;
 begin
   FillChar(Info, SizeOf(Info), 0);
-  with Info.bmiHeader do
-    begin
-      biSize := SizeOf(Info.bmiHeader);
-      biWidth := 1;
-      biHeight := 1;
-      biPlanes := 1;
-      biBitCount := 32;
-      biCompression := BI_RGB;
-    end;
+  with Info.bmiHeader do begin
+    biSize := SizeOf(Info.bmiHeader);
+    biWidth := 1;
+    biHeight := 1;
+    biPlanes := 1;
+    biBitCount := 32;
+    biCompression := BI_RGB;
+  end;
   Info.bmiColors[0] := CreatePreMultipliedRGBQuad(Color, Alpha);
   Result := CreateDIBPatternBrushPt(@Info, 0);
 end;
@@ -150,14 +148,13 @@ end;
 
 procedure AssignBlendBitmap(const Bmp: TBitmap; Color: TColor);
 begin
-  if Bmp <> nil then
-    begin
-      Bmp.PixelFormat := pf32Bit;
-      Bmp.Width := 1;
-      Bmp.Height := 1;
-      Bmp.Canvas.Brush.Color := Color;
-      Bmp.Canvas.FillRect(Rect(0, 0, 1, 1));
-    end;
+  if Bmp <> nil then begin
+    Bmp.PixelFormat := pf32Bit;
+    Bmp.Width := 1;
+    Bmp.Height := 1;
+    Bmp.Canvas.Brush.Color := Color;
+    Bmp.Canvas.FillRect(Rect(0, 0, 1, 1));
+  end;
 end;
 
 procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; Direction: TUDirection);

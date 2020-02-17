@@ -176,6 +176,8 @@ type
     procedure buttonHighlightClick(Sender: TObject);
     procedure buttonAppListFormClick(Sender: TObject);
   private
+    procedure AppThemeBeforeUpdate(Sender: TObject);
+    procedure AppThemeAfterUpdate(Sender: TObject);
   public
   end;
 
@@ -185,7 +187,6 @@ var
 implementation
 
 uses
-  DataModule.Main,
   Form.LoginDialog,
   Form.ImageBackground,
   Form.AppList;
@@ -196,7 +197,56 @@ uses
 
 procedure TformDemo.FormCreate(Sender: TObject);
 begin
-  ThemeManager := dmMain.AppTheme;
+  Self.ThemeManager.OnBeforeUpdate := AppThemeBeforeUpdate;
+  Self.ThemeManager.OnAfterUpdate  := AppThemeAfterUpdate;
+end;
+
+procedure TformDemo.AppThemeBeforeUpdate(Sender: TObject);
+begin
+  if formDemo <> Nil then
+    LockWindowUpdate(formDemo.Handle);
+  if formLoginDialog <> Nil then
+    LockWindowUpdate(formLoginDialog.Handle);
+  if formImageBackground <> Nil then
+    LockWindowUpdate(formImageBackground.Handle);
+end;
+
+procedure TformDemo.AppThemeAfterUpdate(Sender: TObject);
+begin
+  //  Handle theme changed for formDemo
+  if formDemo <> Nil then begin
+    //  Theme changed
+    if Self.ThemeManager.UseSystemTheme then
+      formDemo.radioSystemTheme.IsChecked := true
+    else if Self.ThemeManager.CustomTheme = utLight then
+      formDemo.radioLightTheme.IsChecked := true
+    else
+      formDemo.radioDarkTheme.IsChecked := true;
+
+    //  Accent color changed
+    formDemo.panelSelectAccentColor.CustomBackColor := Self.ThemeManager.AccentColor;
+    formDemo.panelSelectAccentColor.CustomTextColor :=
+      GetTextColorFromBackground(Self.ThemeManager.AccentColor);
+
+    //  Color on border changed
+    if Self.ThemeManager.ColorOnBorder then
+      formDemo.checkColorBorder.State := cbsChecked
+    else
+      formDemo.checkColorBorder.State := cbsUnchecked;
+  end;
+
+  //  Handle theme changed for formImageBackground
+  if formImageBackground <> Nil then begin
+    //  Theme changed
+    if Self.ThemeManager.UseSystemTheme then
+      formImageBackground.radioSystemTheme.IsChecked := true
+    else if Self.ThemeManager.CustomTheme = utLight then
+      formImageBackground.radioLightTheme.IsChecked := true
+    else
+      formImageBackground.radioDarkTheme.IsChecked := true;
+  end;
+
+  LockWindowUpdate(0);
 end;
 
 //  ANIMATION TESTING
@@ -385,21 +435,21 @@ end;
 
 procedure TformDemo.radioSystemThemeClick(Sender: TObject);
 begin
-  ThemeManager.UseSystemTheme := true;
+  ThemeManager.UseSystemTheme := True;
   ThemeManager.Reload;
 end;
 
 procedure TformDemo.radioLightThemeClick(Sender: TObject);
 begin
   ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := false;
+  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 
 procedure TformDemo.radioDarkThemeClick(Sender: TObject);
 begin
   ThemeManager.CustomTheme := utDark;
-  ThemeManager.UseSystemTheme := false;
+  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 

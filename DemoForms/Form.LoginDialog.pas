@@ -54,9 +54,6 @@ var
 
 implementation
 
-uses
-  DataModule.Main;
-
 {$R *.dfm}
 
 procedure TformLoginDialog.buttonAppThemeClick(Sender: TObject);
@@ -82,8 +79,6 @@ end;
 procedure TformLoginDialog.FormCreate(Sender: TObject);
 begin
 //  EnableBlur(Handle, 3);
-
-  ThemeManager := dmMain.AppTheme;
 end;
 
 procedure TformLoginDialog.popupEditItemClick(Sender: TObject; Index: Integer);

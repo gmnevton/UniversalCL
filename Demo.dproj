@@ -70,10 +70,6 @@
 			<DCCReference Include="DemoForms\Form.ImageBackground.pas">
 				<Form>formImageBackground</Form>
 			</DCCReference>
-			<DCCReference Include="DemoForms\DataModule.Main.pas">
-				<Form>dmMain</Form>
-				<DesignClass>TDataModule</DesignClass>
-			</DCCReference>
 			<DCCReference Include="DemoForms\Form.AppList.pas">
 				<Form>formAppList</Form>
 			</DCCReference>

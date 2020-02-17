@@ -7,136 +7,142 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils,
   Classes,
-  Windows, Messages,
-  Controls, Graphics;
+  Windows,
+  Messages,
+  Controls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils;
 
 type
   TUCustomSlider = class(TGraphicControl, IUThemeComponent)
-    const
-      DefActiveColor: TDefColor = (
-        ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
-        ($D77800, $D77800, $D77800, $333333, $D77800));
-      DefBackColor: TDefColor = (
-        ($999999, $666666, $999999, $CCCCCC, $999999),
-        ($666666, $999999, $666666, $333333, $666666));
-      DefCurColor: TDefColor = (
-        ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
-        ($D77800, $F2F2F2, $767676, $333333, $D77800));
+  private const
+    DefActiveColor: TDefColor = (
+      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
+      ($D77800, $D77800, $D77800, $333333, $D77800));
+    DefBackColor: TDefColor = (
+      ($999999, $666666, $999999, $CCCCCC, $999999),
+      ($666666, $999999, $666666, $333333, $666666));
+    DefCurColor: TDefColor = (
+      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
+      ($D77800, $F2F2F2, $767676, $333333, $D77800));
 
-    private
-      var CurWidth: Integer;
-      var CurHeight: Integer;
-      var CurCorner: Integer;
-      var BarHeight: Integer;
-      var ActiveRect, NormalRect, CurRect: TRect;
-      var ActiveColor, BackColor, CurColor: TColor;
+  private
+    var CurWidth: Integer;
+    var CurHeight: Integer;
+    var CurCorner: Integer;
+    var BarHeight: Integer;
+    var ActiveRect, NormalRect, CurRect: TRect;
+    var ActiveColor, BackColor, CurColor: TColor;
 
-      FIsSliding: Boolean;
+    FIsSliding: Boolean;
 
-      FThemeManager: TUThemeManager;
-      FControlState: TUControlState;
-      FOrientation: TUOrientation;
-      FHitTest: Boolean;
-      FMin: Integer;
-      FMax: Integer;
-      FValue: Integer;
+    FThemeManager: TUThemeManager;
+    FControlState: TUControlState;
+    FOrientation: TUOrientation;
+    FHitTest: Boolean;
+    FMin: Integer;
+    FMax: Integer;
+    FValue: Integer;
 
-      //  Events
-      FOnChange: TNotifyEvent;
+    //  Events
+    FOnChange: TNotifyEvent;
 
-      //  Internal
-      procedure UpdateColors;
-      procedure UpdateRects;
+    //  Internal
+    procedure UpdateColors;
+    procedure UpdateRects;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetControlState(const Value: TUControlState);
-      procedure SetOrientation(const Value: TUOrientation);
-      procedure SetMin(const Value: Integer);
-      procedure SetMax(const Value: Integer);
-      procedure SetValue(const Value: Integer);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetControlState(const Value: TUControlState);
+    procedure SetOrientation(const Value: TUOrientation);
+    procedure SetMin(const Value: Integer);
+    procedure SetMax(const Value: Integer);
+    procedure SetValue(const Value: Integer);
 
-      //  Messages
-      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    //  Messages
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
-      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
-      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
-    protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
-      procedure Resize; override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Resize; override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    public
-      constructor Create(aOwner: TComponent); override;
-      procedure UpdateTheme;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property ControlState: TUControlState read FControlState write SetControlState default csNone;
+    procedure UpdateTheme;
 
-      property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
-      property IsSliding: Boolean read FIsSliding;
-      property HitTest: Boolean read FHitTest write FHitTest default true;
-      property Min: Integer read FMin write SetMin default 0;
-      property Max: Integer read FMax write SetMax default 100;
-      property Value: Integer read FValue write SetValue default 0;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
-      //  Events
-      property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
+    property IsSliding: Boolean read FIsSliding;
+    property HitTest: Boolean read FHitTest write FHitTest default true;
+    property Min: Integer read FMin write SetMin default 0;
+    property Max: Integer read FMax write SetMax default 100;
+    property Value: Integer read FValue write SetValue default 0;
+
+    //  Events
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
   TUSlider = class(TUCustomSlider)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      //property Caption;
-      property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
+  published
+    property Align;
+    property Anchors;
+    property AutoSize;
+    property BiDiMode;
+    //property Caption;
+    property Color;
+    property Constraints;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Touch;
+    property Visible;
+  {$IF CompilerVersion > 29}
+    property StyleElements;
+  {$IFEND}
 
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
+    property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDock;
+    property OnStartDrag;
   end;
 
 implementation
@@ -150,20 +156,8 @@ uses
 
 procedure TUCustomSlider.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomSlider.UpdateTheme;
@@ -172,143 +166,135 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 procedure TUCustomSlider.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUCustomSlider.UpdateColors;
 begin
-  if ThemeManager = nil then
-    begin
-      ActiveColor := DefActiveColor[utLight, ControlState];
-      BackColor := DefBackColor[utLight, ControlState];
-      CurColor := DefCurColor[utLight, ControlState];
-    end
-  else
-    begin
-      if Enabled then
-        ActiveColor := ThemeManager.AccentColor
-      else
-        ActiveColor := DefActiveColor[ThemeManager.Theme, ControlState];
-      BackColor := DefBackColor[ThemeManager.Theme, ControlState];
-      if ControlState = csNone then
-        CurColor := ThemeManager.AccentColor
-      else
-        CurColor := DefCurColor[ThemeManager.Theme, ControlState];
-    end;
+  if ThemeManager = nil then begin
+    ActiveColor := DefActiveColor[utLight, ControlState];
+    BackColor := DefBackColor[utLight, ControlState];
+    CurColor := DefCurColor[utLight, ControlState];
+  end
+  else begin
+    if Enabled then
+      ActiveColor := ThemeManager.AccentColor
+    else
+      ActiveColor := DefActiveColor[ThemeManager.Theme, ControlState];
+    BackColor := DefBackColor[ThemeManager.Theme, ControlState];
+    if ControlState = csNone then
+      CurColor := ThemeManager.AccentColor
+    else
+      CurColor := DefCurColor[ThemeManager.Theme, ControlState];
+  end;
 end;
 
 procedure TUCustomSlider.UpdateRects;
 begin
-  if Orientation = oHorizontal then
-    begin
-      ActiveRect.Left := 0;
-      ActiveRect.Top := (Height - BarHeight) div 2;
-      ActiveRect.Right := Round((Width - CurWidth) * (Value - Min) / (Max - Min));
-      ActiveRect.Bottom := ActiveRect.Top + BarHeight;
+  if Orientation = oHorizontal then begin
+    ActiveRect.Left := 0;
+    ActiveRect.Top := (Height - BarHeight) div 2;
+    ActiveRect.Right := Round((Width - CurWidth) * (Value - Min) / (Max - Min));
+    ActiveRect.Bottom := ActiveRect.Top + BarHeight;
 
-      NormalRect.Left := ActiveRect.Right + 1;
-      NormalRect.Top := ActiveRect.Top;
-      NormalRect.Right := Width;
-      NormalRect.Bottom := ActiveRect.Bottom;
+    NormalRect.Left := ActiveRect.Right + 1;
+    NormalRect.Top := ActiveRect.Top;
+    NormalRect.Right := Width;
+    NormalRect.Bottom := ActiveRect.Bottom;
 
-      CurRect.Left := ActiveRect.Right;
-      CurRect.Top := Height div 2 - CurHeight div 2;
-      CurRect.Right := CurRect.Left + CurWidth;
-      CurRect.Bottom := CurRect.Top + CurHeight;
-    end
-  else
-    begin
-      NormalRect.Left := (Width - BarHeight) div 2;
-      NormalRect.Top := 0;
-      NormalRect.Right := NormalRect.Left + BarHeight;
-      NormalRect.Bottom := Round((Height - CurHeight) * ({Value - Min}Max - Value) / (Max - Min));
+    CurRect.Left := ActiveRect.Right;
+    CurRect.Top := Height div 2 - CurHeight div 2;
+    CurRect.Right := CurRect.Left + CurWidth;
+    CurRect.Bottom := CurRect.Top + CurHeight;
+  end
+  else begin
+    NormalRect.Left := (Width - BarHeight) div 2;
+    NormalRect.Top := 0;
+    NormalRect.Right := NormalRect.Left + BarHeight;
+    NormalRect.Bottom := Round((Height - CurHeight) * ({Value - Min}Max - Value) / (Max - Min));
 
-      ActiveRect.Left := NormalRect.Left;
-      ActiveRect.Top := NormalRect.Bottom + 1;
-      ActiveRect.Right := NormalRect.Right;
-      ActiveRect.Bottom := Height;
+    ActiveRect.Left := NormalRect.Left;
+    ActiveRect.Top := NormalRect.Bottom + 1;
+    ActiveRect.Right := NormalRect.Right;
+    ActiveRect.Bottom := Height;
 
-      CurRect.Left := (Width - CurWidth) div 2;
-      CurRect.Top := NormalRect.Bottom;
-      CurRect.Right := CurRect.Left + CurWidth;
-      CurRect.Bottom := CurRect.Top + CurHeight;
-    end;
+    CurRect.Left := (Width - CurWidth) div 2;
+    CurRect.Top := NormalRect.Bottom;
+    CurRect.Right := CurRect.Left + CurWidth;
+    CurRect.Bottom := CurRect.Top + CurHeight;
+  end;
 end;
 
 //  SETTERS
 
 procedure TUCustomSlider.SetControlState(const Value: TUControlState);
 begin
-  if Value <> FControlState then
-    begin
-      FControlState := Value;
-      UpdateColors;
-      Repaint;
-    end;
+  if Value <> FControlState then begin
+    FControlState := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomSlider.SetOrientation(const Value: TUOrientation);
 var
   TempSize: Integer;
 begin
-  if Value <> FOrientation then
-    begin
-      FOrientation := Value;
+  if Value <> FOrientation then begin
+    FOrientation := Value;
 
-      //  Switch CurWidth and CurHeight
-      TempSize := CurWidth;
-      CurWidth := CurHeight;
-      CurHeight := TempSize;
+    //  Switch CurWidth and CurHeight
+    TempSize := CurWidth;
+    CurWidth := CurHeight;
+    CurHeight := TempSize;
 
-      UpdateRects;
-      Repaint;
-    end;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomSlider.SetMin(const Value: Integer);
 begin
-  if Value <> FMin then
-    begin
-      FMin := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if Value <> FMin then begin
+    FMin := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomSlider.SetMax(const Value: Integer);
 begin
-  if Value <> FMax then
-    begin
-      FMax := Value;
-      UpdateRects;
-      Repaint;
-    end;
+  if Value <> FMax then begin
+    FMax := Value;
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 procedure TUCustomSlider.SetValue(const Value: Integer);
 begin
-  if Value <> FValue then
-    begin
-      FValue := Value;
-      if Assigned(FOnChange) then
-        FOnChange(Self);
-      UpdateRects;
-      Repaint;
-    end;
+  if Value <> FValue then begin
+    FValue := Value;
+    if Assigned(FOnChange) then
+      FOnChange(Self);
+    UpdateRects;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomSlider.Create(aOwner: TComponent);
+constructor TUCustomSlider.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   //  New properties
   CurWidth := 8;
@@ -330,8 +316,18 @@ begin
   Height := 25;
   Width := 100;
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateColors;
   UpdateRects;
+end;
+
+destructor TUCustomSlider.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
 end;
 
 procedure TUCustomSlider.Paint;
@@ -382,56 +378,49 @@ end;
 
 procedure TUCustomSlider.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      ControlState := csHover;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ControlState := csHover;
+    inherited;
+  end;
 end;
 
 procedure TUCustomSlider.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
-    begin
-      ControlState := csNone;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ControlState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUCustomSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
 begin
-  if not (Enabled and HitTest) then exit;
+  if not (Enabled and HitTest) then
+    Exit;
 
   FControlState := csPress;
   UpdateColors;
   FIsSliding := true;
 
   //  If press in cursor
-  if
-    (Msg.XPos < CurRect.Left)
-    or (Msg.XPos > CurRect.Right)
-    or (Msg.YPos < CurRect.Top)
-    or (Msg.YPos > CurRect.Bottom)
-  then
-    begin
-      //  Change Value by click position, click point is center of cursor
-      if Orientation = oHorizontal then
-        TempValue := Min + Round((Msg.XPos - CurWidth div 2) * (Max - Min) / (Width - CurWidth))
-      else
-        TempValue := Max - Round((Msg.YPos - CurHeight div 2) * (Max - Min) / (Height - CurHeight));
+  if (Msg.XPos < CurRect.Left) or (Msg.XPos > CurRect.Right) or (Msg.YPos < CurRect.Top) or (Msg.YPos > CurRect.Bottom) then begin
+    //  Change Value by click position, click point is center of cursor
+    if Orientation = oHorizontal then
+      TempValue := Min + Round((Msg.XPos - CurWidth div 2) * (Max - Min) / (Width - CurWidth))
+    else
+      TempValue := Max - Round((Msg.YPos - CurHeight div 2) * (Max - Min) / (Height - CurHeight));
 
-      //  Keep value in range [Min..Max]
-      if TempValue < Min then
-        TempValue := Min
-      else if TempValue > Max then
-        TempValue := Max;
+    //  Keep value in range [Min..Max]
+    if TempValue < Min then
+      TempValue := Min
+    else if TempValue > Max then
+      TempValue := Max;
 
-      FValue := TempValue;
-      UpdateRects;
-      Repaint;
-    end;
+    FValue := TempValue;
+    UpdateRects;
+    Repaint;
+  end;
 
   inherited;
 end;
@@ -440,35 +429,34 @@ procedure TUCustomSlider.WMMouseMove(var Msg: TWMMouseMove);
 var
   TempValue: Integer;
 begin
-  if not (Enabled and HitTest) then exit;
+  if not (Enabled and HitTest) then
+    Exit;
 
-  if FIsSliding then
-    begin
-      if Orientation = oHorizontal then
-        TempValue := Min + Round((Msg.XPos - CurWidth div 2) * (Max - Min) / (Width - CurWidth))
-      else
-        TempValue := Max - Round((Msg.YPos - CurHeight div 2) * (Max - Min) / (Height - CurHeight));
+  if FIsSliding then begin
+    if Orientation = oHorizontal then
+      TempValue := Min + Round((Msg.XPos - CurWidth div 2) * (Max - Min) / (Width - CurWidth))
+    else
+      TempValue := Max - Round((Msg.YPos - CurHeight div 2) * (Max - Min) / (Height - CurHeight));
 
-      //  Keep value in range [Min..Max]
-      if TempValue < Min then
-        TempValue := Min
-      else if TempValue > Max then
-        TempValue := Max;
+    //  Keep value in range [Min..Max]
+    if TempValue < Min then
+      TempValue := Min
+    else if TempValue > Max then
+      TempValue := Max;
 
-      Value := TempValue;
-    end;
+    Value := TempValue;
+  end;
 
   inherited;
 end;
 
 procedure TUCustomSlider.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then
-    begin
-      ControlState := csNone;
-      FIsSliding := false;
-      inherited;
-    end;
+  if Enabled and HitTest then begin
+    ControlState := csNone;
+    FIsSliding := false;
+    inherited;
+  end;
 end;
 
 end.

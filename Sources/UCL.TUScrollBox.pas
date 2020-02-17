@@ -3,10 +3,19 @@ unit UCL.TUScrollBox;
 interface
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.IntAnimation, UCL.Utils,
-  Classes, TypInfo,
-  Windows, Messages, FlatSB,
-  Controls, Forms, ExtCtrls, Graphics;
+  Classes,
+  TypInfo,
+  Windows,
+  Messages,
+  FlatSB,
+  Controls,
+  Forms,
+  ExtCtrls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.IntAnimation,
+  UCL.Utils;
 
 type
   TUScrollBarStyle = (sbsMini, sbsFull, sbsNo);
@@ -45,11 +54,11 @@ type
       procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
       procedure Loaded; override;
 
@@ -84,18 +93,16 @@ var
   ControlSize: Integer;
   Ani: TIntAni;
 begin
-  FTimer.Enabled := false;  //  Stop getting scroll event
+  FTimer.Enabled := False;  //  Stop getting scroll event
 
-  if ScrollOrientation = oVertical then
-    begin
-      SB := VertScrollBar;
-      ControlSize := Height;
-    end
-  else
-    begin
-      SB := HorzScrollBar;
-      ControlSize := Width;
-    end;
+  if ScrollOrientation = oVertical then begin
+    SB := VertScrollBar;
+    ControlSize := Height;
+  end
+  else begin
+    SB := HorzScrollBar;
+    ControlSize := Width;
+  end;
 
   //  Limit scrolL count
   if ScrollCount > MaxScrollCount then
@@ -156,39 +163,36 @@ var
   ThumbSize, ThumbPos: Integer;
 begin
   //  Get orientation values
-  if ScrollOrientation = oVertical then
-    begin
-      SB := VertScrollBar;
-      ControlSize := Height;
-    end
-  else
-    begin
-      SB := HorzScrollBar;
-      ControlSize := Width;
-    end;
+  if ScrollOrientation = oVertical then begin
+    SB := VertScrollBar;
+    ControlSize := Height;
+  end
+  else begin
+    SB := HorzScrollBar;
+    ControlSize := Width;
+  end;
 
   //  Check scrollable
-  if (SB.Range = 0) or (SB.Range < ControlSize) then exit;
+  if (SB.Range = 0) or (SB.Range < ControlSize) then
+    Exit;
 
   //  Calc mini scroll bar size
   ThumbSize := Round(ControlSize * ControlSize / SB.Range);
   ThumbPos := Round(ControlSize * SB.Position / SB.Range);
 
   //  Calc mini scroll bar rect
-  if ScrollOrientation = oVertical then
-    begin
-      MiniSBRect.Left := Width - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
-      MiniSBRect.Right := Width - MINI_SCROLLBAR_MARGIN;
-      MiniSBRect.Top := ThumbPos;
-      MiniSBRect.Bottom := ThumbPos + ThumbSize;
-    end
-  else
-    begin
-      MiniSBRect.Top := Height - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
-      MiniSBRect.Bottom := Height - MINI_SCROLLBAR_MARGIN;
-      MiniSBRect.Left := ThumbPos;
-      MiniSBRect.Right := ThumbPos + ThumbSize;
-    end;
+  if ScrollOrientation = oVertical then begin
+    MiniSBRect.Left := Width - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
+    MiniSBRect.Right := Width - MINI_SCROLLBAR_MARGIN;
+    MiniSBRect.Top := ThumbPos;
+    MiniSBRect.Bottom := ThumbPos + ThumbSize;
+  end
+  else begin
+    MiniSBRect.Top := Height - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
+    MiniSBRect.Bottom := Height - MINI_SCROLLBAR_MARGIN;
+    MiniSBRect.Left := ThumbPos;
+    MiniSBRect.Right := ThumbPos + ThumbSize;
+  end;
 
   //  Paint mini scroll bar
   FCanvas.Brush.Handle := CreateSolidBrushWithAlpha(MINI_SCROLLBAR_COLOR, 255);
@@ -211,45 +215,34 @@ end;
 
 procedure TUScrollBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUScrollBox.UpdateTheme;
 begin
   //  Background color
-  if ThemeManager = nil then
+  if ThemeManager = Nil then
     Color := $E6E6E6
   else if ThemeManager.Theme = utLight then
     Color := $E6E6E6
   else
     Color := $1F1F1F;
 end;
-
+{
 procedure TUScrollBox.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  MAIN CLASS
 
-constructor TUScrollBox.Create(aOwner: TComponent);
+constructor TUScrollBox.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   MINI_SCROLLBAR_THICKNESS := 2;
   MINI_SCROLLBAR_MARGIN := 3;
@@ -278,6 +271,9 @@ begin
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
@@ -286,6 +282,8 @@ begin
   FAniSet.Free;
   FTimer.Free;
   FCanvas.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -311,7 +309,7 @@ procedure TUScrollBox.WMSize(var Msg: TWMSize);
 begin
   inherited;
   if ScrollBarStyle <> sbsFull then
-    SetOldSBVisible(false);
+    SetOldSBVisible(False);
 end;
 
 procedure TUScrollBox.WMMouseWheel(var Msg: TWMMouseWheel);
@@ -319,18 +317,17 @@ begin
   inherited;
 
   if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
-    exit;
+    Exit;
 
   WheelDelta := Msg.WheelDelta;
-  if ScrollCount = 0 then
+  if ScrollCount = 0 then begin
     //  Begin getting scroll
-    begin
-      ScrollCount := 1;
-      FIsScrolling := true;
+    ScrollCount := 1;
+    FIsScrolling := True;
 
-      FTimer.Interval := WaitEventTime;
-      FTimer.Enabled := true;
-    end
+    FTimer.Interval := WaitEventTime;
+    FTimer.Enabled := True;
+  end
   else
     //  Continue getting scroll messages
     Inc(ScrollCount);

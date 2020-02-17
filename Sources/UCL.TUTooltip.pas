@@ -3,37 +3,40 @@ unit UCL.TUTooltip;
 interface
 
 uses
-  UCL.Classes, UCL.Utils,
   Classes,
-  Windows, Messages,
-  Controls, Graphics;
+  Windows,
+  Messages,
+  Controls,
+  Graphics,
+  UCL.Classes,
+  UCL.Utils;
 
 type
   TUCustomTooltip = class(THintWindow)
-    const
-      DEF_HEIGHT = 26;
+  const
+    DEF_HEIGHT = 26;
 
-    private
-      var BorderColor: TColor;
-      var BackColor: TColor;
+  private
+    var BorderColor: TColor;
+    var BackColor: TColor;
 
-    protected
-      procedure CreateParams(var Params: TCreateParams); override;
-      procedure Paint; override;
-      procedure NCPaint(DC: HDC); override;
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure Paint; override;
+    procedure NCPaint(DC: HDC); override;
 
-    public
-      function CalcHintRect(MaxWidth: Integer; const AHint: string; AData: Pointer): TRect; override;
+  public
+    function CalcHintRect(MaxWidth: Integer; const AHint: String; AData: Pointer): TRect; override;
   end;
 
   TULightTooltip = class(TUCustomTooltip)
-    public
-      constructor Create(aOwner: TComponent); override;
+  public
+    constructor Create(aOwner: TComponent); override;
   end;
 
   TUDarkTooltip = class(TUCustomTooltip)
-    public
-      constructor Create(aOwner: TComponent); override;
+  public
+    constructor Create(aOwner: TComponent); override;
   end;
 
 implementation

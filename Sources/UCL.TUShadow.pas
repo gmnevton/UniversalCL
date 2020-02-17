@@ -7,90 +7,96 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.Utils, UCL.Graphics, UCL.TUThemeManager,
-  Classes, Types,
+  Classes, 
+  Types,
   Windows,
-  Controls, Graphics, ExtCtrls;
+  Controls, 
+  Graphics, 
+  ExtCtrls,
+  UCL.Classes, 
+  UCL.Utils, 
+  UCL.Graphics, 
+  UCL.TUThemeManager;
 
 type
   TUCustomShadow = class(TGraphicControl, IUThemeComponent)
-    private
-      var Color: TColor;
-      var BlendFunc: BLENDFUNCTION;
-      var BlendBmp: TBitmap;
+  private
+    var Color: TColor;
+    var BlendFunc: BLENDFUNCTION;
+    var BlendBmp: TBitmap;
 
-      FThemeManager: TUThemeManager;
+    FThemeManager: TUThemeManager;
 
-      FLightColor: TColor;
-      FDarkColor: TColor;
-      FDirection: TUDirection;
+    FLightColor: TColor;
+    FDarkColor: TColor;
+    FDirection: TUDirection;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetDirection(const Value: TUDirection);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetDirection(const Value: TUDirection);
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
-      procedure UpdateTheme;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure UpdateTheme;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
-      property LightColor: TColor read FLightColor write FLightColor default $F2F2F2;
-      property DarkColor: TColor read FDarkColor write FDarkColor default $2B2B2B;
-      property Direction: TUDirection read FDirection write SetDirection default dLeft;
+    property LightColor: TColor read FLightColor write FLightColor default $F2F2F2;
+    property DarkColor: TColor read FDarkColor write FDarkColor default $2B2B2B;
+    property Direction: TUDirection read FDirection write SetDirection default dLeft;
   end;
 
   TUShadow = class(TUCustomShadow)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      //property Caption;
-      //property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
+  published
+    property Align;
+    property Anchors;
+    property AutoSize;
+    property BiDiMode;
+    //property Caption;
+    //property Color;
+    property Constraints;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Touch;
+    property Visible;
+  {$IF CompilerVersion > 29}
+    property StyleElements;
+  {$IFEND}
 
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
+    property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDock;
+    property OnStartDrag;
   end;
 
 implementation

@@ -3,77 +3,88 @@ unit UCL.TUSmoothBox;
 interface
 
 uses
+  Classes,
+  Types,
+  Windows,
+  Messages,
+  FlatSB,
+  Controls,
+  StdCtrls,
+  Forms,
+  Dialogs,
+  ExtCtrls,
+  Graphics,
   UCL.IntAnimation,
-  UCL.Classes, UCL.Utils, UCL.TUThemeManager,
-  Classes, Types,
-  Windows, Messages, FlatSB,
-  Controls, StdCtrls, Forms, Dialogs, ExtCtrls, Graphics;
+  UCL.Classes,
+  UCL.Utils,
+  UCL.TUThemeManager;
 
 type
   TUScrollBarStyle = (sbsMini, sbsFull, sbsNo);
 
   TUMiniScrollBar = class(TCustomPanel)
-    private
-      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+  private
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
-    public
-      constructor Create(AOwner: TComponent); override;
+  public
+    constructor Create(AOwner: TComponent); override;
 
-    published
-      property Visible default False;
+  published
+    property Visible default False;
   end;
 
   TUSmoothBox = class(TScrollBox, IUThemeComponent)
-    private var
-      MiniSB: TUMiniScrollBar;
-      MINI_SB_THICKNESS: Byte;
-      MINI_SB_MARGIN: Byte;
-      //MINI_SB_COLOR: TColor;
-      MouseLeave: Boolean;
-      canMouseEnter: Boolean;
+  private var
+    MiniSB: TUMiniScrollBar;
+    MINI_SB_THICKNESS: Byte;
+    MINI_SB_MARGIN: Byte;
+    //MINI_SB_COLOR: TColor;
+    MouseLeave: Boolean;
+    canMouseEnter: Boolean;
 
-    private
-      FThemeManager: TUThemeManager;
-      FAniSet: TIntAniSet;
+  private
+    FThemeManager: TUThemeManager;
+    FAniSet: TIntAniSet;
 
-      FScrollCount: Integer;
-      FScrollOrientation: TUOrientation;      
-      FScrollBarStyle: TUScrollBarStyle;
-      FLengthPerStep: Integer;
-      FMaxScrollCount: Integer;
+    FScrollCount: Integer;
+    FScrollOrientation: TUOrientation;
+    FScrollBarStyle: TUScrollBarStyle;
+    FLengthPerStep: Integer;
+    FMaxScrollCount: Integer;
 
-      //  Setters
-      procedure SetThemeManager; //(const Value: TUThemeManager);
+    //  Setters
+    procedure SetThemeManager; //(const Value: TUThemeManager);
 
-      //  Messages
-      procedure WMSize(var Msg: TWMSize); message WM_SIZE;
-      procedure CMMouseWheel(var Msg: TCMMouseWheel); message CM_MOUSEWHEEL;
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    //  Messages
+    procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+    procedure CMMouseWheel(var Msg: TCMMouseWheel); message CM_MOUSEWHEEL;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
-    protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    public
-      constructor Create(aOwner: TComponent); override;
-      destructor Destroy; override;
-      procedure UpdateTheme;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-      procedure SetOldSBVisible(IsVisible: Boolean);
-      procedure UpdateMiniSB;
-      procedure SetMiniSBVisible(IsVisible: Boolean);
+    procedure UpdateTheme;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property AniSet: TIntAniSet read FAniSet write FAniSet;
+    procedure SetOldSBVisible(IsVisible: Boolean);
+    procedure UpdateMiniSB;
+    procedure SetMiniSBVisible(IsVisible: Boolean);
 
-      property ScrollCount: Integer read FScrollCount;
-      property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
-      property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
-      property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
-      property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property AniSet: TIntAniSet read FAniSet write FAniSet;
+
+    property ScrollCount: Integer read FScrollCount;
+    property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
+    property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
+    property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
+    property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
   end;
 
 implementation
@@ -93,19 +104,7 @@ type
 procedure TUSmoothBox.SetThemeManager; // (const Value: TUThemeManager);
 begin
   FThemeManager := GetCommonThemeManager;
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> Nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    FThemeManager := Value;
-//
-//    if Value <> Nil then begin
-//      Value.Connect(Self);
-//      Value.FreeNotification(Self);
-//    end;
-//
-//    UpdateTheme;
-//  end;
+  UpdateTheme;
 end;
 
 procedure TUSmoothBox.UpdateTheme;
@@ -118,7 +117,7 @@ begin
 //  else
 //    Color := $1F1F1F;
 
-  if ThemeManager = nil then begin
+  if ThemeManager = Nil then begin
     Color := SCROLLBOX_BACK_NIL;
     MiniSB.Color := MINI_SB_COLOR_NIL;
   end
@@ -131,19 +130,20 @@ begin
     MiniSB.Color := MINI_SB_COLOR_DARK;
   end;
 end;
-
+{
 procedure TUSmoothBox.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  MAIN CLASS
 
-constructor TUSmoothBox.Create(aOwner: TComponent);
+constructor TUSmoothBox.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   //  Internal
   MouseLeave := True;
@@ -154,8 +154,8 @@ begin
 
   //  Parent properties
   BorderStyle := bsNone;
-  VertScrollBar.Tracking := true;
-  HorzScrollBar.Tracking := true;
+  VertScrollBar.Tracking := True;
+  HorzScrollBar.Tracking := True;
 
   //  Fields
   FScrollCount := 0;
@@ -175,12 +175,17 @@ begin
   //  Custom AniSet
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10);
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUSmoothBox.Destroy;
 begin
   MiniSB.Free;
   FAniSet.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -278,6 +283,7 @@ begin
           Msg.Result := HTTRANSPARENT;
         end;
       end;
+
       alBottom: begin
         // we need to check bottom, left and right borders
         if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
@@ -285,6 +291,7 @@ begin
           Msg.Result := HTTRANSPARENT;
         end;
       end;
+
       alLeft: begin
         // we need to check left, top and bottom borders
         if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
@@ -292,6 +299,7 @@ begin
           Msg.Result := HTTRANSPARENT;
         end;
       end;
+
       alRight: begin
         // we need to check right, top and bottom borders
         if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
@@ -346,7 +354,7 @@ begin
   inherited;
 
   if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
-    exit;
+    Exit;
 
   if ScrollOrientation = oVertical then
     SB := VertScrollBar
@@ -368,11 +376,10 @@ begin
     if FScrollCount >= MaxScrollCount then
       Exit;
 
-    if FScrollCount = 0 then
-      begin
-        DisableAlign;
-        Mouse.Capture := Handle;
-      end;
+    if FScrollCount = 0 then begin
+      DisableAlign;
+      Mouse.Capture := Handle;
+    end;
 
     Inc(FScrollCount);
     Sign := Msg.WheelDelta div Abs(Msg.WheelDelta);
@@ -414,7 +421,7 @@ end;
 
 constructor TUMiniScrollBar.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
 
 {$IF CompilerVersion > 29}
   StyleElements :=[];
@@ -426,7 +433,7 @@ begin
   ParentBackground := False;
   ParentColor := False;
 
-  Visible := false;
+  Visible := False;
 end;
 
 procedure TUMiniScrollBar.WMNCHitTest(var Msg: TWMNCHitTest);

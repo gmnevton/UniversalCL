@@ -63,7 +63,6 @@ type
     USymbolButton2: TUSymbolButton;
     USymbolButton4: TUSymbolButton;
     USymbolButton3: TUSymbolButton;
-    procedure FormCreate(Sender: TObject);
   private
   public
   end;
@@ -74,12 +73,5 @@ var
 implementation
 
 {$R *.dfm}
-
-uses DataModule.Main;
-
-procedure TformAppList.FormCreate(Sender: TObject);
-begin
-  ThemeManager := dmMain.AppTheme;
-end;
 
 end.

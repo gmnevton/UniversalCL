@@ -33,7 +33,11 @@ object formLoginDialog: TformLoginDialog
     ParentColor = False
     ParentDoubleBuffered = False
     TabOrder = 0
-    ThemeManager = dmMain.AppTheme
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkQuartic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 250
+    AniSet.Step = 25
     MaxScrollCount = 6
     object titleSignin: TUText
       AlignWithMargins = True
@@ -49,12 +53,11 @@ object formLoginDialog: TformLoginDialog
       Alignment = taCenter
       Caption = 'Hello, John'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 14120960
+      Font.Color = clBlack
       Font.Height = -28
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ThemeManager = dmMain.AppTheme
       TextKind = tkTitle
       UseAccentColor = True
       ExplicitWidth = 137
@@ -78,7 +81,6 @@ object formLoginDialog: TformLoginDialog
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ThemeManager = dmMain.AppTheme
       TextKind = tkHeading
       ExplicitWidth = 197
     end
@@ -95,7 +97,6 @@ object formLoginDialog: TformLoginDialog
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
       ParentFont = False
-      ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
       ExplicitWidth = 58
     end
@@ -112,7 +113,6 @@ object formLoginDialog: TformLoginDialog
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
       ParentFont = False
-      ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
       ExplicitWidth = 32
     end
@@ -136,7 +136,6 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       OnClick = textShowMoreOptionsClick
-      ThemeManager = dmMain.AppTheme
       TextKind = tkDescription
       ExplicitWidth = 103
     end
@@ -153,7 +152,6 @@ object formLoginDialog: TformLoginDialog
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
       ParentFont = False
-      ThemeManager = dmMain.AppTheme
       TextKind = tkEntry
       ExplicitWidth = 130
     end
@@ -175,7 +173,6 @@ object formLoginDialog: TformLoginDialog
       ShowCaption = False
       TabOrder = 0
       Visible = False
-      ThemeManager = dmMain.AppTheme
       CustomTextColor = clBlack
       CustomBackColor = 15132390
       object checkSendMeNews: TUCheckBox
@@ -183,7 +180,6 @@ object formLoginDialog: TformLoginDialog
         Top = 30
         Width = 330
         Height = 30
-        ThemeManager = dmMain.AppTheme
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
@@ -203,7 +199,6 @@ object formLoginDialog: TformLoginDialog
         Top = 0
         Width = 330
         Height = 30
-        ThemeManager = dmMain.AppTheme
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
@@ -246,7 +241,6 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       ShowCaption = False
       TabOrder = 1
-      ThemeManager = dmMain.AppTheme
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -290,7 +284,6 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       ShowCaption = False
       TabOrder = 2
-      ThemeManager = dmMain.AppTheme
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -336,7 +329,6 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       ShowCaption = False
       TabOrder = 3
-      ThemeManager = dmMain.AppTheme
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -374,14 +366,12 @@ object formLoginDialog: TformLoginDialog
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
-    ThemeManager = dmMain.AppTheme
     object buttonAppQuit: TUQuickButton
       Left = 365
       Top = 0
       Width = 45
       Height = 32
       Hint = 'Close'
-      ThemeManager = dmMain.AppTheme
       ButtonStyle = sbsQuit
       LightColor = 2298344
       DarkColor = 2298344
@@ -403,7 +393,6 @@ object formLoginDialog: TformLoginDialog
       Width = 45
       Height = 32
       Hint = 'Minimize'
-      ThemeManager = dmMain.AppTheme
       ButtonStyle = sbsMin
       LightColor = 13619151
       DarkColor = 3947580
@@ -425,7 +414,6 @@ object formLoginDialog: TformLoginDialog
       Width = 45
       Height = 32
       Hint = 'Switch theme'
-      ThemeManager = dmMain.AppTheme
       ButtonStyle = sbsSysButton
       LightColor = 13619151
       DarkColor = 3947580
@@ -464,7 +452,6 @@ object formLoginDialog: TformLoginDialog
     ParentFont = False
     ShowCaption = False
     TabOrder = 2
-    ThemeManager = dmMain.AppTheme
     CustomTextColor = clBlack
     CustomBackColor = 15132390
     object buttonOk: TUButton
@@ -472,7 +459,6 @@ object formLoginDialog: TformLoginDialog
       Top = 10
       Width = 130
       Height = 32
-      ThemeManager = dmMain.AppTheme
       CustomBorderColors.None = 15921906
       CustomBorderColors.Hover = 15132390
       CustomBorderColors.Press = 13421772
@@ -505,7 +491,6 @@ object formLoginDialog: TformLoginDialog
       Margins.Top = 0
       Margins.Right = 10
       Margins.Bottom = 0
-      ThemeManager = dmMain.AppTheme
       CustomBorderColors.None = 15921906
       CustomBorderColors.Hover = 15132390
       CustomBorderColors.Press = 13421772
@@ -529,7 +514,11 @@ object formLoginDialog: TformLoginDialog
     end
   end
   object popupEdit: TUPopupMenu
-    ThemeManager = dmMain.AppTheme
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkQuartic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 120
+    AniSet.Step = 20
     OnItemClick = popupEditItemClick
     Left = 40
     Top = 102

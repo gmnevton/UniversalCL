@@ -57,16 +57,11 @@ var
 
 implementation
 
-uses
-  DataModule.Main;
-
 {$R *.dfm}
 
 procedure TformImageBackground.FormCreate(Sender: TObject);
 begin
 //  EnableBlur(Handle, 3);
-
-  ThemeManager := dmMain.AppTheme;
 end;
 
 procedure TformImageBackground.radioSystemThemeClick(Sender: TObject);

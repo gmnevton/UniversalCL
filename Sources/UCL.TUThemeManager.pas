@@ -42,10 +42,13 @@ type
       //  Custom
       FCustomTheme: TUTheme;
       FCustomAccentColor: TColor;
+    private
+      procedure CollectAndConnectControls(const Root: TComponent);
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
+      procedure AfterConstruction; override;
       procedure Loaded; override;
 
       //  Utils
@@ -95,7 +98,7 @@ end;
 
 //  MAIN CLASS
 
-constructor TUThemeManager.Create(aOwner: TComponent);
+constructor TUThemeManager.Create(AOwner: TComponent);
 begin
   if not (csLoading in ComponentState) and (CommonThemeManager <> Nil) then
     raise Exception.Create('TUThemeManager allready used in application!');
@@ -124,7 +127,14 @@ end;
 destructor TUThemeManager.Destroy;
 begin
   FCompList.Free;
+  CommonThemeManager := Nil;
   inherited;
+end;
+
+procedure TUThemeManager.AfterConstruction;
+begin
+  inherited;
+  CollectAndConnectControls(Self.Owner);
 end;
 
 procedure TUThemeManager.Loaded;
@@ -195,6 +205,19 @@ begin
     Result := -1
   else
     Result := FCompList.Count;
+end;
+
+procedure TUThemeManager.CollectAndConnectControls(const Root: TComponent);
+var
+  i: Integer;
+  Component: TComponent;
+begin
+  for i:=0 to Root.ComponentCount - 1 do begin
+    Component:=Root.Components[i];
+    Self.Connect(Component);
+    if Component.ComponentCount > 0 then
+      CollectAndConnectControls(Component);
+  end;
 end;
 
 procedure TUThemeManager.Connect(const Comp: TComponent);

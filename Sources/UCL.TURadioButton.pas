@@ -7,10 +7,15 @@ interface
 {$IFEND}
 
 uses
-  UCL.Classes, UCL.TUThemeManager, UCL.Utils, UCL.Graphics,
   Classes,
-  Messages, Windows,
-  Controls, Graphics;
+  Messages,
+  Windows,
+  Controls,
+  Graphics,
+  UCL.Classes,
+  UCL.TUThemeManager,
+  UCL.Utils,
+  UCL.Graphics;
 
 type
   TUCustomRadioButton = class(TGraphicControl, IUThemeComponent)
@@ -47,14 +52,15 @@ type
       procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
     protected
-      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
       procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
       procedure Paint; override;
       procedure Resize; override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
+
       procedure UpdateTheme;
 
     published
@@ -124,20 +130,8 @@ implementation
 
 procedure TUCustomRadioButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//    if FThemeManager <> nil then
-//      FThemeManager.Disconnect(Self);
-//
-//    if Value <> nil then
-//      begin
-//        Value.Connect(Self);
-//        Value.FreeNotification(Self);
-//      end;
-//
-//    FThemeManager := Value;
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomRadioButton.UpdateTheme;
@@ -146,41 +140,37 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 procedure TUCustomRadioButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
-
+}
 //  INTERNAL
 
 procedure TUCustomRadioButton.UpdateColors;
 begin
   //  Active & text color
-  if ThemeManager = nil then
-    begin
-      ActiveColor := CustomActiveColor;
-      TextColor := $000000;
-    end
-  else if ThemeManager.Theme = utLight then
-    begin
-      ActiveColor := ThemeManager.AccentColor;
-      TextColor := $000000;
-    end
-  else
-    begin
-      ActiveColor := ThemeManager.AccentColor;
-      TextColor := $FFFFFF;
-    end;
+  if ThemeManager = nil then begin
+    ActiveColor := CustomActiveColor;
+    TextColor := $000000;
+  end
+  else if ThemeManager.Theme = utLight then begin
+    ActiveColor := ThemeManager.AccentColor;
+    TextColor := $000000;
+  end
+  else begin
+    ActiveColor := ThemeManager.AccentColor;
+    TextColor := $FFFFFF;
+  end;
 
   //  Disabled
-  if not Enabled then
-    begin
-      ActiveColor := $808080;
-      TextColor := $808080;
-    end;
+  if not Enabled then begin
+    ActiveColor := $808080;
+    TextColor := $808080;
+  end;
 end;
 
 procedure TUCustomRadioButton.UpdateRects;
@@ -193,50 +183,46 @@ end;
 
 procedure TUCustomRadioButton.SetAutoSize(const Value: Boolean);
 begin
-  if Value <> FAutoSize then
-    begin
-      FAutoSize := Value;
-      Resize;
-    end;
+  if Value <> FAutoSize then begin
+    FAutoSize := Value;
+    Resize;
+  end;
 end;
 
 procedure TUCustomRadioButton.SetIsChecked(const Value: Boolean);
 var
   i: Integer;
 begin
-  if Value <> FIsChecked then
-    begin
-      FIsChecked := Value;
+  if Value <> FIsChecked then begin
+    FIsChecked := Value;
 
-      //  Uncheck all items with the same group
-      if Value then
-        for i := 0 to Parent.ControlCount - 1 do
-          if
-            (Parent.Controls[i] <> Self)
-            and (Parent.Controls[i] is TUCustomRadioButton)
-            and ((Parent.Controls[i] as TUCustomRadioButton).Group = Group)
-          then
-            (Parent.Controls[i] as TUCustomRadioButton).IsChecked := false;
+    //  Uncheck all items with the same group
+    if Value then begin
+      for i := 0 to Parent.ControlCount - 1 do begin
+        if (Parent.Controls[i] <> Self) and (Parent.Controls[i] is TUCustomRadioButton) and ((Parent.Controls[i] as TUCustomRadioButton).Group = Group) then
+          (Parent.Controls[i] as TUCustomRadioButton).IsChecked := false;
+      end;
 
       Repaint;
     end;
+  end;
 end;
 
 
 procedure TUCustomRadioButton.SetTextOnGlass(const Value: Boolean);
 begin
-  if Value <> FTextOnGlass then
-    begin
-      FTextOnGlass := Value;
-      Repaint;
-    end;
+  if Value <> FTextOnGlass then begin
+    FTextOnGlass := Value;
+    Repaint;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUCustomRadioButton.Create(aOwner: TComponent);
+constructor TUCustomRadioButton.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   //  New props
   FAutoSize := false;
@@ -256,6 +242,9 @@ begin
   Height := 30;
   Width := 180;
 
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateColors;
   UpdateRects;
 end;
@@ -263,6 +252,8 @@ end;
 destructor TUCustomRadioButton.Destroy;
 begin
   FIconFont.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
   inherited;
 end;
 
@@ -281,12 +272,11 @@ begin
   inherited;
 
   //  Paint background
-  if not TextOnGlass then
-    begin
-      Canvas.Brush.Style := bsSolid;
-      Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
-      Canvas.FillRect(Rect(0, 0, Width, Height));
-    end;
+  if not TextOnGlass then begin
+    Canvas.Brush.Style := bsSolid;
+    Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
+    Canvas.FillRect(Rect(0, 0, Width, Height));
+  end;
 
   //  Paint text
   Canvas.Brush.Style := bsClear;
@@ -296,33 +286,30 @@ begin
 
   //  Paint icon
   Canvas.Font := IconFont;
-  if not IsChecked then
-    begin
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
-    end
-  else
-    begin
-      Canvas.Font.Color := ActiveColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
+  if not IsChecked then begin
+    Canvas.Font.Color := TextColor;
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
+  end
+  else begin
+    Canvas.Font.Color := ActiveColor;
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
 
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_INSIDE, TextOnGlass);
-    end;
+    Canvas.Font.Color := TextColor;
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_INSIDE, TextOnGlass);
+  end;
 end;
 
 procedure TUCustomRadioButton.Resize;
 var
   Space: Integer;
 begin
-  if AutoSize and (Align = alNone) then
-    begin
-      Space := 5;
-      Canvas.Font := IconFont;
-      Height := 2 * Space + Canvas.TextHeight(ICON_CIRCLE_BORDER);
-      Canvas.Font := Font;
-      Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
-    end
+  if AutoSize and (Align = alNone) then begin
+    Space := 5;
+    Canvas.Font := IconFont;
+    Height := 2 * Space + Canvas.TextHeight(ICON_CIRCLE_BORDER);
+    Canvas.Font := Font;
+    Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
+  end
   else
     inherited;
   UpdateRects;

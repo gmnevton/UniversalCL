@@ -57,7 +57,7 @@ type
       procedure Paint; override;
 
     public
-      constructor Create(aOwner: TComponent); override;
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
 
       procedure UpdateTheme;
@@ -129,18 +129,8 @@ implementation
 
 procedure TUCustomQuickButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
-//  if Value <> FThemeManager then begin
-//
-//    FThemeManager := Value;
-//
-//    if Value <> nil then begin
-//      Value.Connect(Self);
-//      Value.FreeNotification(Self);
-//    end;
-//
-//    UpdateTheme;
-//  end;
   FThemeManager := GetCommonThemeManager;
+  UpdateTheme;
 end;
 
 procedure TUCustomQuickButton.UpdateTheme;
@@ -170,6 +160,7 @@ begin
         TextColor := Font.Color;
       end;
     end;
+
     csHover: begin
       if ThemeManager = Nil then
         BackColor := CustomAccentColor
@@ -178,6 +169,7 @@ begin
       else
         BackColor := DarkColor;
     end;
+
     csPress: begin
       if ThemeManager = Nil then
         BackColor := BrightenColor(LightColor, PressBrightnessDelta)
@@ -186,9 +178,11 @@ begin
       else
         BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
     end;
+
     csDisabled: begin
       BackColor := $666666;
     end;
+
     csFocused: begin
       if ThemeManager = Nil then
         BackColor := LightColor
@@ -266,9 +260,10 @@ end;
 
 //  MAIN CLASS
 
-constructor TUCustomQuickButton.Create(aOwner: TComponent);
+constructor TUCustomQuickButton.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
+  FThemeManager := Nil;
 
   //  New props
   FButtonState := csNone;
@@ -285,8 +280,10 @@ begin
   Height := 32;
   Width := 45;
 
-  UpdateColors;
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
 
+  UpdateColors;
 end;
 
 destructor TUCustomQuickButton.Destroy;
@@ -351,6 +348,7 @@ begin
           Exit;
         ParentForm.Close;
       end;
+
       sbsMax: begin
         ParentForm := GetParentForm(Self, True);
         if ParentForm = Nil then
@@ -360,6 +358,7 @@ begin
         else
           ParentForm.WindowState := wsMaximized;
       end;
+
       sbsMin: begin
         ParentForm := GetParentForm(Self, True);
         if ParentForm = Nil then
