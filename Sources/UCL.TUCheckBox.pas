@@ -35,7 +35,6 @@ type
 
       FAutoSize: Boolean;
       FAllowGrayed: Boolean;
-      FHitTest: Boolean;
       FTextOnGlass: Boolean;
 
       FState: TUCheckBoxState;
@@ -74,11 +73,14 @@ type
 
       property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
       property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default false;
-      property HitTest: Boolean read FHitTest write FHitTest default true;
       property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
 
       property State: TUCheckBoxState read FState write SetState default cbsUnchecked;
       property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default $D77800;
+
+      property ParentColor default True;
+      property Height default 30;
+      property Width default 180;
   end;
 
   TUCheckBox = class(TUCustomCheckBox)
@@ -236,14 +238,13 @@ begin
 
   FAutoSize := false;
   FAllowGrayed := false;
-  FHitTest := true;
   FTextOnGlass := false;
   FState := cbsUnchecked;
   FCustomActiveColor := $D77800;  //  Default blue
 
   ParentColor := true;
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
+  //Font.Name := 'Segoe UI';
+  //Font.Size := 10;
 
   Height := 30;
   Width := 180;
@@ -333,7 +334,7 @@ end;
 
 procedure TUCustomCheckBox.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then
+  if Enabled then
     if AllowGrayed then   //  Unchecked > Checked > Grayed > ...
       case State of
         cbsUnchecked: State := cbsChecked;

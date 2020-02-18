@@ -1,16 +1,16 @@
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 unit UCL.IntAnimation;
 
 interface
 
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
 uses
   Classes
-  {$IF CompilerVersion > 29}
+{$IF CompilerVersion > 29}
   , Threading
-  {$IFEND}
+{$IFEND}
   ;
 
 type
@@ -224,7 +224,7 @@ begin
   TimePerStep := Round(d / AniSet.Step);
 
   //  Run
-  for i := 1 to AniSet.Step do
+  for i := 1 to AniSet.Step - 1 do
     begin
       t := i * TimePerStep;
       CurrentValue := b + Round(c * AniFunction(t / d));
@@ -232,8 +232,12 @@ begin
       Sleep(TimePerStep);
     end;
 
-  //  Finish
+  //  Last step
+  t := d;
+  CurrentValue := b + Round(c * AniFunction(t / d));
   Synchronize(UpdateControl);
+
+  //  Finish
   Synchronize(DoneControl);
 end;
 

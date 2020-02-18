@@ -29,10 +29,14 @@ type
 
     FLightColor: TColor;
     FDarkColor: TColor;
+    FAlphaA: Byte;
+    FAlphaB: Byte;
     FDirection: TUDirection;
 
     //  Setters
     procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetAlpha(Index: Integer; const Value: Byte);      
+    procedure SetColor(Index: Integer; const Value: TColor);
     procedure SetDirection(const Value: TUDirection);
 
   protected
@@ -42,13 +46,16 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
     procedure UpdateTheme;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
-    property LightColor: TColor read FLightColor write FLightColor default $F2F2F2;
-    property DarkColor: TColor read FDarkColor write FDarkColor default $2B2B2B;
+    property AlphaA: Byte index 0 read FAlphaA write SetAlpha default 255;
+    property AlphaB: Byte index 1 read FAlphaB write SetAlpha default 255;
+    property LightColor: TColor index 0 read FLightColor write SetColor default $F2F2F2;
+    property DarkColor: TColor index 1 read FDarkColor write SetColor default $2B2B2B;
     property Direction: TUDirection read FDirection write SetDirection default dLeft;
   end;
 
@@ -137,6 +144,34 @@ end;
 }
 //  SETTERS
 
+procedure TUCustomShadow.SetAlpha(Index: Integer; const Value: Byte);
+begin
+  case Index of
+    0: if Value <> FAlphaA then begin
+      FAlphaA := Value;
+    end;  
+
+    1: if Value <> FAlphaB then begin
+      FAlphaB := Value;
+    end;
+  end;
+  Repaint;
+end;
+
+procedure TUCustomShadow.SetColor(Index: Integer; const Value: TColor);
+begin
+  case Index of
+    0: if Value <> FLightColor then begin
+      FLightColor := Value;
+    end;
+
+    1: if Value <> FDarkColor then begin
+      FDarkColor := Value;
+    end;
+  end;
+  UpdateTheme;
+end;
+
 procedure TUCustomShadow.SetDirection(const Value: TUDirection);
 begin
   if Value <> FDirection then begin
@@ -149,14 +184,16 @@ end;
 
 constructor TUCustomShadow.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FThemeManager := Nil;
 
+  FAlphaA := 255;
+  FAlphaB := 255;
   FLightColor := $F2F2F2;
   FDarkColor := $2B2B2B;
   FDirection := dLeft;
 
-  Color := $D77800;
+  Color := $F2F2F2;
   BlendFunc := CreateBlendFunc(255, True);
   BlendBmp := TBitmap.Create;
 
@@ -179,7 +216,7 @@ begin
   BlendBmp.Width := Width;
   BlendBmp.Height := Height;
 
-  AssignGradientBlendBitmap(BlendBmp, Color, Direction);
+  AssignGradientBlendBitmap(BlendBmp, Color, AlphaA, AlphaB, Direction);
   PaintBlendBitmap(Canvas, Rect(0, 0, Width, Height), BlendBmp, BlendFunc);
 end;
 

@@ -36,7 +36,6 @@ type
     FCustomTextColors: TControlStateColors;
 
     FEnabled: Boolean;  //  Must override Enabled, if not disabled style wrong on Dark theme
-    FHitTest: Boolean;
     FOpenLink: Boolean;
     FURL: string;
 
@@ -71,9 +70,10 @@ type
     property CustomTextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
 
     property Enabled: Boolean read FEnabled write SetEnabled default true;
-    property HitTest: Boolean read FHitTest write FHitTest default true;
     property OpenLink: Boolean read FOpenLink write FOpenLink default true;
     property URL: string read FURL write FURL;
+
+    property Cursor default crHandPoint;
   end;
 
 implementation
@@ -145,21 +145,20 @@ begin
   FCustomTextColors.OnChange := DoCustomTextColorsChange;
 
   FEnabled := true;
-  FHitTest := true;
   FOpenLink := true;
   FURL := 'https://embarcadero.com/';
 
-  Caption := 'Embarcadero website';
+//  Caption := 'Embarcadero website';
 
   Cursor := crHandPoint;
 
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
-  UpdateTheme;
+//  UpdateTheme;
 end;
 
 destructor TUHyperLink.Destroy;
@@ -174,7 +173,7 @@ end;
 
 procedure TUHyperLink.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -182,7 +181,7 @@ end;
 
 procedure TUHyperLink.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -190,7 +189,7 @@ end;
 
 procedure TUHyperLink.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     if OpenLink then
       ShellExecute(0, '', PWideChar(URL), '', '', SW_SHOWNORMAL);
     ButtonState := csHover;
@@ -200,7 +199,7 @@ end;
 
 procedure TUHyperLink.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csHover;
     inherited;
   end;
@@ -208,7 +207,7 @@ end;
 
 procedure TUHyperLink.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csNone;
     inherited;
   end;

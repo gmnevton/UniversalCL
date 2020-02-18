@@ -31,7 +31,6 @@ type
       FIconFont: TFont;
 
       FAutoSize: Boolean;
-      FHitTest: Boolean;
       FIsChecked: Boolean;
       FGroup: string;
       FCustomActiveColor: TColor;
@@ -68,11 +67,14 @@ type
       property IconFont: TFont read FIconFont write FIconFont;
 
       property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
-      property HitTest: Boolean read FHitTest write FHitTest default true;
       property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
       property Group: string read FGroup write FGroup;
       property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor;
       property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
+
+      property ParentColor default true;
+      property Height default 30;
+      property Width default 180;
   end;
 
   TURadioButton = class(TUCustomRadioButton)
@@ -153,7 +155,7 @@ end;
 procedure TUCustomRadioButton.UpdateColors;
 begin
   //  Active & text color
-  if ThemeManager = nil then begin
+  if ThemeManager = Nil then begin
     ActiveColor := CustomActiveColor;
     TextColor := $000000;
   end
@@ -226,7 +228,6 @@ begin
 
   //  New props
   FAutoSize := false;
-  FHitTest := true;
   FIsChecked := false;
   FCustomActiveColor := $D77800;
   FTextOnGlass := false;
@@ -236,8 +237,8 @@ begin
   FIconFont.Size := 15;
 
   ParentColor := true;
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
 
   Height := 30;
   Width := 180;
@@ -319,7 +320,7 @@ end;
 
 procedure TUCustomRadioButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then
+  if Enabled then
     IsChecked := true;
 
   inherited;

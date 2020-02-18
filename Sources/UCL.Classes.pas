@@ -12,6 +12,7 @@ uses
   Graphics,
   Forms;
 
+{$REGION 'Older Delphi version'}
 {$IF CompilerVersion <= 30}
 const
   {$EXTERNALSYM WM_DPICHANGED}
@@ -43,6 +44,7 @@ type
     property PixelsPerInch: Integer read GetPixelsPerInch;
   end;
 {$IFEND}
+{$ENDREGION}
 
 type
   TUTheme = (utLight, utDark);
@@ -52,6 +54,9 @@ type
   TUDirection = (dLeft, dTop, dRight, dBottom);
 
   TUControlState = (csNone, csHover, csPress, csDisabled, csFocused);
+
+  //  NEW
+  TUButtonState = (ubsNone, ubsHover, ubsPress, ubsSelectedNone, ubsSelectedHover, ubsSelectedPress);
 
   TUImageKind = (ikFontIcon, ikImage);
 
@@ -72,8 +77,8 @@ type
 
   TQuadColor = packed record
     case Boolean of
-      True : (Blue, Green, Red, Alpha : Byte);
-      False : (Quad : Cardinal);
+      True: (Blue, Green, Red, Alpha: Byte);
+      False: (Quad: Cardinal);
   end;
 
   PQuadColor = ^TQuadColor;
@@ -113,6 +118,7 @@ function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
 
 implementation
 
+{$REGION 'Older Delphi version'}
 {$IF CompilerVersion <= 30}
 uses
   SysUtils,
@@ -137,6 +143,7 @@ begin
   end;
 end;
 {$IFEND}
+{$ENDREGION}
 
 { TControlStateColors }
 

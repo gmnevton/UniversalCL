@@ -54,6 +54,8 @@ type
     property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
     property DragMovement: Boolean read FDragMovement write FDragMovement default true;
     property EnableSystemMenu: Boolean read FEnableSystemMenu write FEnableSystemMenu default true;
+
+    property Height default 32;
   end;
 
   TUTitleBar = class(TUCustomTitleBar)
@@ -149,10 +151,10 @@ begin
   FDragMovement := true;
   FEnableSystemMenu := true;
 
-  Font.Name := 'Segoe UI';
-  Font.Size := 9;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 9;
   Height := 32;
-  Width := 400;
+//  Width := 400;
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);

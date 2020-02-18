@@ -3,11 +3,13 @@ unit UCL.Utils;
 interface
 
 uses
-  UCL.Classes,
+  SysUtils,
   Types,
   Windows,
-  Graphics, GraphUtil,
+  Graphics, 
+  GraphUtil,
   Themes,
+  UCL.Classes,
   UCL.Types;
 
 //  Form
@@ -25,16 +27,13 @@ function MulColor(aColor: TColor; Base: Single): TColor;
 //  Blend support
 function CreateBlendFunc(Alpha: Byte; Gradient: Boolean): BLENDFUNCTION;
 procedure AssignBlendBitmap(const Bmp: TBitmap; Color: TColor);
-procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; Direction: TUDirection);
+procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; A1, A2: Byte; Direction: TUDirection);
 procedure PaintBlendBitmap(const Canvas: TCanvas; DestRect: TRect; const BlendBitmap: TBitmap; BlendFunc: BLENDFUNCTION);
 
 // OS
 function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 
 implementation
-
-uses
-  SysUtils;
 
 //  FORM
 
@@ -114,10 +113,19 @@ begin
   R := GetRValue(C);
   G := GetGValue(C);
   B := GetBValue(C);
-  if 0.299 * R + 0.587 * G + 0.114 * B > 156 then
-    Result := $000000
-  else
-    Result := $FFFFFF;
+
+  if (R = G) and (G = B) then begin //  Black white colors
+    if C < $808080 then
+      Result := $FFFFFF
+    else
+      Result := $000000;
+  end
+  else begin //  Other colors
+    if 0.299 * R + 0.587 * G + 0.114 * B > 156 then
+      Result := $000000
+    else
+      Result := $FFFFFF;
+  end;
 end;
 
 function MulColor(aColor: TColor; Base: Single): TColor;
@@ -148,7 +156,7 @@ end;
 
 procedure AssignBlendBitmap(const Bmp: TBitmap; Color: TColor);
 begin
-  if Bmp <> nil then begin
+  if Bmp <> Nil then begin
     Bmp.PixelFormat := pf32Bit;
     Bmp.Width := 1;
     Bmp.Height := 1;
@@ -157,9 +165,9 @@ begin
   end;
 end;
 
-procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; Direction: TUDirection);
+procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; A1, A2: Byte; Direction: TUDirection);
 var
-  Alpha: Single;
+  Alpha, Percent: Single;
   R, G, B, A: Byte;
   X, Y, W, H: Integer;
   Pixel: PQuadColor;
@@ -178,18 +186,20 @@ begin
     Pixel := Bmp.ScanLine[Y];
     for X := 0 to W - 1 do begin
       case Direction of
-        dTop   : Alpha := 1 - Y / H;
-        dLeft  : Alpha := 1 - X / W;
-        dRight : Alpha := X / W;
-        dBottom: Alpha := Y / H;
+        dTop   : Percent := 1 - Y / H;
+        dLeft  : Percent := 1 - X / W;
+        dRight : Percent := X / W;
+        dBottom: Percent := Y / H;
       end;
 
-      A := Trunc(Alpha * 255);
+      A := A1 + Trunc(Percent * (A2 - A1));
+      Alpha := A / 255;
+
       Pixel.Alpha := A;
       Pixel.Red := Trunc(R * Alpha);
       Pixel.Green := Trunc(G * Alpha);
       Pixel.Blue := Trunc(B * Alpha);
-      inc(Pixel);
+      Inc(Pixel);
     end;
   end;
 end;

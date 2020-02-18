@@ -52,7 +52,6 @@ type
       FAlignment: TAlignment;
       FImageIndex: Integer;
       FImages: TCustomImageList;
-      FHitTest: Boolean;
       FAllowFocus: Boolean;
       FHighlight: Boolean;
       FIsToggleButton: Boolean;
@@ -111,12 +110,15 @@ type
       property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
       property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
       property Images: TCustomImageList read FImages write FImages;
-      property HitTest: Boolean read FHitTest write FHitTest default true;
       property AllowFocus: Boolean read FAllowFocus write FAllowFocus default true;
       property Highlight: Boolean read FHighlight write SetHighlight default false;
       property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
       property IsToggled: Boolean read FIsToggled write FIsToggled default false;
       property Transparent: Boolean read FTransparent write SetTransparent default false;
+
+      property Height default 30;
+      property Width default 135;
+      property TabStop default True;
   end;
 
   TUButton = class(TUCustomButton)
@@ -197,7 +199,7 @@ end;
 procedure TUCustomButton.UpdateColors;
 begin
   //  Not connect ThemeManager, use custom colors
-  if ThemeManager = nil then begin
+  if ThemeManager = Nil then begin
     BorderColor := CustomBorderColors.GetStateColor(ButtonState);
     BackColor := CustomBackColors.GetStateColor(ButtonState);
     TextColor := CustomTextColors.GetStateColor(ButtonState);
@@ -305,7 +307,6 @@ begin
   FButtonState := csNone;
   FAlignment := taCenter;
   FImageIndex := -1;
-  FHitTest := true;
   FAllowFocus := true;
   FHighlight := false;
   FIsToggleButton := false;
@@ -315,8 +316,8 @@ begin
   //  Property
   Height := 30;
   Width := 135;
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
   TabStop := true;
 
   if GetCommonThemeManager <> Nil then
@@ -341,16 +342,15 @@ var
 begin
   inherited;
 
-  //  Paint border
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BorderColor, 255);
-  Canvas.FillRect(Rect(0, 0, Width, Height));
-
   //  Paint background
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
-  Canvas.FillRect(Rect(BorderThickness, BorderThickness, Width - BorderThickness, Height - BorderThickness));
+  Canvas.FillRect(Rect(0, 0, Width, Height));
+
+  //  Draw border
+  DrawBorder(Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
 
   //  Paint image
-  if (Images <> nil) and (ImageIndex >= 0) then begin
+  if (Images <> Nil) and (ImageIndex >= 0) then begin
     GetCenterPos(Images.Width, Images.Height, ImgRect, ImgX, ImgY);
     Images.Draw(Canvas, ImgX, ImgY, ImageIndex, Enabled);
   end;
@@ -385,7 +385,7 @@ end;
 
 procedure TUCustomButton.WMSetFocus(var Msg: TWMSetFocus);
 begin
-  if Enabled and HitTest and AllowFocus then begin
+  if Enabled and AllowFocus then begin
     ButtonState := csFocused;
     inherited;
   end;
@@ -393,7 +393,7 @@ end;
 
 procedure TUCustomButton.WMKillFocus(var Msg: TWMKillFocus);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csNone;
     inherited;
   end;
@@ -401,7 +401,7 @@ end;
 
 procedure TUCustomButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -409,7 +409,7 @@ end;
 
 procedure TUCustomButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     if AllowFocus then
       SetFocus;
     ButtonState := csPress;
@@ -419,7 +419,7 @@ end;
 
 procedure TUCustomButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     if IsToggleButton then
       FIsToggled := not FIsToggled;
     ButtonState := csHover;
@@ -429,7 +429,7 @@ end;
 
 procedure TUCustomButton.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csHover;
     inherited;
   end;
@@ -437,7 +437,7 @@ end;
 
 procedure TUCustomButton.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     //  Dont allow focus
     if not AllowFocus then
       ButtonState := csNone //  No keep border

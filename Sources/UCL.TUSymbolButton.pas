@@ -32,14 +32,14 @@ type
       ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF)
     );
 
-  private
-    var BackColor, TextColor, DetailColor: TColor;
-    var IconRect, TextRect, DetailRect: TRect;
-
+  private var
+    BackColor, TextColor, DetailColor: TColor;
+    IconRect, TextRect, DetailRect: TRect;
+  
+  private  
     FThemeManager: TUThemeManager;
 
     FSymbolFont: TFont;
-    FTextFont: TFont;
     FDetailFont: TFont;
 
     FImageIndex: Integer;
@@ -47,7 +47,6 @@ type
     FImages: TCustomImageList;
 
     FButtonState: TUControlState;
-    FHitTest: Boolean;
     FOrientation: TUOrientation;
     FSymbolChar: string;
     FText: string;
@@ -108,7 +107,6 @@ type
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
 
     property SymbolFont: TFont read FSymbolFont write FSymbolFont;
-    property TextFont: TFont read FTextFont write FTextFont;
     property DetailFont: TFont read FDetailFont write FDetailFont;
 
     property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
@@ -116,7 +114,6 @@ type
     property Images: TCustomImageList read FImages write FImages;
 
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-    property HitTest: Boolean read FHitTest write FHitTest default true;
     property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
     property SymbolChar: string read FSymbolChar write SetSymbolChar;
     property Text: string read FText write SetText;
@@ -128,6 +125,10 @@ type
     property Transparent: Boolean read FTransparent write SetTransparent default false;
     property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
     property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
+
+    property TabStop default true;
+    property Height default 40;
+    property Width default 250;
   end;
 
   TUSymbolButton = class(TUCustomSymbolButton)
@@ -403,16 +404,12 @@ begin
   FSymbolFont.Name := 'Segoe MDL2 Assets';
   FSymbolFont.Size := 12;
 
-  FTextFont := TFont.Create;
-  FTextFont.Name := 'Segoe UI';
-  FTextFont.Size := 10;
-
   FDetailFont := TFont.Create;
-  FDetailFont.Name := 'Segoe UI';
-  FDetailFont.Size := 10;
+  FDetailFont.Name := Font.Name;
+//  FDetailFont.Name := 'Segoe UI';
+//  FDetailFont.Size := 10;
 
   FButtonState := csNone;
-  FHitTest := True;
   FOrientation := oHorizontal;
   FSymbolChar := '';
   FText := 'Some text';
@@ -425,9 +422,9 @@ begin
   FIsToggleButton := False;
   FIsToggled := False;
 
-  Width := 250;
-  Height := 40;
   TabStop := True;
+  Height := 40;
+  Width := 250;
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
@@ -436,7 +433,6 @@ end;
 destructor TUCustomSymbolButton.Destroy;
 begin
   FSymbolFont.Free;
-  FTextFont.Free;
   FDetailFont.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
@@ -461,11 +457,11 @@ begin
     if ShowIcon then begin
       Canvas.Font := SymbolFont;
       Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, false)
+      DrawTextRect(Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, False)
     end;
   end
   else begin
-    if Images <> nil then begin
+    if Images <> Nil then begin
       GetCenterPos(Images.Width, Images.Height, IconRect, ImgX, ImgY);
       Images.Draw(Canvas, ImgX, ImgY, ImageIndex, Enabled);
     end;
@@ -476,18 +472,18 @@ begin
     Canvas.Font := DetailFont;
     Canvas.Font.Color := DetailColor;
     if Orientation = oHorizontal then
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false)
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False)
     else
-      DrawTextRect(Canvas, taCenter, taAlignTop, DetailRect, Detail, false);
+      DrawTextRect(Canvas, taCenter, taAlignTop, DetailRect, Detail, False);
   end;
 
   //  Paint text
-  Canvas.Font := TextFont;
+  Canvas.Font := Font;
   Canvas.Font.Color := TextColor;
   if Orientation = oHorizontal then
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false)
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False)
   else
-    DrawTextRect(Canvas, taCenter, taAlignTop, TextRect, Text, false);
+    DrawTextRect(Canvas, taCenter, taAlignTop, TextRect, Text, False);
 end;
 
 procedure TUCustomSymbolButton.Resize;
@@ -511,7 +507,7 @@ begin
   DetailRightOffset := MulDiv(DetailRightOffset, M, D);
 
   SymbolFont.Height := MulDiv(SymbolFont.Height, M, D);
-  TextFont.Height := MulDiv(TextFont.Height, M, D);
+//  Font.Height := MulDiv(Font.Height, M, D);
   DetailFont.Height := MulDiv(DetailFont.Height, M, D);
 
   UpdateRects;
@@ -521,7 +517,7 @@ end;
 
 procedure TUCustomSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -529,7 +525,7 @@ end;
 
 procedure TUCustomSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -537,7 +533,7 @@ end;
 
 procedure TUCustomSymbolButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     if IsToggleButton then
       FIsToggled := not FIsToggled;
     ButtonState := csHover;
@@ -547,7 +543,7 @@ end;
 
 procedure TUCustomSymbolButton.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csHover;
     inherited;
   end;
@@ -555,7 +551,7 @@ end;
 
 procedure TUCustomSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csNone;
     inherited;
   end;

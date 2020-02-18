@@ -23,15 +23,13 @@ type
   TUPanel = class(TPanel, IUThemeComponent)
     private
       FThemeManager: TUThemeManager;
+      FBackColor: TUThemeColorSet;
 
-      FHitTest: Boolean;
-      FCustomTextColor: TColor;
-      FCustomBackColor: TColor;
-
+      //  Child events
+      procedure BackColor_OnChange(Sender: TObject);
+      
       //  Setters
       procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetCustomBackColor(const Value: TColor);
-      procedure SetCustomTextColor(const Value: TColor);
 
       //  Messages
       procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
@@ -47,10 +45,11 @@ type
 
     published
       property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+      property BackColor: TUThemeColorSet read FBackColor write FBackColor;
 
-      property HitTest: Boolean read FHitTest write FHitTest default true;
-      property CustomTextColor: TColor read FCustomTextColor write SetCustomTextColor;
-      property CustomBackColor: TColor read FCustomBackColor write SetCustomBackColor;
+      property BevelOuter default bvNone;
+      property ParentColor default false;
+      property ParentBackground default false;
   end;
 
 implementation
@@ -73,19 +72,26 @@ begin
 end;
 
 procedure TUPanel.UpdateTheme;
+var
+  Back: TUThemeColorSet;
 begin
-  if ThemeManager = Nil then begin
-    Color := CustomBackColor;
-    Font.Color := CustomTextColor;
-  end
-  else if ThemeManager.Theme = utLight then begin
-    Color := $00E6E6E6;
-    Font.Color := GetTextColorFromBackground(Color);
+  if ThemeManager = Nil then begin // do nothing
+//    Color := CustomBackColor;
+//    Font.Color := CustomTextColor;
   end
   else begin
-    Color := $001F1F1F;
+    //  Select default or custom style
+    if not BackColor.Enabled then
+      Back := PANEL_BACK
+    else
+      Back := BackColor;
+
+    Color := Back.GetColor(ThemeManager);
     Font.Color := GetTextColorFromBackground(Color);
-  end;
+  end;  
+
+  //  Repaint
+  //  Do not repaint, because it does not override Paint method
 end;
 
 procedure TUPanel.WMNCHitTest(var Msg: TWMNCHitTest);
@@ -139,23 +145,6 @@ begin
     FThemeManager := nil;
 end;
 }
-//  SETTERS
-
-procedure TUPanel.SetCustomBackColor(const Value: TColor);
-begin
-  if FCustomBackColor <> Value then begin
-    FCustomBackColor := Value;
-    UpdateTheme;
-  end;
-end;
-
-procedure TUPanel.SetCustomTextColor(const Value: TColor);
-begin
-  if FCustomTextColor <> Value then begin
-    FCustomTextColor := Value;
-    UpdateTheme;
-  end;
-end;
 
 //  MAIN CLASS
 
@@ -166,24 +155,35 @@ begin
 
   //  Old properties
   BevelOuter := bvNone;
-  Font.Name := 'Segoe UI';
-  Font.Size := 9;
+  ParentColor := false;
+  ParentBackground := false;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 9;
 
-  FHitTest := true;
-  FCustomTextColor := $00000000;
-  FCustomBackColor := $00E6E6E6;
+  //  Objects
+  FBackColor := TUThemeColorSet.Create;
+  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.Assign(PANEL_BACK);
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
-  UpdateTheme;
+//  UpdateTheme;
 end;
 
 destructor TUPanel.Destroy;
 begin
+  FBackColor.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
+end;
+
+//  CHILD EVENTS
+
+procedure TUPanel.BackColor_OnChange(Sender: TObject);
+begin
+  UpdateTheme;
 end;
 
 end.

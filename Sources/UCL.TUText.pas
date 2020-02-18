@@ -41,6 +41,9 @@ type
 
 implementation
 
+uses
+  UCL.Colors;
+
 { TUText }
 
 //  THEME
@@ -127,7 +130,7 @@ begin
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
-  UpdateTheme;
+//  UpdateTheme;
 end;
 
 destructor TUText.Destroy;

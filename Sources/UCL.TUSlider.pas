@@ -29,20 +29,20 @@ type
       ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
       ($D77800, $F2F2F2, $767676, $333333, $D77800));
 
-  private
-    var CurWidth: Integer;
-    var CurHeight: Integer;
-    var CurCorner: Integer;
-    var BarHeight: Integer;
-    var ActiveRect, NormalRect, CurRect: TRect;
-    var ActiveColor, BackColor, CurColor: TColor;
+  private var
+    CurWidth: Integer;
+    CurHeight: Integer;
+    CurCorner: Integer;
+    BarHeight: Integer;
+    ActiveRect, NormalRect, CurRect: TRect;
+    ActiveColor, BackColor, CurColor: TColor;
 
+  private
     FIsSliding: Boolean;
 
     FThemeManager: TUThemeManager;
     FControlState: TUControlState;
     FOrientation: TUOrientation;
-    FHitTest: Boolean;
     FMin: Integer;
     FMax: Integer;
     FValue: Integer;
@@ -89,13 +89,15 @@ type
 
     property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
     property IsSliding: Boolean read FIsSliding;
-    property HitTest: Boolean read FHitTest write FHitTest default true;
     property Min: Integer read FMin write SetMin default 0;
     property Max: Integer read FMax write SetMax default 100;
     property Value: Integer read FValue write SetValue default 0;
 
     //  Events
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
+
+    property Height default 25;
+    property Width default 100;
   end;
 
   TUSlider = class(TUCustomSlider)
@@ -178,7 +180,7 @@ end;
 
 procedure TUCustomSlider.UpdateColors;
 begin
-  if ThemeManager = nil then begin
+  if ThemeManager = Nil then begin
     ActiveColor := DefActiveColor[utLight, ControlState];
     BackColor := DefBackColor[utLight, ControlState];
     CurColor := DefCurColor[utLight, ControlState];
@@ -307,7 +309,6 @@ begin
   FControlState := csNone;
   FOrientation := oHorizontal;
 
-  FHitTest := true;
   FMin := 0;
   FMax := 100;
   FValue := 0;
@@ -378,7 +379,7 @@ end;
 
 procedure TUCustomSlider.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ControlState := csHover;
     inherited;
   end;
@@ -386,7 +387,7 @@ end;
 
 procedure TUCustomSlider.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ControlState := csNone;
     inherited;
   end;
@@ -396,7 +397,7 @@ procedure TUCustomSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
 begin
-  if not (Enabled and HitTest) then
+  if not Enabled then
     Exit;
 
   FControlState := csPress;
@@ -429,7 +430,7 @@ procedure TUCustomSlider.WMMouseMove(var Msg: TWMMouseMove);
 var
   TempValue: Integer;
 begin
-  if not (Enabled and HitTest) then
+  if not Enabled then
     Exit;
 
   if FIsSliding then begin
@@ -452,9 +453,9 @@ end;
 
 procedure TUCustomSlider.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ControlState := csNone;
-    FIsSliding := false;
+    FIsSliding := False;
     inherited;
   end;
 end;

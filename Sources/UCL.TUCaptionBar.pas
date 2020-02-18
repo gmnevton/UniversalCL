@@ -19,6 +19,7 @@ type
   TUCaptionBar = class(TPanel, IUThemeComponent)
   private
     FThemeManager: TUThemeManager;
+    FBackColor: TUThemeColorSet;
 
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
@@ -26,6 +27,9 @@ type
 
     //  Setters
     procedure SetThemeManager; // (const Value: TUThemeManager);
+
+    //  Child events
+    procedure BackColor_OnChange(Sender: TObject);
 
     //  Messages
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
@@ -44,10 +48,16 @@ type
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property BackColor: TUThemeColorSet read FBackColor write FBackColor;
 
     property DragMovement: Boolean read FDragMovement write FDragMovement default true;
     property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default true;
     property CustomColor: TColor read FCustomColor write FCustomColor default $D77800;
+
+    property Align default alTop;
+    property Alignment default taLeftJustify;
+    property BevelOuter default bvNone;
+    property Height default 32;
   end;
 
 implementation
@@ -69,17 +79,22 @@ begin
 end;
 
 procedure TUCaptionBar.UpdateTheme;
+var
+  Back: TUThemeColorSet;
 begin
   //  Background color
-  if ThemeManager = nil then
-    Color := CustomColor
-  else if ThemeManager.Theme = utLight then
-    Color := $F2F2F2
-  else
-    Color := $2B2B2B;
+  if ThemeManager = Nil then
+    //Color := CustomColor // do nothing
+  else begin
+    //  Select default or custom style
+    if not BackColor.Enabled then
+      Back := CAPTIONBAR_BACK
+    else
+      Back := BackColor;
 
-  //  Font color
-  Font.Color := GetTextColorFromBackground(Color);
+    Color := Back.GetColor(ThemeManager);
+    Font.Color := GetTextColorFromBackground(Color);
+  end;
 end;
 
 destructor TUCaptionBar.Destroy;
@@ -111,16 +126,20 @@ begin
   Alignment := taLeftJustify;
   Caption := '   TUCaptionBar';
   BevelOuter := bvNone;
-  TabStop := false;
+//  TabStop := False;
   Height := 32;
-  Font.Name := 'Segoe UI';
-  Font.Size := 9;
-  FullRepaint := true;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 9;
+//  FullRepaint := True;
+
+  FBackColor := TUThemeColorSet.Create;
+  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.Assign(CAPTIONBAR_BACK);
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
-  UpdateTheme;
+//  UpdateTheme;
 end;
 
 // MESSAGES
@@ -184,6 +203,13 @@ begin
     if P.Y < BorderSpace then
       Msg.Result := HTTRANSPARENT;  //  Send event to parent
   end;
+end;
+
+//  CHILD EVENTS
+
+procedure TUCaptionBar.BackColor_OnChange(Sender: TObject);
+begin
+  UpdateTheme;
 end;
 
 end.

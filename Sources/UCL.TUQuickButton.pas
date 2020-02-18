@@ -72,6 +72,9 @@ type
       property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
       property PressBrightnessDelta: Integer read FPressBrightnessDelta write FPressBrightnessDelta default 25;
       property Transparent: Boolean read FTransparent write SetTransparent default false;
+
+      property Height default 32;
+      property Width default 45;
   end;
 
   TUQuickButton = class(TUCustomQuickButton)
@@ -158,6 +161,7 @@ begin
       end
       else begin
         TextColor := Font.Color;
+        Exit;
       end;
     end;
 
@@ -301,7 +305,7 @@ var
 begin
   inherited;
 
-  if (not Transparent) or (ButtonState <> csNone) then begin //  Paint background
+  if not Transparent or (ButtonState <> csNone) then begin //  Paint background
     Canvas.Brush.Style := bsSolid;
     Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
     Canvas.FillRect(Rect(0, 0, Width, Height));

@@ -5,7 +5,7 @@ interface
 {$IF CompilerVersion <= 30}
 function IsDpiAware: Boolean;
 function SetHighDpiAware: Boolean;
-{$ENDIF}
+{$IFEND}
 
 implementation
 
@@ -41,6 +41,6 @@ end;
 initialization
   SetHighDpiAware;
 {$ENDIF}
-{$ENDIF}
+{$IFEND}
 
 end.

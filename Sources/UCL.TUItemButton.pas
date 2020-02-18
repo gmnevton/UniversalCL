@@ -44,7 +44,6 @@ type
 
       FObjectSelected: TUItemObjectKind;
       FButtonState: TUControlState;
-      FHitTest: Boolean;
       FLeftIconKind: TUImageKind;
       FRightIconKind: TUImageKind;
 
@@ -127,7 +126,6 @@ type
     published
       property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-      property HitTest: Boolean read FHitTest write FHitTest default true;
 
       //  Image
       property Images: TCustomImageList read FImages write FImages;
@@ -162,6 +160,10 @@ type
       property RightIconKind: TUImageKind read FRightIconKind write SetRightIconKind default ikFontIcon;
       property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
       property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
+
+      property TabStop default true;
+      property Height default 40;
+      property Width default 250;
   end;
 
   TUItemButton = class(TUCustomItemButton)
@@ -482,15 +484,12 @@ begin
 
   FObjectSelected := iokNone;
   FButtonState := csNone;
-  FHitTest := true;
   FImageLeftIndex := -1;
   FImageRightIndex := -1;
 
   //  Init text font
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
-  Height := 40;
-  Width := 250;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
 
   //  Init icon font
   FIconFont := TFont.Create;
@@ -499,8 +498,8 @@ begin
 
   //  Init detail font
   FDetailFont := TFont.Create;
-  FDetailFont.Name := 'Segoe UI';
-  FDetailFont.Size := 10;
+//  FDetailFont.Name := 'Segoe UI';
+//  FDetailFont.Size := 10;
 
   FObjectsVisible := [iokNone, iokLeftIcon, iokText, iokDetail];
 
@@ -524,6 +523,8 @@ begin
 
   //  Common properties
   TabStop := True;
+  Height := 40;
+  Width := 250;
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
@@ -633,7 +634,7 @@ end;
 
 procedure TUCustomItemButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -641,7 +642,7 @@ end;
 
 procedure TUCustomItemButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
@@ -649,7 +650,7 @@ end;
 
 procedure TUCustomItemButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
 //      if Msg.XPos < CheckBoxWidth then
 //        FObjectSelected := iokCheckBox
 //      else if Msg.XPos < CheckBoxWidth + LeftIconWidth then
@@ -695,7 +696,7 @@ end;
 
 procedure TUCustomItemButton.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csHover;
     inherited;
   end;
@@ -703,7 +704,7 @@ end;
 
 procedure TUCustomItemButton.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ButtonState := csNone;
     inherited;
   end;

@@ -17,9 +17,10 @@ uses
 
 type
   TUCustomSeparator = class(TGraphicControl, IUThemeComponent)
-  private
-    var LineColor: TColor;
+  private var
+    LineColor: TColor;
 
+  private
     FThemeManager: TUThemeManager;
 
     FCustomColor: TColor;
@@ -38,7 +39,6 @@ type
     procedure SetAlignSpace(const Value: Integer);
     procedure SetLineBetween(const Value: Boolean);
     procedure SetUseAccentColor(const Value: Boolean);
-    //procedure Notification(AComponent: TComponent; Operation: TOperation);
 
   protected
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -58,6 +58,9 @@ type
     property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 10;
     property LineBetween: Boolean read FLineBetween write SetLineBetween default true;
     property UseAccentColor: Boolean read FUseAccentColor write SetUseAccentColor default false;
+
+      property Height default 50;
+      property Width default 20;
   end;
 
   TUSeparator = class(TUCustomSeparator)

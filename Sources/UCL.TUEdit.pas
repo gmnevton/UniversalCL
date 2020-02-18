@@ -25,10 +25,39 @@ const
   UM_SUBEDIT_KILLFOCUS = WM_USER + 2;
 
 type
-  TUSubEdit = class(TEdit)
+  TUSubEdit = class(TCustomEdit)
   private
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+
+  published
+    property Align default alClient;
+    property BorderStyle default bsNone;
+    property AutoSize default true;
+    property ParentColor default true;
+    property ParentFont default true;
+    property Height default 20;
+
+    property Alignment;
+    property CharCase;
+    property Enabled;
+    property Font stored false;
+    property MaxLength;
+    property NumbersOnly;
+    property PasswordChar;
+    property PopupMenu;
+    property ReadOnly;
+    property Text;
+    property TextHint;
+    property OnChange;
+    property OnClick;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
   end;
 
   TUEdit = class(TPanel, IUThemeComponent)
@@ -47,7 +76,6 @@ type
       FControlState: TUControlState;
       FEdit: TUSubEdit;
 
-      FHitTest: Boolean;
       FTransparent: Boolean;
 
       //  Internal
@@ -88,8 +116,13 @@ type
       property Edit: TUSubEdit read FEdit write FEdit;
       property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
-      property HitTest: Boolean read FHitTest write FHitTest default true;
       property Transparent: Boolean read FTransparent write SetTransparent default false;
+
+      property Padding stored false;
+      property Alignment default taLeftJustify;
+      property ShowCaption default false;
+      property BevelOuter default bvNone;
+      property Height default 29;
   end;
 
 implementation
@@ -158,7 +191,7 @@ begin
 
   //  Transparent edit
   if Transparent and (ControlState = csNone) then begin
-    ParentColor := true;
+    ParentColor := True;
     BackColor := Color;
   end;
 
@@ -202,34 +235,29 @@ begin
   BorderThickness := 2;
 
   FControlState := csNone;
-  FHitTest := true;
-  FTransparent := false;
+  FTransparent := False;
 
   Alignment := taLeftJustify;
-  ShowCaption := false;
+  ShowCaption := False;
   Height := 29;
   BevelOuter := bvNone;
   Caption := '';
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
+  Padding.SetBounds(5, 5, 4, 4);
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
 
   FEdit := TUSubEdit.Create(Self);
   FEdit.Parent := Self;
-  FEdit.Name := 'SubEdit';
-  FEdit.Text := '';
-
-  FEdit.Font := Self.Font;
+  FEdit.ParentFont := True;
+//  FEdit.Name := 'SubEdit';
+//  FEdit.Text := '';
   FEdit.BorderStyle := bsNone;
-  FEdit.AutoSize := true;
-  FEdit.ParentColor := true;
-
-  Padding.Left := 5;
-  Padding.Right := 5;
-  Padding.Bottom := (Height - FEdit.Height) div 2 - 1;
-  Padding.Top := (Height - FEdit.Height) - Padding.Bottom;
+  FEdit.AutoSize := True;
+  FEdit.ParentColor := True;
+  FEdit.Height := 20;
 
   FEdit.Align := alClient;
-  FEdit.SetSubComponent(true);
+  FEdit.SetSubComponent(True);
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
@@ -286,7 +314,7 @@ end;
 
 procedure TUEdit.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     FEdit.SetFocus;
     ControlState := csPress;
     inherited;
@@ -295,8 +323,8 @@ end;
 
 procedure TUEdit.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled and HitTest then begin
-    if (Focused) or (FEdit.Focused) then
+  if Enabled then begin
+    if Focused or FEdit.Focused then
       ControlState := csFocused
     else
       ControlState := csNone;
@@ -306,7 +334,7 @@ end;
 
 procedure TUEdit.WMSetFocus(var Msg: TWMSetFocus);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ControlState := csFocused;
     inherited;
   end;
@@ -314,7 +342,7 @@ end;
 
 procedure TUEdit.WMKillFocus(var Msg: TWMKillFocus);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     ControlState := csNone;
     inherited;
   end;
@@ -322,20 +350,20 @@ end;
 
 procedure TUEdit.UMSubEditSetFocus(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
+  if Enabled then
     ControlState := csFocused;
 end;
 
 procedure TUEdit.UMSubEditKillFocus(var Msg: TMessage);
 begin
-  if Enabled and HitTest then
+  if Enabled then
     ControlState := csNone;
 end;
 
 procedure TUEdit.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
-    if (Focused) or (FEdit.Focused) then
+  if Enabled then begin
+    if Focused or FEdit.Focused then
       ControlState := csFocused
     else
       ControlState := csHover;
@@ -345,7 +373,7 @@ end;
 
 procedure TUEdit.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled and HitTest then begin
+  if Enabled then begin
     if (Focused) or (FEdit.Focused) then
       ControlState := csFocused
     else

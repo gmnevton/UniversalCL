@@ -20,32 +20,41 @@ uses
 type
   TUScrollBarStyle = (sbsMini, sbsFull, sbsNo);
 
-  TUScrollBox = class(TScrollBox, IUThemeComponent)
+  TUMiniScrollBar = class(TCustomPanel)
     private
-      var MINI_SCROLLBAR_THICKNESS: Byte;
-      var MINI_SCROLLBAR_MARGIN: Byte;
-      var MINI_SCROLLBAR_COLOR: TColor;
-      var ScrollCount: Integer;
-      var WheelDelta: SmallInt;
-      var MiniSBRect: TRect;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
+    public
+      constructor Create(aOwner: TComponent); override;
+
+    published
+      property Visible default false;
+  end;
+
+  TUScrollBox = class(TScrollBox, IUThemeComponent)
+    private var
+      MiniSB: TUMiniScrollBar;
+      MINI_SB_THICKNESS: Byte;
+      MINI_SB_MARGIN: Byte;
+      MINI_SB_COLOR: TColor;
+      MouseLeave: Boolean;
+
+    private
       FThemeManager: TUThemeManager;
       FAniSet: TIntAniSet;
-      FTimer: TTimer;
-      FCanvas: TCanvas;
+      FBackColor: TUThemeColorSet;
 
-      FIsScrolling: Boolean;
+      FScrollCount: Integer;
+      FScrollOrientation: TUOrientation;      
       FScrollBarStyle: TUScrollBarStyle;
-      FScrollOrientation: TUOrientation;
-      FWaitEventTime: Cardinal;
+      FLengthPerStep: Integer;
       FMaxScrollCount: Integer;
-      FLengthPerStep: Cardinal;
-      FTimePerStep: Cardinal;
-
-      procedure DoTimer(Sender: TObject);
 
       //  Setters
       procedure SetThemeManager; // (const Value: TUThemeManager);
+
+      //  Child events
+      procedure BackColor_OnChange(Sender: TObject);
 
       //  Messages
       procedure WMSize(var Msg: TWMSize); message WM_SIZE;
@@ -60,156 +69,30 @@ type
     public
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
-      procedure Loaded; override;
 
       procedure UpdateTheme;
 
-      procedure PaintMiniSB;
-      procedure ClearMiniSB;
       procedure SetOldSBVisible(IsVisible: Boolean);
+      procedure UpdateMiniSB;
+      procedure SetMiniSBVisible(IsVisible: Boolean);
 
     published
       property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
       property AniSet: TIntAniSet read FAniSet write FAniSet;
-      property IsScrolling: Boolean read FIsScrolling;
+      property BackColor: TUThemeColorSet read FBackColor write FBackColor;
+
+      property ScrollCount: Integer read FScrollCount;
       property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
       property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
-      property WaitEventTime: Cardinal read FWaitEventTime write FWaitEventTime default 50;
-      property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 5;
-      property LengthPerStep: Cardinal read FLengthPerStep write FLengthPerStep default 90;
-      property TimePerStep: Cardinal read FTimePerStep write FTimePerStep default 120;
+      property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
+      property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
+
+      property BorderStyle default bsNone;
   end;
 
 implementation
 
 { TUScrollBox }
-
-//  UTILS
-
-procedure TUScrollBox.DoTimer(Sender: TObject);
-var
-  SB: TControlScrollBar;
-  Start, Stop, Length: Integer;
-  ControlSize: Integer;
-  Ani: TIntAni;
-begin
-  FTimer.Enabled := False;  //  Stop getting scroll event
-
-  if ScrollOrientation = oVertical then begin
-    SB := VertScrollBar;
-    ControlSize := Height;
-  end
-  else begin
-    SB := HorzScrollBar;
-    ControlSize := Width;
-  end;
-
-  //  Limit scrolL count
-  if ScrollCount > MaxScrollCount then
-    ScrollCount := MaxScrollCount;
-
-  Length := - LengthPerStep * ScrollCount * (WheelDelta div Abs(WheelDelta));
-  Start := SB.Position;
-  Stop := Start + Length;
-
-  //  Keep Stop in range
-  if Stop < 0 then
-    Stop := 0
-  else if Stop > SB.Range - ControlSize then
-    Stop := SB.Range - ControlSize;
-
-  //  Recalc ani length
-  Length := Abs(Stop - Start);
-  ScrollCount := Round(Length / LengthPerStep); //  No limit needed, because Length2 always <= Length1
-  if ScrollCount = 0 then
-    ScrollCount := 1;
-
-  if not (csDesigning in ComponentState) then
-    DisableAlign;
-
-  Ani := TIntAni.Create(Start, Stop - Start, nil, nil);
-  if ScrollBarStyle = sbsMini then
-    Ani.OnSync := procedure (V: Integer)
-      begin
-        ClearMiniSB;
-        SB.Position := V;
-        PaintMiniSB;
-      end
-  else
-    Ani.OnSync := procedure (V: Integer)
-      begin
-        SB.Position := V;
-      end;
-
-  Ani.OnDone := procedure
-    begin
-      ScrollCount := 0;
-      FIsScrolling := false;
-      if ScrollBarStyle <> sbsFull then
-        SetOldSBVisible(false);
-      if not (csDesigning in ComponentState) then
-        EnableAlign;
-    end;
-
-  Ani.AniSet.Duration := Round(TimePerStep * Sqrt(ScrollCount));
-  Ani.AniSet.Step := Ani.AniSet.Duration div 12;
-  Ani.Start;
-end;
-
-procedure TUScrollBox.PaintMiniSB;
-var
-  SB: TControlScrollBar;
-  ControlSize: Integer;
-  ThumbSize, ThumbPos: Integer;
-begin
-  //  Get orientation values
-  if ScrollOrientation = oVertical then begin
-    SB := VertScrollBar;
-    ControlSize := Height;
-  end
-  else begin
-    SB := HorzScrollBar;
-    ControlSize := Width;
-  end;
-
-  //  Check scrollable
-  if (SB.Range = 0) or (SB.Range < ControlSize) then
-    Exit;
-
-  //  Calc mini scroll bar size
-  ThumbSize := Round(ControlSize * ControlSize / SB.Range);
-  ThumbPos := Round(ControlSize * SB.Position / SB.Range);
-
-  //  Calc mini scroll bar rect
-  if ScrollOrientation = oVertical then begin
-    MiniSBRect.Left := Width - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
-    MiniSBRect.Right := Width - MINI_SCROLLBAR_MARGIN;
-    MiniSBRect.Top := ThumbPos;
-    MiniSBRect.Bottom := ThumbPos + ThumbSize;
-  end
-  else begin
-    MiniSBRect.Top := Height - MINI_SCROLLBAR_MARGIN - MINI_SCROLLBAR_THICKNESS ;
-    MiniSBRect.Bottom := Height - MINI_SCROLLBAR_MARGIN;
-    MiniSBRect.Left := ThumbPos;
-    MiniSBRect.Right := ThumbPos + ThumbSize;
-  end;
-
-  //  Paint mini scroll bar
-  FCanvas.Brush.Handle := CreateSolidBrushWithAlpha(MINI_SCROLLBAR_COLOR, 255);
-  FCanvas.FillRect(MiniSBRect);
-end;
-
-procedure TUScrollBox.ClearMiniSB;
-begin
-  FCanvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
-  FCanvas.FillRect(MiniSBRect);
-end;
-
-procedure TUScrollBox.SetOldSBVisible(IsVisible: Boolean);
-begin
-  if not (csDesigning in ComponentState) then
-    FlatSB_ShowScrollBar(Handle, SB_BOTH, IsVisible);
-end;
 
 //  THEME
 
@@ -220,14 +103,21 @@ begin
 end;
 
 procedure TUScrollBox.UpdateTheme;
+var
+  Back: TUThemeColorSet;
 begin
   //  Background color
   if ThemeManager = Nil then
-    Color := $E6E6E6
-  else if ThemeManager.Theme = utLight then
-    Color := $E6E6E6
-  else
-    Color := $1F1F1F;
+    // Color := $E6E6E6 // do nothing
+  else begin
+    //  Select default or custom style
+    if not BackColor.Enabled then
+      Back := SCROLLBOX_BACK
+    else
+      Back := BackColor;
+
+    Color := Back.GetColor(ThemeManager);
+  end;
 end;
 {
 procedure TUScrollBox.Notification(AComponent: TComponent; Operation: TOperation);
@@ -244,53 +134,54 @@ begin
   inherited Create(AOwner);
   FThemeManager := Nil;
 
-  MINI_SCROLLBAR_THICKNESS := 2;
-  MINI_SCROLLBAR_MARGIN := 3;
-  MINI_SCROLLBAR_COLOR := $7A7A7A;
-  ScrollCount := 0;
-  WheelDelta := 0;
+  //  Internal
+  MouseLeave := true;
+  MINI_SB_THICKNESS := 2;
+  MINI_SB_MARGIN := 3;
+  MINI_SB_COLOR := $7A7A7A;
 
-  FIsScrolling := false;
-  FScrollOrientation := oVertical;
-  FScrollBarStyle :=sbsMini;
-  FWaitEventTime := 50;
-  FMaxScrollCount := 6;
-  FLengthPerStep := 90;
-  FTimePerStep := 120;
-
+  //  Parent properties
   BorderStyle := bsNone;
-  DoubleBuffered := true;
+  VertScrollBar.Tracking := true;
+  HorzScrollBar.Tracking := true;
 
-  FTimer := TTimer.Create(Self);
-  FTimer.Enabled := false;
-  FTimer.Interval := FWaitEventTime;
-  FTimer.OnTimer := DoTimer;
+  //  Fields
+  FScrollCount := 0;
+  FScrollOrientation := oVertical;
+  FScrollBarStyle := sbsMini;
+  FLengthPerStep := 4;
+  FMaxScrollCount := 8;
 
-  FCanvas := TCanvas.Create;
+  //  Mini scrollbar
+  MiniSB := TUMiniScrollBar.Create(Self);
+  MiniSB.Color := MINI_SB_COLOR;
+  MiniSB.Parent := Self;
+  MiniSB.SetSubComponent(true);
+  MiniSB.Visible := false;
+  MiniSB.Width := 0;
 
+  //  Custom AniSet
   FAniSet := TIntAniSet.Create;
-  FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
+  FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10);
+
+  FBackColor := TUThemeColorSet.Create;
+  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.Assign(SCROLLBOX_BACK);
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
-  UpdateTheme;
+//  UpdateTheme;
 end;
 
 destructor TUScrollBox.Destroy;
 begin
+  MiniSB.Free;
   FAniSet.Free;
-  FTimer.Free;
-  FCanvas.Free;
+  FBackColor.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
-end;
-
-procedure TUScrollBox.Loaded;
-begin
-  inherited;
-  FCanvas.Handle := GetDC(Handle);
 end;
 
 //  CUSTOM METHODS
@@ -298,9 +189,55 @@ end;
 procedure TUScrollBox.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
-  MINI_SCROLLBAR_THICKNESS := MulDiv(MINI_SCROLLBAR_THICKNESS, M, D);
-  MINI_SCROLLBAR_MARGIN := MulDiv(MINI_SCROLLBAR_MARGIN, M, D);
-  LengthPerStep := MulDiv(LengthPerStep, M, D);
+  MINI_SB_THICKNESS := MulDiv(MINI_SB_THICKNESS, M, D);
+  MINI_SB_MARGIN := MulDiv(MINI_SB_MARGIN, M, D);
+  FLengthPerStep := MulDiv(FLengthPerStep, M, D);
+end;
+//  UTILS
+
+procedure TUScrollBox.SetOldSBVisible(IsVisible: Boolean);
+begin
+  if not (csDesigning in ComponentState) then
+    FlatSB_ShowScrollBar(Handle, SB_BOTH, IsVisible);
+end;
+
+procedure TUScrollBox.UpdateMiniSB;
+var
+  SB: TControlScrollBar;
+  ControlSize: Integer;
+  ThumbPos, ThumbSize: Integer;
+begin
+  //  Get orientation values
+  if ScrollOrientation = oVertical then begin
+    SB := VertScrollBar;
+    ControlSize := Height;
+  end
+  else begin
+    SB := HorzScrollBar;
+    ControlSize := Width;
+  end;
+
+  if (SB.Range = 0) or (SB.Range < ControlSize) then begin
+    MiniSB.Visible := False;
+    Exit;
+  end;
+
+  ThumbSize := Round(ControlSize * ControlSize / SB.Range);
+  ThumbPos := Round(ControlSize * SB.Position / SB.Range);
+
+  if ScrollOrientation = oVertical then
+    (MiniSB as TControl).SetBounds(Width - MINI_SB_MARGIN - MINI_SB_THICKNESS, ThumbPos, MINI_SB_THICKNESS, ThumbSize)
+  else
+    (MiniSB as TControl).SetBounds(ThumbPos, Height - MINI_SB_MARGIN - MINI_SB_THICKNESS, ThumbSize, MINI_SB_THICKNESS);
+end;
+
+procedure TUScrollBox.SetMiniSBVisible(IsVisible: Boolean);
+begin
+  MiniSB.Visible := IsVisible;
+  if IsVisible then begin
+    UpdateMiniSB;
+    MiniSB.BringToFront;
+  end;
 end;
 
 //  MESSAGES
@@ -312,38 +249,132 @@ begin
     SetOldSBVisible(False);
 end;
 
-procedure TUScrollBox.WMMouseWheel(var Msg: TWMMouseWheel);
+procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
+begin
+  if Win32MajorVersion <> 10 then
+    SetFocus;
+
+  if MouseLeave and PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+    if ScrollBarStyle <> sbsFull then
+      SetOldSBVisible(False);
+    if ScrollBarStyle = sbsMini then
+      SetMiniSBVisible(True);
+  end;
+
+  inherited;
+end;
+
+procedure TUScrollBox.CMMouseLeave(var Msg: TMessage);
+begin
+  if (ScrollBarStyle = sbsMini) and not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+    MouseLeave := True;
+    SetMiniSBVisible(false);
+  end;
+
+  inherited;
+end;
+
+procedure TUScrollBox.CMMouseWheel(var Msg: TWMMouseWheel);
+var
+  SB: TControlScrollBar;
+  Ani: TIntAni;
+  Sign: Integer;
 begin
   inherited;
 
   if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
     Exit;
 
-  WheelDelta := Msg.WheelDelta;
-  if ScrollCount = 0 then begin
-    //  Begin getting scroll
-    ScrollCount := 1;
-    FIsScrolling := True;
+  if ScrollOrientation = oVertical then
+    SB := VertScrollBar
+  else 
+    SB := HorzScrollBar;
+  
+  //  Scroll by touchpad
+  if (Abs(Msg.WheelDelta) < 100) or (csDesigning in ComponentState) then begin
+    if csDesigning in ComponentState then
+      Msg.WheelDelta := 10 * Msg.WheelDelta div Abs(Msg.WheelDelta);
 
-    FTimer.Interval := WaitEventTime;
-    FTimer.Enabled := True;
+    DisableAlign;
+    SB.Position := SB.Position - Msg.WheelDelta;
+    if ScrollBarStyle = sbsMini then
+      UpdateMiniSB;
+    EnableAlign;
   end
-  else
-    //  Continue getting scroll messages
-    Inc(ScrollCount);
+  //  Scroll by mouse
+  else begin
+    if FScrollCount >= MaxScrollCount then 
+      Exit;
+
+    if FScrollCount = 0 then begin
+      DisableAlign;
+      Mouse.Capture := Handle;
+    end;
+
+    Inc(FScrollCount);
+    Sign := Msg.WheelDelta div Abs(Msg.WheelDelta);
+
+    Ani := TIntAni.Create(1, +LengthPerStep, nil, nil);
+    Ani.AniSet.Assign(Self.AniSet);
+
+    if ScrollBarStyle = sbsMini then begin
+      Ani.OnSync := 
+        procedure (V: Integer)
+        begin
+          SB.Position := SB.Position - V * Sign;
+          UpdateMiniSB;
+        end;
+    end
+    else begin
+      Ani.OnSync :=
+        procedure (V: Integer)
+        begin
+          SB.Position := SB.Position - V * Sign;
+        end;
+    end;
+
+    Ani.OnDone :=
+      procedure
+      begin
+        if ScrollBarStyle <> sbsFull then
+          SetOldSBVisible(False);
+        Dec(FScrollCount);
+        if FScrollCount <= 0 then begin
+          FScrollCount := 0;
+          EnableAlign;
+          Mouse.Capture := 0;
+        end;
+      end;
+    Ani.Start;
+  end;
 end;
 
-procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
+//  CHILD EVENTS
+
+procedure TUScrollBox.BackColor_OnChange(Sender: TObject);
+begin
+  UpdateTheme;
+end;
+
+{ TUMiniScrollBar }
+
+constructor TUMiniScrollBar.Create(aOwner: TComponent);
 begin
   inherited;
-  if ScrollBarStyle = sbsMini then
-    PaintMiniSB;
+
+{$IF CompilerVersion > 29}
+  StyleElements :=[];
+{$ENDIF}
+  BevelOuter := bvNone;
+  FullRepaint := False;
+  DoubleBuffered := True;
+
+  Visible := False;
 end;
 
-procedure TUScrollBox.CMMouseLeave(var Msg: TMessage);
+procedure TUMiniScrollBar.WMNCHitTest(var Msg: TWMNCHitTest);
 begin
-  if ScrollBarStyle = sbsMini then
-    ClearMiniSB;
+  Msg.Result := HTTRANSPARENT;
 end;
 
 end.
