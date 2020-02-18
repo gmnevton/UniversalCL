@@ -13,7 +13,7 @@ uses
   UCL.Classes,
   UCL.Utils,
   UCL.TUThemeManager,
-  UCL.TUBorderlessForm,
+  UCL.TUForm,
   UCL.TUEdit,
   UCL.TUButton,
   UCL.TUPanel,
@@ -27,7 +27,7 @@ uses
   UCL.TUShadow;
 
 type
-  TformImageBackground = class(TUBorderlessForm)
+  TformImageBackground = class(TUForm)
     imgBackground: TImage;
     titlebarMain: TUTitleBar;
     sliderMain: TUSlider;
@@ -42,8 +42,8 @@ type
     buttonCancel: TUButton;
     shadowMenu: TUShadow;
     entryChooseTheme: TUText;
-    buttonWinClose: TUQuickButton;
-    buttonWinMin: TUQuickButton;
+    buttonAppQuit: TUQuickButton;
+    buttonAppMinimized: TUQuickButton;
     procedure FormCreate(Sender: TObject);
     procedure radioSystemThemeClick(Sender: TObject);
     procedure radioLightThemeClick(Sender: TObject);
@@ -66,21 +66,21 @@ end;
 
 procedure TformImageBackground.radioSystemThemeClick(Sender: TObject);
 begin
-  ThemeManager.UseSystemTheme := true;
+  ThemeManager.UseSystemTheme := True;
   ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioLightThemeClick(Sender: TObject);
 begin
   ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := false;
+  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioDarkThemeClick(Sender: TObject);
 begin
   ThemeManager.CustomTheme := utDark;
-  ThemeManager.UseSystemTheme := false;
+  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 

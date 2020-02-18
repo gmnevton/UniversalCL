@@ -12,6 +12,7 @@ uses
   Forms,
   Graphics,
   UCL.Classes,
+  UCL.Colors,
   UCL.TUThemeManager,
   UCL.Utils;
 
@@ -63,10 +64,11 @@ type
 implementation
 
 uses
-  UCL.TUWPForm;
+  Types,
+  UCL.TUForm;
 
 type
-  TUWPFormAccess = class(TUWPForm);
+  TUFormAccess = class(TUForm);
 
 { TUCustomCaptionBar }
 
@@ -198,8 +200,8 @@ begin
     P := Point(Msg.Pos.x, Msg.Pos.y);
     P := ScreenToClient(P);
     BorderSpace:=8;
-    if ParentForm is TUWPForm then
-      BorderSpace:=TUWPFormAccess(ParentForm).GetBorderSpace(bsTop);
+    if ParentForm is TUForm then
+      BorderSpace:=TUFormAccess(ParentForm).GetBorderSpace(bsTop);
     if P.Y < BorderSpace then
       Msg.Result := HTTRANSPARENT;  //  Send event to parent
   end;

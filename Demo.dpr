@@ -1,9 +1,10 @@
 program Demo;
 
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListModules,
   Forms,
   Form.Demo in 'DemoForms\Form.Demo.pas' {formDemo},
   Form.LoginDialog in 'DemoForms\Form.LoginDialog.pas' {formLoginDialog},
@@ -11,7 +12,11 @@ uses
   Form.AppList in 'DemoForms\Form.AppList.pas' {formAppList};
 
 {$R *.res}
-{$R 'UCLPackage_D2010Resource.res'}
+{$IF CompilerVersion < 30}
+  {$R 'UCLPackage_D2010Resource.res'}
+{$ELSE}
+  {$R 'UCLPackage.dres'}
+{$IFEND}
 
 begin
   {$IFDEF DEBUG}

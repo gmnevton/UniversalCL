@@ -8,19 +8,18 @@ object formDemo: TformDemo
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 17
   object linkConnected: TUHyperLink
     Left = 540
     Top = 170
     Width = 125
     Height = 17
-    Cursor = crHandPoint
     Caption = 'TUHyperLink (default)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = 14120960
@@ -40,7 +39,6 @@ object formDemo: TformDemo
     Top = 190
     Width = 161
     Height = 17
-    Cursor = crHandPoint
     Caption = 'TUHyperLink (custom color)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = 8951296
@@ -60,6 +58,7 @@ object formDemo: TformDemo
     Top = 210
     Width = 135
     Height = 17
+    Cursor = crDefault
     Caption = 'TUHyperLink (disabled)'
     Color = clWhite
     Enabled = False
@@ -81,7 +80,7 @@ object formDemo: TformDemo
   object textDescription: TUText
     Left = 390
     Top = 210
-    Width = 95
+    Width = 94
     Height = 15
     Caption = 'This is description'
     Font.Charset = DEFAULT_CHARSET
@@ -108,7 +107,7 @@ object formDemo: TformDemo
   object textEntry: TUText
     Left = 390
     Top = 170
-    Width = 73
+    Width = 74
     Height = 17
     Caption = 'This is entry'
     Font.Charset = DEFAULT_CHARSET
@@ -156,7 +155,6 @@ object formDemo: TformDemo
     Left = 560
     Top = 370
     Width = 140
-    Height = 25
     OnChange = sliderHorzChange
     ParentShowHint = False
     ShowHint = False
@@ -165,7 +163,6 @@ object formDemo: TformDemo
     Left = 560
     Top = 340
     Width = 140
-    Height = 25
     ControlState = csDisabled
     Value = 50
     Enabled = False
@@ -182,7 +179,6 @@ object formDemo: TformDemo
     Left = 390
     Top = 340
     Width = 134
-    Height = 30
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -192,18 +188,11 @@ object formDemo: TformDemo
     TextOnGlass = True
     State = cbsChecked
     Caption = '2-state checkbox'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object check3State: TUCheckBox
     Left = 390
     Top = 368
     Width = 134
-    Height = 30
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -214,18 +203,11 @@ object formDemo: TformDemo
     TextOnGlass = True
     State = cbsGrayed
     Caption = '3-state checkbox'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object radioA1: TURadioButton
     Left = 390
     Top = 240
     Width = 89
-    Height = 30
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -240,18 +222,11 @@ object formDemo: TformDemo
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio A1'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object radioA2: TURadioButton
     Left = 390
     Top = 270
     Width = 89
-    Height = 30
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -267,18 +242,11 @@ object formDemo: TformDemo
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio A2'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object radioA3: TURadioButton
     Left = 390
     Top = 300
     Width = 89
-    Height = 30
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -294,18 +262,11 @@ object formDemo: TformDemo
     TextOnGlass = True
     Caption = 'Radio A3'
     Enabled = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object radioB1: TURadioButton
     Left = 540
     Top = 240
     Width = 88
-    Height = 30
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -320,18 +281,11 @@ object formDemo: TformDemo
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio B1'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object radioB2: TURadioButton
     Left = 540
     Top = 270
     Width = 88
-    Height = 30
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -347,18 +301,12 @@ object formDemo: TformDemo
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio B2'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object progressVert: TUProgressBar
     Left = 660
     Top = 420
     Width = 5
-    Height = 71
+    Height = 70
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -368,12 +316,13 @@ object formDemo: TformDemo
     Orientation = oVertical
     CustomFillColor = 2469894
     CustomBackColor = 15132390
+    Color = clWhite
+    ParentColor = False
   end
   object progressCustomColor: TUProgressBar
     Left = 390
     Top = 420
-    Width = 251
-    Height = 5
+    Width = 250
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -383,14 +332,13 @@ object formDemo: TformDemo
     Orientation = oHorizontal
     CustomFillColor = 2469894
     CustomBackColor = 13421772
-    Color = clBlue
+    Color = clWhite
     ParentColor = False
   end
   object progressConnected: TUProgressBar
     Left = 390
     Top = 440
-    Width = 251
-    Height = 5
+    Width = 250
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -400,40 +348,38 @@ object formDemo: TformDemo
     Orientation = oHorizontal
     CustomFillColor = 2469894
     CustomBackColor = 15132390
+    Color = clWhite
+    ParentColor = False
   end
-  object captionbarNewStyle: TUCaptionBar
+  object captionBarMain: TUCaptionBar
     Left = 0
     Top = 0
     Width = 1000
-    Height = 32
-    Align = alTop
-    Alignment = taLeftJustify
-    BevelOuter = bvNone
-    Caption = '                  Delphi UWP app'
+    Caption = '                Delphi UWP app'
     Color = 15921906
-    DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentBackground = False
-    ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 22
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15921906
+    BackColor.DarkColor = 2829099
     CustomColor = clWhite
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
-      Width = 45
-      Height = 32
       ButtonStyle = sbsHighlight
       LightColor = 14120960
       DarkColor = 14120960
       Align = alLeft
       Caption = #57510
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
+      Font.Color = clWindowText
       Font.Height = -13
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
@@ -442,8 +388,6 @@ object formDemo: TformDemo
     object buttonWinClose: TUQuickButton
       Left = 955
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Close'
       ButtonStyle = sbsQuit
       LightColor = 2298344
@@ -463,8 +407,6 @@ object formDemo: TformDemo
     object buttonWinMax: TUQuickButton
       Left = 910
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Maximize'
       ButtonStyle = sbsMax
       LightColor = 13619151
@@ -484,8 +426,6 @@ object formDemo: TformDemo
     object buttonWinMin: TUQuickButton
       Left = 865
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Minimize'
       ButtonStyle = sbsMin
       LightColor = 13619151
@@ -502,12 +442,31 @@ object formDemo: TformDemo
       ParentShowHint = False
       ShowHint = True
     end
+    object buttonBlurForm: TUQuickButton
+      Left = 544
+      Top = 0
+      ButtonStyle = sbsSysButton
+      LightColor = 13619151
+      DarkColor = 3947580
+      PressBrightnessDelta = -32
+      Align = alRight
+      Caption = #57615
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe MDL2 Assets'
+      Font.Style = []
+      ParentFont = False
+      OnClick = buttonBlurFormClick
+      ExplicitLeft = 540
+      ExplicitTop = 10
+    end
     object comboAppDPI: TComboBox
       AlignWithMargins = True
       Left = 741
       Top = 4
       Width = 120
-      Height = 23
+      Height = 25
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
@@ -515,8 +474,8 @@ object formDemo: TformDemo
       Align = alRight
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
+      Font.Color = clBlack
+      Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ItemIndex = 0
@@ -535,20 +494,23 @@ object formDemo: TformDemo
       Left = 613
       Top = 4
       Width = 120
-      Height = 23
-      Margins.Left = 4
+      Height = 25
+      Hint = 'Do not change form style runtime in Windows 7'
+      Margins.Left = 24
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
       Align = alRight
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
+      Font.Color = clBlack
+      Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
       ItemIndex = 2
       ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       Text = 'bsSizeable'
       OnChange = comboAppBorderStyleChange
@@ -560,7 +522,7 @@ object formDemo: TformDemo
         'bsSizeToolWin')
     end
   end
-  object panelRibbon: TUSmoothBox
+  object panelRibbon: TUScrollBox
     Left = 0
     Top = 32
     Width = 1000
@@ -568,22 +530,22 @@ object formDemo: TformDemo
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alTop
-    BorderStyle = bsNone
-    DoubleBuffered = True
-    Color = 15132390
+    Color = 14342874
     ParentColor = False
-    ParentDoubleBuffered = False
     TabOrder = 1
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 6
+    BackColor.Enabled = True
+    BackColor.Color = clBlack
+    BackColor.LightColor = 14342874
+    BackColor.DarkColor = 3355443
     ScrollOrientation = oHorizontal
     object separator1: TUSeparator
       Left = 120
       Top = 0
-      Width = 20
       Height = 60
       CustomColor = clBlack
       Align = alLeft
@@ -591,7 +553,6 @@ object formDemo: TformDemo
     object separator2: TUSeparator
       Left = 320
       Top = 0
-      Width = 20
       Height = 60
       CustomColor = clBlack
       Align = alLeft
@@ -606,11 +567,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -635,11 +591,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -664,11 +615,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -693,11 +639,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -722,11 +663,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -752,11 +688,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -781,11 +712,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -811,11 +737,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -837,7 +758,6 @@ object formDemo: TformDemo
     Left = 60
     Top = 190
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -852,19 +772,12 @@ object formDemo: TformDemo
     Alignment = taLeftJustify
     AllowFocus = False
     Caption = 'Button no focus'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object buttonCanFocus: TUButton
     Tag = 9
     Left = 60
     Top = 230
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -877,19 +790,12 @@ object formDemo: TformDemo
     CustomBackColors.Focused = 15921906
     CustomTextColors.Disabled = clGray
     Caption = 'Button can focus'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object buttonCustomColor: TUButton
     Tag = 17
     Left = 60
     Top = 270
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15132390
     CustomBorderColors.Hover = 14120960
     CustomBorderColors.Press = clBlue
@@ -905,12 +811,6 @@ object formDemo: TformDemo
     CustomTextColors.Disabled = clGray
     Alignment = taRightJustify
     Caption = 'Custom button'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Times New Roman'
-    Font.Style = []
-    ParentFont = False
   end
   object buttonReloadSettings: TUSymbolButton
     Left = 220
@@ -922,11 +822,6 @@ object formDemo: TformDemo
     SymbolFont.Height = -16
     SymbolFont.Name = 'Segoe MDL2 Assets'
     SymbolFont.Style = []
-    TextFont.Charset = DEFAULT_CHARSET
-    TextFont.Color = clBlack
-    TextFont.Height = -13
-    TextFont.Name = 'Segoe UI'
-    TextFont.Style = []
     DetailFont.Charset = DEFAULT_CHARSET
     DetailFont.Color = clWindowText
     DetailFont.Height = -13
@@ -943,7 +838,6 @@ object formDemo: TformDemo
     Left = 220
     Top = 230
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -957,12 +851,6 @@ object formDemo: TformDemo
     CustomTextColors.Disabled = clGray
     Highlight = True
     Caption = 'Highlight button'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
     OnClick = buttonHighlightClick
   end
   object buttonDisabled: TUButton
@@ -970,7 +858,6 @@ object formDemo: TformDemo
     Left = 220
     Top = 190
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -985,19 +872,12 @@ object formDemo: TformDemo
     ButtonState = csDisabled
     Caption = 'Button disabled'
     Enabled = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = 6710886
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
-  object buttonToggle: TUButton
+  object buttonToggled: TUButton
     Tag = 5
     Left = 220
     Top = 310
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -1011,12 +891,6 @@ object formDemo: TformDemo
     CustomTextColors.Disabled = clGray
     IsToggleButton = True
     Caption = 'Toggle button'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object itembuttonImage: TUItemButton
     Left = 60
@@ -1041,14 +915,6 @@ object formDemo: TformDemo
     RightIcon = #57345
     AlignSpace = 10
     CustomActiveColor = 14120960
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    ParentShowHint = False
-    ShowHint = True
     OnClick = itembuttonImageClick
   end
   object itembuttonFontIcon: TUItemButton
@@ -1056,7 +922,6 @@ object formDemo: TformDemo
     Top = 510
     Width = 311
     Height = 41
-    Hint = 'ABC'
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -1073,12 +938,6 @@ object formDemo: TformDemo
     RightIcon = #57345
     CustomActiveColor = 14120960
     IsToggleButton = True
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object symbolButtonOpenDisabled: TUSymbolButton
     Left = 130
@@ -1090,11 +949,6 @@ object formDemo: TformDemo
     SymbolFont.Height = -16
     SymbolFont.Name = 'Segoe MDL2 Assets'
     SymbolFont.Style = []
-    TextFont.Charset = DEFAULT_CHARSET
-    TextFont.Color = 6710886
-    TextFont.Height = -13
-    TextFont.Name = 'Segoe UI'
-    TextFont.Style = []
     DetailFont.Charset = DEFAULT_CHARSET
     DetailFont.Color = clWindowText
     DetailFont.Height = -13
@@ -1116,11 +970,6 @@ object formDemo: TformDemo
     SymbolFont.Height = -16
     SymbolFont.Name = 'Segoe MDL2 Assets'
     SymbolFont.Style = []
-    TextFont.Charset = DEFAULT_CHARSET
-    TextFont.Color = clBlack
-    TextFont.Height = -13
-    TextFont.Name = 'Segoe UI'
-    TextFont.Style = []
     DetailFont.Charset = DEFAULT_CHARSET
     DetailFont.Color = clWindowText
     DetailFont.Height = -13
@@ -1141,11 +990,6 @@ object formDemo: TformDemo
     SymbolFont.Height = -16
     SymbolFont.Name = 'Segoe MDL2 Assets'
     SymbolFont.Style = []
-    TextFont.Charset = DEFAULT_CHARSET
-    TextFont.Color = clBlack
-    TextFont.Height = -13
-    TextFont.Name = 'Segoe UI'
-    TextFont.Style = []
     DetailFont.Charset = DEFAULT_CHARSET
     DetailFont.Color = clWindowText
     DetailFont.Height = -13
@@ -1155,13 +999,12 @@ object formDemo: TformDemo
     SymbolChar = #57696
     Text = 'New'
     Detail = 'Ctrl+N'
-    IsToggleButton = True
   end
   object buttonRandomProgress: TUButton
     Tag = 5
     Left = 390
     Top = 460
-    Width = 251
+    Width = 250
     Height = 31
     Hint = 'This is tooltip'
     CustomBorderColors.None = 15921906
@@ -1176,12 +1019,6 @@ object formDemo: TformDemo
     CustomBackColors.Focused = 15921906
     CustomTextColors.Disabled = clGray
     Caption = 'Random progress value'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
     ParentShowHint = False
     ShowHint = True
     OnClick = buttonRandomProgressClick
@@ -1195,16 +1032,16 @@ object formDemo: TformDemo
     Caption = 'Here we go'
     TabOrder = 5
   end
-  object buttonAniStart: TButton
+  object buttonAniToRight: TButton
     Left = 60
     Top = 140
     Width = 151
     Height = 31
     Caption = 'Start animation'
     TabOrder = 6
-    OnClick = buttonAniStartClick
+    OnClick = buttonAniToRightClick
   end
-  object buttonAniInverse: TButton
+  object buttonAniToLeft: TButton
     Left = 220
     Top = 140
     Width = 151
@@ -1212,14 +1049,13 @@ object formDemo: TformDemo
     Caption = 'Reserve animation'
     ImageIndex = 0
     TabOrder = 7
-    OnClick = buttonAniInverseClick
+    OnClick = buttonAniToLeftClick
   end
   object buttonWithImage: TUButton
     Tag = 6
     Left = 60
     Top = 310
     Width = 150
-    Height = 30
     CustomBorderColors.None = 15921906
     CustomBorderColors.Hover = 15132390
     CustomBorderColors.Press = 13421772
@@ -1232,12 +1068,6 @@ object formDemo: TformDemo
     CustomBackColors.Focused = 15921906
     CustomTextColors.Disabled = clGray
     Caption = 'Button with image'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
   end
   object drawerNavigation: TUPanel
     Left = 0
@@ -1245,21 +1075,19 @@ object formDemo: TformDemo
     Width = 45
     Height = 498
     Align = alLeft
-    BevelOuter = bvNone
     Color = 15132390
-    DoubleBuffered = True
     FullRepaint = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ParentBackground = False
-    ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    CustomTextColor = clBlack
-    CustomBackColor = 15132390
+    BackColor.Enabled = False
+    BackColor.Color = clWhite
+    BackColor.LightColor = 15132390
+    BackColor.DarkColor = 2039583
     object buttonOpenMenu: TUSymbolButton
       Left = 0
       Top = 0
@@ -1270,11 +1098,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -15
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = [fsBold]
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1299,11 +1122,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1327,11 +1145,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1354,11 +1167,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1381,11 +1189,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1408,11 +1211,6 @@ object formDemo: TformDemo
       SymbolFont.Height = -16
       SymbolFont.Name = 'Segoe MDL2 Assets'
       SymbolFont.Style = []
-      TextFont.Charset = DEFAULT_CHARSET
-      TextFont.Color = clBlack
-      TextFont.Height = -13
-      TextFont.Name = 'Segoe UI'
-      TextFont.Style = []
       DetailFont.Charset = DEFAULT_CHARSET
       DetailFont.Color = clWindowText
       DetailFont.Height = -13
@@ -1426,7 +1224,7 @@ object formDemo: TformDemo
       Align = alTop
     end
   end
-  object boxSmoothScrolling: TUSmoothBox
+  object boxSettings: TUScrollBox
     Left = 750
     Top = 92
     Width = 250
@@ -1434,21 +1232,23 @@ object formDemo: TformDemo
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alRight
-    BorderStyle = bsNone
-    DoubleBuffered = True
     Color = 15132390
     Padding.Left = 15
     Padding.Top = 5
     Padding.Right = 15
     Padding.Bottom = 15
     ParentColor = False
-    ParentDoubleBuffered = False
     TabOrder = 23
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 10
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15132390
+    BackColor.DarkColor = 2039583
+    MaxScrollCount = 6
     object headingSettings: TUText
       AlignWithMargins = True
       Left = 15
@@ -1686,7 +1486,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitWidth = 187
+      ExplicitWidth = 186
     end
     object headingAbout: TUText
       AlignWithMargins = True
@@ -1780,8 +1580,7 @@ object formDemo: TformDemo
       Left = 15
       Top = 965
       Width = 203
-      Height = 17
-      Cursor = crHandPoint
+      Height = 13
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 0
@@ -1790,8 +1589,8 @@ object formDemo: TformDemo
       Caption = 'https://example.com/'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = 14120960
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
+      Font.Height = -11
+      Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
       CustomTextColors.None = 14120960
@@ -1800,13 +1599,12 @@ object formDemo: TformDemo
       CustomTextColors.Disabled = clMedGray
       CustomTextColors.Focused = 14120960
       URL = 'https://example.com/'
-      ExplicitWidth = 124
+      ExplicitWidth = 104
     end
     object checkColorBorder: TUCheckBox
       Left = 15
       Top = 200
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1815,12 +1613,6 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Color on window border'
       Enabled = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 230
     end
     object checkAutoSync: TUCheckBox
@@ -1828,7 +1620,6 @@ object formDemo: TformDemo
       Left = 15
       Top = 373
       Width = 203
-      Height = 30
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
@@ -1840,19 +1631,12 @@ object formDemo: TformDemo
       IconFont.Style = []
       Align = alTop
       Caption = 'Auto synchronize'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 403
     end
     object checkKeepEmailPrivate: TUCheckBox
       Left = 15
       Top = 433
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1860,19 +1644,12 @@ object formDemo: TformDemo
       IconFont.Style = []
       Align = alTop
       Caption = 'Keep my email in private'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 463
     end
     object checkSendEmail: TUCheckBox
       Left = 15
       Top = 403
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1880,19 +1657,12 @@ object formDemo: TformDemo
       IconFont.Style = []
       Align = alTop
       Caption = 'Send me emails'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 433
     end
     object radioSystemTheme: TURadioButton
       Left = 15
       Top = 65
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1903,19 +1673,12 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Use system setting'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       OnClick = radioSystemThemeClick
     end
     object radioLightTheme: TURadioButton
       Left = 15
       Top = 95
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1925,19 +1688,12 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Light'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       OnClick = radioLightThemeClick
     end
     object radioDarkTheme: TURadioButton
       Left = 15
       Top = 125
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1947,19 +1703,12 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Dark'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       OnClick = radioDarkThemeClick
     end
     object radioFreeAccount: TURadioButton
       Left = 15
       Top = 500
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1970,19 +1719,12 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Free user'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 530
     end
     object radioProAccount: TURadioButton
       Left = 15
       Top = 530
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1992,19 +1734,12 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Professional user'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 560
     end
     object radioDevAccount: TURadioButton
       Left = 15
       Top = 560
       Width = 203
-      Height = 30
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -2014,17 +1749,11 @@ object formDemo: TformDemo
       CustomActiveColor = 14120960
       Align = alTop
       Caption = 'Developer'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       ExplicitTop = 590
     end
     object separatorLastBox: TUSeparator
       Left = 15
-      Top = 992
+      Top = 988
       Width = 203
       Height = 10
       CustomColor = clBlack
@@ -2045,21 +1774,20 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 5
       Align = alTop
-      BevelOuter = bvNone
       Caption = 'Select custom accent color'
       Color = 14120960
-      FullRepaint = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
-      Font.Height = -12
+      Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
-      ParentBackground = False
       ParentFont = False
       TabOrder = 1
       OnClick = panelSelectAccentColorClick
-      CustomTextColor = clWhite
-      CustomBackColor = 14120960
+      BackColor.Enabled = False
+      BackColor.Color = -1
+      BackColor.LightColor = 15132390
+      BackColor.DarkColor = 2039583
     end
     object buttonDeleteAccount: TUButton
       Tag = 2
@@ -2067,7 +1795,6 @@ object formDemo: TformDemo
       Left = 15
       Top = 595
       Width = 203
-      Height = 30
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
@@ -2085,12 +1812,6 @@ object formDemo: TformDemo
       CustomTextColors.Disabled = clGray
       Align = alTop
       Caption = 'Delete my account'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
     end
     object buttonUpgradeAccount: TUButton
       Tag = 2
@@ -2098,7 +1819,6 @@ object formDemo: TformDemo
       Left = 15
       Top = 712
       Width = 203
-      Height = 30
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 0
@@ -2116,19 +1836,12 @@ object formDemo: TformDemo
       CustomTextColors.Disabled = clGray
       Align = alTop
       Caption = 'Upgrade account'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
     end
     object progressStorageUsed: TUProgressBar
       AlignWithMargins = True
       Left = 15
       Top = 752
       Width = 203
-      Height = 5
       Margins.Left = 0
       Margins.Top = 0
       Margins.Right = 0
@@ -2150,7 +1863,6 @@ object formDemo: TformDemo
       Left = 15
       Top = 865
       Width = 203
-      Height = 30
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
@@ -2168,58 +1880,27 @@ object formDemo: TformDemo
       CustomTextColors.Disabled = clGray
       Align = alTop
       Caption = 'Check for update'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
     end
     object editAccountName: TUEdit
       Left = 15
       Top = 339
       Width = 203
-      Height = 29
       Align = alTop
-      Alignment = taLeftJustify
-      BevelOuter = bvNone
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      Padding.Left = 5
-      Padding.Top = 5
-      Padding.Right = 4
-      Padding.Bottom = 4
       ParentColor = True
-      ParentFont = False
-      ShowCaption = False
       TabOrder = 3
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 194
-      Edit.Height = 20
-      Edit.Align = alClient
-      Edit.AutoSize = False
-      Edit.BorderStyle = bsNone
-      Edit.Color = 15132390
-      Edit.Font.Charset = DEFAULT_CHARSET
-      Edit.Font.Color = clBlack
-      Edit.Font.Height = -13
-      Edit.Font.Name = 'Segoe UI'
-      Edit.Font.Style = []
       Edit.ParentFont = False
       Edit.PopupMenu = popupEdit
-      Edit.TabOrder = 0
       Edit.TextHint = 'Right click to open context menu'
       Transparent = True
     end
   end
   object dialogSelectColor: TColorDialog
     Color = 14120960
-    Left = 720
-    Top = 40
+    Left = 440
+    Top = 510
   end
   object popupEdit: TUPopupMenu
     AniSet.AniKind = akOut
@@ -2228,8 +1909,8 @@ object formDemo: TformDemo
     AniSet.Duration = 120
     AniSet.Step = 20
     OnItemClick = popupEditItemClick
-    Left = 640
-    Top = 42
+    Left = 570
+    Top = 512
     object CutCtrlX1: TMenuItem
       Caption = #57707'Cut|Ctrl+X'
       Hint = 'Remove the selected content and put it on the clipboard'

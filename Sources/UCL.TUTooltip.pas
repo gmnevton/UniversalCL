@@ -46,6 +46,9 @@ type
 
 implementation
 
+uses
+  Types;
+
 { TULightTooltip }
 
 constructor TULightTooltip.Create(AOwner: TComponent);

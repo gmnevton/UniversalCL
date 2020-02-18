@@ -107,6 +107,9 @@ type
 
 implementation
 
+uses
+  Types;
+
 { TUCustomTitleBar }
 
 //  THEME

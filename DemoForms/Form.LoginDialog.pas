@@ -3,13 +3,29 @@ unit Form.LoginDialog;
 interface
 
 uses
-  UCL.TUThemeManager, UCL.TUForm, UCL.Classes, UCL.Utils,
-  UCL.TUText, UCL.TUEdit, UCL.TUQuickButton, UCL.TUPanel, UCL.TUPopupMenu,
-  UCL.TUCheckBox, UCL.TUCaptionBar, UCL.TUButton, UCL.TUScrollBox,
-
-  SysUtils, Classes,
-  Windows, Messages,
-  Forms, StdCtrls, pngimage, Menus, ExtCtrls, Controls;
+  SysUtils, 
+  Classes,
+  Windows, 
+  Messages,
+  Forms, 
+  StdCtrls, 
+  pngimage, 
+  Menus, 
+  ExtCtrls, 
+  Controls,
+  UCL.TUThemeManager, 
+  UCL.TUForm, 
+  UCL.Classes, 
+  UCL.Utils,
+  UCL.TUText, 
+  UCL.TUEdit, 
+  UCL.TUQuickButton, 
+  UCL.TUPanel, 
+  UCL.TUPopupMenu,
+  UCL.TUCheckBox, 
+  UCL.TUCaptionBar, 
+  UCL.TUButton, 
+  UCL.TUScrollBox;
 
 type
   TformLoginDialog = class(TUForm)
@@ -44,9 +60,7 @@ type
     procedure popupEditItemClick(Sender: TObject; Index: Integer);
     procedure FormCreate(Sender: TObject);
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 var
@@ -62,7 +76,7 @@ begin
     ThemeManager.CustomTheme := utDark
   else
     ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := false;
+  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 
@@ -86,18 +100,16 @@ var
   Edit: TCustomEdit;
 begin
   Self.SetFocus;  //  Close popup
-  if popupEdit.PopupComponent is TCustomEdit then
-    begin
-      Edit := popupEdit.PopupComponent as TCustomEdit;
-      case Index of
-        0:  //  Cut
-          Edit.CutToClipboard;
-        1:  //  Copy
-          Edit.CopyToClipboard;
-        2:  //  Paste
-          Edit.PasteFromClipboard;
-      end;
+  if popupEdit.PopupComponent is TCustomEdit then begin
+    Edit := popupEdit.PopupComponent as TCustomEdit;
+    case Index of
+      0: Edit.CutToClipboard; //  Cut
+
+      1: Edit.CopyToClipboard; //  Copy
+
+      2: Edit.PasteFromClipboard; //  Paste
     end;
+  end;
 end;
 
 procedure TformLoginDialog.textShowMoreOptionsClick(Sender: TObject);

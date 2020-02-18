@@ -3,14 +3,14 @@ object formImageBackground: TformImageBackground
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Test UWP app'
+  Caption = 'Transparent caption bar form'
   ClientHeight = 410
   ClientWidth = 610
   Color = clWhite
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
@@ -20,12 +20,13 @@ object formImageBackground: TformImageBackground
     610
     410)
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 17
   object shadowMenu: TUShadow
     Left = 0
     Top = 0
     Width = 200
     Height = 352
+    AlphaA = 0
     Direction = dRight
     Align = alLeft
     ParentColor = False
@@ -14492,20 +14493,6 @@ object formImageBackground: TformImageBackground
     ExplicitWidth = 600
     ExplicitHeight = 340
   end
-  object titlebarMain: TUTitleBar
-    Left = 0
-    Top = 0
-    Width = 509
-    Height = 32
-    Anchors = [akLeft, akTop, akRight]
-    Caption = 'Transparent caption bar form'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-  end
   object sliderMain: TUSlider
     Left = 240
     Top = 60
@@ -14516,8 +14503,7 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 151
-    Height = 30
+    Width = 156
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -14529,19 +14515,12 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Use system settings'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
     OnClick = radioSystemThemeClick
   end
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 64
-    Height = 30
+    Width = 69
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -14552,19 +14531,12 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Light'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
     OnClick = radioLightThemeClick
   end
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 63
-    Height = 30
+    Width = 68
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -14575,12 +14547,6 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Dark'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
     OnClick = radioDarkThemeClick
   end
   object entryChooseTheme: TUText
@@ -14597,11 +14563,10 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     TextKind = tkEntry
   end
-  object buttonWinClose: TUQuickButton
+  object buttonAppQuit: TUQuickButton
     Left = 565
-    Top = 1
-    Width = 45
-    Height = 32
+    Top = 0
+    Hint = 'Close'
     ButtonStyle = sbsQuit
     LightColor = 2298344
     DarkColor = 2298344
@@ -14610,17 +14575,18 @@ object formImageBackground: TformImageBackground
     Anchors = [akTop, akRight]
     Caption = #57606
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
+    Font.Color = clBlack
+    Font.Height = -12
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
     ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
   end
-  object buttonWinMin: TUQuickButton
-    Left = 515
-    Top = 1
-    Width = 45
-    Height = 32
+  object buttonAppMinimized: TUQuickButton
+    Left = 520
+    Top = 0
+    Hint = 'Minimize'
     ButtonStyle = sbsMin
     LightColor = 13619151
     DarkColor = 3947580
@@ -14629,10 +14595,27 @@ object formImageBackground: TformImageBackground
     Anchors = [akTop, akRight]
     Caption = #59192
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -13
+    Font.Color = clBlack
+    Font.Height = -15
     Font.Name = 'Segoe MDL2 Assets'
     Font.Style = []
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object titlebarMain: TUTitleBar
+    Left = 0
+    Top = 0
+    Width = 520
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Transparent caption bar form'
+    Color = clBtnFace
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentColor = False
     ParentFont = False
   end
   object progressMain: TUProgressBar
@@ -14660,11 +14643,6 @@ object formImageBackground: TformImageBackground
     SymbolFont.Height = -16
     SymbolFont.Name = 'Segoe MDL2 Assets'
     SymbolFont.Style = []
-    TextFont.Charset = DEFAULT_CHARSET
-    TextFont.Color = clWindowText
-    TextFont.Height = -13
-    TextFont.Name = 'Segoe UI'
-    TextFont.Style = []
     DetailFont.Charset = DEFAULT_CHARSET
     DetailFont.Color = clWindowText
     DetailFont.Height = -13
@@ -14683,29 +14661,28 @@ object formImageBackground: TformImageBackground
     Width = 610
     Height = 58
     Align = alBottom
-    BevelOuter = bvNone
     Caption = 'panelBottom'
     Color = 15132390
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     Padding.Left = 14
     Padding.Top = 14
     Padding.Right = 14
     Padding.Bottom = 14
-    ParentBackground = False
     ParentFont = False
     ShowCaption = False
     TabOrder = 2
-    CustomTextColor = clBlack
-    CustomBackColor = 15132390
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15132390
+    BackColor.DarkColor = 2039583
     object buttonOk: TUButton
       Left = 465
       Top = 14
       Width = 131
-      Height = 30
       CustomBorderColors.None = 15921906
       CustomBorderColors.Hover = 15132390
       CustomBorderColors.Press = 13421772
@@ -14720,19 +14697,12 @@ object formImageBackground: TformImageBackground
       Highlight = True
       Align = alRight
       Caption = 'OK'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
     end
     object buttonCancel: TUButton
       AlignWithMargins = True
       Left = 320
       Top = 14
       Width = 131
-      Height = 30
       Margins.Left = 14
       Margins.Top = 0
       Margins.Right = 14
@@ -14750,12 +14720,6 @@ object formImageBackground: TformImageBackground
       CustomTextColors.Disabled = clGray
       Align = alRight
       Caption = 'Cancel'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
     end
     object editEmail: TUEdit
       Left = 14
@@ -14763,35 +14727,14 @@ object formImageBackground: TformImageBackground
       Width = 292
       Height = 30
       Align = alClient
-      Alignment = taLeftJustify
-      BevelOuter = bvNone
       Caption = 'editEmail'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      Padding.Left = 5
-      Padding.Top = 5
-      Padding.Right = 4
-      Padding.Bottom = 4
-      ParentFont = False
-      ShowCaption = False
       TabOrder = 2
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 283
       Edit.Height = 21
-      Edit.Align = alClient
-      Edit.BorderStyle = bsNone
-      Edit.Color = clWhite
-      Edit.Font.Charset = DEFAULT_CHARSET
-      Edit.Font.Color = clBlack
-      Edit.Font.Height = -13
-      Edit.Font.Name = 'Segoe UI'
-      Edit.Font.Style = []
+      Edit.ParentColor = False
       Edit.ParentFont = False
-      Edit.TabOrder = 0
       Edit.TextHint = 'Enter your email'
     end
   end

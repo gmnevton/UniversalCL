@@ -65,8 +65,9 @@ contains
   UCL.TUTitleBar in 'Sources\UCL.TUTitleBar.pas',
   UCL.TUShadow in 'Sources\UCL.TUShadow.pas',
   UCL.TUTooltip in 'Sources\UCL.TUTooltip.pas',
-  UCL.TUSmoothBox in 'Sources\UCL.TUSmoothBox.pas',
-  UCL.Types in 'Sources\UCL.Types.pas';
+  UCL.Types in 'Sources\UCL.Types.pas',
+  UCL.Colors in 'Sources\UCL.Colors.pas',
+  UCL.TUFormOverlay in 'Sources\UCL.TUFormOverlay.pas';
 
 end.
 

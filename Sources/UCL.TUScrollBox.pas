@@ -4,6 +4,7 @@ interface
 
 uses
   Classes,
+  Types,
   TypInfo,
   Windows,
   Messages,
@@ -13,6 +14,7 @@ uses
   ExtCtrls,
   Graphics,
   UCL.Classes,
+  UCL.Colors,
   UCL.TUThemeManager,
   UCL.IntAnimation,
   UCL.Utils;
@@ -28,7 +30,7 @@ type
       constructor Create(aOwner: TComponent); override;
 
     published
-      property Visible default false;
+      property Visible default False;
   end;
 
   TUScrollBox = class(TScrollBox, IUThemeComponent)
@@ -58,9 +60,10 @@ type
 
       //  Messages
       procedure WMSize(var Msg: TWMSize); message WM_SIZE;
-      procedure WMMouseWheel(var Msg: TWMMouseWheel); message WM_MOUSEWHEEL;
+      procedure CMMouseWheel(var Msg: TWMMouseWheel); message CM_MOUSEWHEEL;
       procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
       procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
     protected
       //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -92,6 +95,13 @@ type
 
 implementation
 
+uses
+  SysUtils,
+  UCL.TUForm;
+
+type
+  TUFormAccess = class(TUForm);
+
 { TUScrollBox }
 
 //  THEME
@@ -107,8 +117,10 @@ var
   Back: TUThemeColorSet;
 begin
   //  Background color
-  if ThemeManager = Nil then
+  if ThemeManager = Nil then begin
     // Color := $E6E6E6 // do nothing
+    MiniSB.Color := MINI_SB_COLOR_NIL;
+  end
   else begin
     //  Select default or custom style
     if not BackColor.Enabled then
@@ -117,6 +129,10 @@ begin
       Back := BackColor;
 
     Color := Back.GetColor(ThemeManager);
+    if ThemeManager.Theme = utLight then
+      MiniSB.Color := MINI_SB_COLOR_LIGHT
+    else
+      MiniSB.Color := MINI_SB_COLOR_DARK;
   end;
 end;
 {
@@ -156,8 +172,8 @@ begin
   MiniSB := TUMiniScrollBar.Create(Self);
   MiniSB.Color := MINI_SB_COLOR;
   MiniSB.Parent := Self;
-  MiniSB.SetSubComponent(true);
-  MiniSB.Visible := false;
+  MiniSB.SetSubComponent(True);
+  MiniSB.Visible := False;
   MiniSB.Width := 0;
 
   //  Custom AniSet
@@ -242,6 +258,69 @@ end;
 
 //  MESSAGES
 
+procedure TUScrollBox.WMNCHitTest(var Msg: TWMNCHitTest);
+
+//  procedure SendLeavingMsg;
+//  begin
+//    PostMessage(Self.Handle, CM_MOUSELEAVE, 0, 1);
+//  end;
+
+var
+  P: TPoint;
+  ParentForm: TCustomForm;
+  BorderSpace: Integer;
+begin
+  inherited;
+
+  ParentForm := GetParentForm(Self, True);
+  if (ParentForm.WindowState = wsNormal) and (Align <> alNone) then begin
+    if Align = alCustom then
+      Exit;
+    //
+    P := Point(Msg.Pos.x, Msg.Pos.y);
+    P := ScreenToClient(P);
+    BorderSpace:=5;
+    if MiniSB.Visible then
+      BorderSpace := MINI_SB_MARGIN
+    else if ParentForm is TUForm then
+      BorderSpace:=TUFormAccess(ParentForm).GetBorderSpace(bsDefault);
+    //  Send event to parent
+    case Align of
+      alTop: begin
+        // we need to check top, left and right borders
+        if (P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
+//          SendLeavingMsg;
+          Msg.Result := HTTRANSPARENT;
+        end;
+      end;
+
+      alBottom: begin
+        // we need to check bottom, left and right borders
+        if (Height - P.Y < BorderSpace) or (P.X < BorderSpace) or (Width - P.X < BorderSpace) then begin
+//          SendLeavingMsg;
+          Msg.Result := HTTRANSPARENT;
+        end;
+      end;
+
+      alLeft: begin
+        // we need to check left, top and bottom borders
+        if (P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
+//          SendLeavingMsg;
+          Msg.Result := HTTRANSPARENT;
+        end;
+      end;
+
+      alRight: begin
+        // we need to check right, top and bottom borders
+        if (Width - P.X < BorderSpace) or (P.Y < BorderSpace) or (Height - P.Y < BorderSpace) then begin
+//          SendLeavingMsg;
+          Msg.Result := HTTRANSPARENT;
+        end;
+      end;
+    end;
+  end;
+end;
+
 procedure TUScrollBox.WMSize(var Msg: TWMSize);
 begin
   inherited;
@@ -251,7 +330,7 @@ end;
 
 procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
 begin
-  if Win32MajorVersion <> 10 then
+  if (Win32MajorVersion <> 10) and CanFocus then
     SetFocus;
 
   if MouseLeave and PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
@@ -267,8 +346,10 @@ end;
 procedure TUScrollBox.CMMouseLeave(var Msg: TMessage);
 begin
   if (ScrollBarStyle = sbsMini) and not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+    if Msg.LParam = 1 then
+      Msg.LParam := 0;
     MouseLeave := True;
-    SetMiniSBVisible(false);
+    SetMiniSBVisible(False);
   end;
 
   inherited;
@@ -360,14 +441,17 @@ end;
 
 constructor TUMiniScrollBar.Create(aOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
 
 {$IF CompilerVersion > 29}
   StyleElements :=[];
 {$ENDIF}
   BevelOuter := bvNone;
+  BevelInner := bvNone;
   FullRepaint := False;
   DoubleBuffered := True;
+  ParentBackground := False;
+  ParentColor := False;
 
   Visible := False;
 end;

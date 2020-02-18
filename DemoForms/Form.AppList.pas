@@ -11,21 +11,20 @@ uses
   ExtCtrls,
   pngimage,
   UCL.Utils,
-//  UCL.TUForm,
-  UCL.TUBorderlessForm,
-  UCL.TUSmoothBox,
+  UCL.TUForm,
+  UCL.TUScrollBox,
   UCL.TUItemButton,
   UCL.TUCaptionBar,
   UCL.TUQuickButton,
   UCL.TUSymbolButton;
 
 type
-  TformAppList = class(TUBorderlessForm)
-    boxHorizontal: TUSmoothBox;
+  TformAppList = class(TUForm)
+    boxHorizontal: TUScrollBox;
     captionBar: TUCaptionBar;
     buttonWinClose: TUQuickButton;
     buttonWinMin: TUQuickButton;
-    boxVertical: TUSmoothBox;
+    boxVertical: TUScrollBox;
     UItemButton1: TUItemButton;
     UItemButton2: TUItemButton;
     UItemButton3: TUItemButton;

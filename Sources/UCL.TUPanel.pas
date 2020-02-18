@@ -15,6 +15,7 @@ uses
   ExtCtrls,
   Graphics,
   UCL.Classes,
+  UCL.Colors,
   UCL.Utils,
   UCL.SystemSettings,
   UCL.TUThemeManager;
@@ -55,11 +56,12 @@ type
 implementation
 
 uses
+  Types,
   Forms,
-  UCL.TUWPForm;
+  UCL.TUForm;
 
 type
-  TUWPFormAccess = class(TUWPForm);
+  TUFormAccess = class(TUForm);
 
 { TUPanel }
 
@@ -110,8 +112,8 @@ begin
     P := Point(Msg.Pos.x, Msg.Pos.y);
     P := ScreenToClient(P);
     BorderSpace:=5;
-    if ParentForm is TUWPForm then
-      BorderSpace:=TUWPFormAccess(ParentForm).GetBorderSpace(bsDefault);
+    if ParentForm is TUForm then
+      BorderSpace:=TUFormAccess(ParentForm).GetBorderSpace(bsDefault);
     //  Send event to parent
     case Align of
       alTop: begin

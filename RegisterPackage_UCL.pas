@@ -30,8 +30,7 @@ uses
   UCL.TUPopupMenu,
   UCL.TUQuickButton,
   UCL.TUTitleBar,
-  UCL.TUShadow,
-  UCL.TUSmoothBox;
+  UCL.TUShadow;
 
 procedure Register;
 begin
@@ -55,8 +54,7 @@ begin
     TUPopupMenu,
     TUTitleBar,
     TUQuickButton,
-    TUShadow,
-    TUSmoothBox
+    TUShadow
   ]);
 end;
 

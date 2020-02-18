@@ -10,34 +10,37 @@ object formLoginDialog: TformLoginDialog
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
+  Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 17
   object boxMain: TUScrollBox
     Left = 0
     Top = 32
     Width = 410
     Height = 476
+    HorzScrollBar.Tracking = True
+    VertScrollBar.Tracking = True
     Align = alClient
-    BorderStyle = bsNone
-    DoubleBuffered = True
     Color = 15132390
     Padding.Left = 40
     Padding.Right = 40
     Padding.Bottom = 50
     ParentColor = False
-    ParentDoubleBuffered = False
     TabOrder = 0
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
     AniSet.Duration = 250
     AniSet.Step = 25
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15132390
+    BackColor.DarkColor = 2039583
     MaxScrollCount = 6
     object titleSignin: TUText
       AlignWithMargins = True
@@ -161,25 +164,24 @@ object formLoginDialog: TformLoginDialog
       Width = 330
       Height = 80
       Align = alTop
-      BevelOuter = bvNone
       Color = 15132390
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -12
+      Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
-      ParentBackground = False
       ParentFont = False
       ShowCaption = False
       TabOrder = 0
       Visible = False
-      CustomTextColor = clBlack
-      CustomBackColor = 15132390
+      BackColor.Enabled = False
+      BackColor.Color = clBlack
+      BackColor.LightColor = 15132390
+      BackColor.DarkColor = 2039583
       object checkSendMeNews: TUCheckBox
         Left = 0
         Top = 30
         Width = 330
-        Height = 30
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
@@ -187,18 +189,11 @@ object formLoginDialog: TformLoginDialog
         IconFont.Style = []
         Align = alTop
         Caption = 'Send me news about offers'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -13
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
       end
       object checkKeepLogin: TUCheckBox
         Left = 0
         Top = 0
         Width = 330
-        Height = 30
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
@@ -207,12 +202,6 @@ object formLoginDialog: TformLoginDialog
         State = cbsChecked
         Align = alTop
         Caption = 'Keep me logged in'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -13
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
       end
     end
     object editEmail: TUEdit
@@ -220,42 +209,19 @@ object formLoginDialog: TformLoginDialog
       Left = 40
       Top = 158
       Width = 330
-      Height = 29
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
       Margins.Bottom = 20
       Align = alTop
-      Alignment = taLeftJustify
-      BevelOuter = bvNone
       UseDockManager = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      Padding.Left = 5
-      Padding.Top = 5
-      Padding.Right = 4
-      Padding.Bottom = 4
-      ParentFont = False
-      ShowCaption = False
       TabOrder = 1
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
-      Edit.Height = 20
-      Edit.Align = alClient
-      Edit.BorderStyle = bsNone
-      Edit.Color = clWhite
-      Edit.Font.Charset = DEFAULT_CHARSET
-      Edit.Font.Color = clBlack
-      Edit.Font.Height = -13
-      Edit.Font.Name = 'Segoe UI'
-      Edit.Font.Style = []
+      Edit.ParentColor = False
       Edit.ParentFont = False
       Edit.PopupMenu = popupEdit
-      Edit.TabOrder = 0
       Edit.TextHint = 'Enter your email here'
     end
     object editPassword: TUEdit
@@ -263,43 +229,20 @@ object formLoginDialog: TformLoginDialog
       Left = 40
       Top = 229
       Width = 330
-      Height = 29
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
       Margins.Bottom = 20
       Align = alTop
-      Alignment = taLeftJustify
-      BevelOuter = bvNone
       UseDockManager = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      Padding.Left = 5
-      Padding.Top = 5
-      Padding.Right = 4
-      Padding.Bottom = 4
-      ParentFont = False
-      ShowCaption = False
       TabOrder = 2
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
-      Edit.Height = 20
-      Edit.Align = alClient
-      Edit.BorderStyle = bsNone
-      Edit.Color = clWhite
-      Edit.Font.Charset = DEFAULT_CHARSET
-      Edit.Font.Color = clBlack
-      Edit.Font.Height = -13
-      Edit.Font.Name = 'Segoe UI'
-      Edit.Font.Style = []
+      Edit.ParentColor = False
       Edit.ParentFont = False
       Edit.PasswordChar = '*'
       Edit.PopupMenu = popupEdit
-      Edit.TabOrder = 0
       Edit.TextHint = 'Enter your password here'
     end
     object editDescription: TUEdit
@@ -307,43 +250,19 @@ object formLoginDialog: TformLoginDialog
       Left = 40
       Top = 300
       Width = 330
-      Height = 29
       Margins.Left = 0
       Margins.Top = 5
       Margins.Right = 0
       Margins.Bottom = 20
       Align = alTop
-      Alignment = taLeftJustify
-      BevelOuter = bvNone
       UseDockManager = False
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      Padding.Left = 5
-      Padding.Top = 5
-      Padding.Right = 4
-      Padding.Bottom = 4
       ParentColor = True
-      ParentFont = False
-      ShowCaption = False
       TabOrder = 3
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
-      Edit.Height = 20
-      Edit.Align = alClient
-      Edit.BorderStyle = bsNone
-      Edit.Font.Charset = DEFAULT_CHARSET
-      Edit.Font.Color = clBlack
-      Edit.Font.Height = -13
-      Edit.Font.Name = 'Segoe UI'
-      Edit.Font.Style = []
-      Edit.ParentColor = True
       Edit.ParentFont = False
       Edit.PopupMenu = popupEdit
-      Edit.TabOrder = 0
       Edit.TextHint = 'Talk about yourself'
       Transparent = True
     end
@@ -352,25 +271,23 @@ object formLoginDialog: TformLoginDialog
     Left = 0
     Top = 0
     Width = 410
-    Height = 32
-    Align = alTop
-    Alignment = taLeftJustify
-    BevelOuter = bvNone
     Caption = '   Login'
     Color = 15921906
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15921906
+    BackColor.DarkColor = 2829099
     object buttonAppQuit: TUQuickButton
       Left = 365
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Close'
       ButtonStyle = sbsQuit
       LightColor = 2298344
@@ -379,8 +296,8 @@ object formLoginDialog: TformLoginDialog
       Align = alRight
       Caption = #57606
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -12
+      Font.Color = clWindowText
+      Font.Height = -13
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
@@ -390,8 +307,6 @@ object formLoginDialog: TformLoginDialog
     object buttonAppMinimized: TUQuickButton
       Left = 320
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Minimize'
       ButtonStyle = sbsMin
       LightColor = 13619151
@@ -400,8 +315,8 @@ object formLoginDialog: TformLoginDialog
       Align = alRight
       Caption = #59192
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -15
+      Font.Color = clWindowText
+      Font.Height = -13
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
@@ -411,8 +326,6 @@ object formLoginDialog: TformLoginDialog
     object buttonAppTheme: TUQuickButton
       Left = 275
       Top = 0
-      Width = 45
-      Height = 32
       Hint = 'Switch theme'
       ButtonStyle = sbsSysButton
       LightColor = 13619151
@@ -421,8 +334,8 @@ object formLoginDialog: TformLoginDialog
       Align = alRight
       Caption = #59144
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -15
+      Font.Color = clWindowText
+      Font.Height = -13
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
@@ -437,23 +350,23 @@ object formLoginDialog: TformLoginDialog
     Width = 410
     Height = 52
     Align = alBottom
-    BevelOuter = bvNone
     Color = 15132390
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -12
+    Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
     Padding.Left = 10
     Padding.Top = 10
     Padding.Right = 10
     Padding.Bottom = 10
-    ParentBackground = False
     ParentFont = False
     ShowCaption = False
     TabOrder = 2
-    CustomTextColor = clBlack
-    CustomBackColor = 15132390
+    BackColor.Enabled = False
+    BackColor.Color = clBlack
+    BackColor.LightColor = 15132390
+    BackColor.DarkColor = 2039583
     object buttonOk: TUButton
       Left = 270
       Top = 10
@@ -473,12 +386,6 @@ object formLoginDialog: TformLoginDialog
       Highlight = True
       Align = alRight
       Caption = 'Ok'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       OnClick = buttonOkClick
     end
     object buttonCancel: TUButton
@@ -504,12 +411,6 @@ object formLoginDialog: TformLoginDialog
       CustomTextColors.Disabled = clGray
       Align = alRight
       Caption = 'Cancel'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
       OnClick = buttonCancelClick
     end
   end

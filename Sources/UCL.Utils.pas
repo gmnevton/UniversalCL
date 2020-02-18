@@ -185,6 +185,7 @@ begin
   for Y := 0 to H - 1 do begin
     Pixel := Bmp.ScanLine[Y];
     for X := 0 to W - 1 do begin
+      Percent := 0; // satisfy compiler
       case Direction of
         dTop   : Percent := 1 - Y / H;
         dLeft  : Percent := 1 - X / W;

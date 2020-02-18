@@ -81,7 +81,7 @@ type
 var
   MINI_SB_COLOR_NIL,
   MINI_SB_COLOR_LIGHT,
-  MINI_SB_COLOR_DARK,
+  MINI_SB_COLOR_DARK: TColor;
   //SCROLLBOX_BACK_NIL,
   //SCROLLBOX_BACK_LIGHT,
   //SCROLLBOX_BACK_DARK: TColor;
@@ -107,35 +107,28 @@ implementation
 
 procedure TUThemeColorSet.SetEnabled(const Value: Boolean);
 begin
-  if Value <> FEnabled then
-    begin
-      FEnabled := Value;
-      Changed;
-    end;
+  if Value <> FEnabled then begin
+    FEnabled := Value;
+    Changed;
+  end;
 end;
 
 procedure TUThemeColorSet.SetThemeColor(Index: Integer; const Value: TColor);
 begin
   case Index of
-    0:
-      if Value <> FColor then
-        begin
-          FColor := Value;
-          Changed;
-        end;
-    1:
-      if Value <> FLightColor then
-        begin
-          FLightColor := Value;
-          Changed;
-        end;
-    2:
-      if Value <> FDarkColor then
-        begin
-          FDarkColor := Value;
-          Changed;
-        end;
+    0: if Value <> FColor then begin
+      FColor := Value;
+    end;
+
+    1: if Value <> FLightColor then begin
+      FLightColor := Value;
+    end;
+
+    2: if Value <> FDarkColor then begin
+      FDarkColor := Value;
+    end;
   end;
+  Changed;
 end;
 
 //  MAIN CLASS
@@ -159,13 +152,12 @@ end;
 
 procedure TUThemeColorSet.Assign(Source: TPersistent);
 begin
-  if Source is TUThemeColorSet then
-    begin
-      FEnabled := (Source as TUThemeColorSet).Enabled;
-      FColor := (Source as TUThemeColorSet).Color;
-      FLightColor := (Source as TUThemeColorSet).LightColor;
-      FDarkColor := (Source as TUThemeColorSet).DarkColor;
-    end
+  if Source is TUThemeColorSet then begin
+    FEnabled := (Source as TUThemeColorSet).Enabled;
+    FColor := (Source as TUThemeColorSet).Color;
+    FLightColor := (Source as TUThemeColorSet).LightColor;
+    FDarkColor := (Source as TUThemeColorSet).DarkColor;
+  end
   else
     inherited;
 end;
@@ -188,7 +180,7 @@ end;
 
 function TUThemeColorSet.GetColor(const TM: TUThemeManager): TColor;
 begin
-  if TM = nil then
+  if TM = Nil then
     Result := Color
   else if TM.Theme = utLight then
     Result := LightColor
@@ -202,53 +194,40 @@ end;
 
 procedure TUStateColorSet.SetEnabled(const Value: Boolean);
 begin
-  if Value <> FEnabled then
-    begin
-      FEnabled := Value;
-      Changed;
-    end;
+  if Value <> FEnabled then begin
+    FEnabled := Value;
+    Changed;
+  end;
 end;
 
 procedure TUStateColorSet.SetStateColor(Index: Integer; const Value: TColor);
 begin
   case Index of
-    0:
-      if Value <> FNone then
-        begin
-          FNone := Value;
-          Changed;
-        end;
-    1:
-      if Value <> FHover then
-        begin
-          FHover := Value;
-          Changed;
-        end;
-    2:
-      if Value <> FPress then
-        begin
-          FPress := Value;
-          Changed;
-        end;
-    3:
-      if Value <> FSelectedNone then
-        begin
-          FSelectedNone := Value;
-          Changed;
-        end;
-    4:
-      if Value <> FSelectedHover then
-        begin
-          FSelectedHover := Value;
-          Changed;
-        end;
-    5:
-      if Value <> FSelectedPress then
-        begin
-          FSelectedPress := Value;
-          Changed;
-        end;
+    0: if Value <> FNone then begin
+      FNone := Value;
+    end;
+
+    1: if Value <> FHover then begin
+      FHover := Value;
+    end;
+
+    2: if Value <> FPress then begin
+      FPress := Value;
+    end;
+
+    3: if Value <> FSelectedNone then begin
+      FSelectedNone := Value;
+    end;
+
+    4: if Value <> FSelectedHover then begin
+      FSelectedHover := Value;
+    end;
+
+    5: if Value <> FSelectedPress then begin
+      FSelectedPress := Value;
+    end;
   end;
+  Changed;
 end;
 
 //  MAIN CLASS
@@ -275,16 +254,15 @@ end;
 
 procedure TUStateColorSet.Assign(Source: TPersistent);
 begin
-  if Source is TUStateColorSet then
-    begin
-      FEnabled := (Source as TUStateColorSet).Enabled;
-      FNone := (Source as TUStateColorSet).None;
-      FHover := (Source as TUStateColorSet).Hover;
-      FPress := (Source as TUStateColorSet).Press;
-      FSelectedNone := (Source as TUStateColorSet).SelectedNone;
-      FSelectedHover := (Source as TUStateColorSet).SelectedHover;
-      FSelectedPress := (Source as TUStateColorSet).SelectedPress;
-    end
+  if Source is TUStateColorSet then begin
+    FEnabled := (Source as TUStateColorSet).Enabled;
+    FNone := (Source as TUStateColorSet).None;
+    FHover := (Source as TUStateColorSet).Hover;
+    FPress := (Source as TUStateColorSet).Press;
+    FSelectedNone := (Source as TUStateColorSet).SelectedNone;
+    FSelectedHover := (Source as TUStateColorSet).SelectedHover;
+    FSelectedPress := (Source as TUStateColorSet).SelectedPress;
+  end
   else
     inherited;
 end;
@@ -299,24 +277,30 @@ end;
 
 procedure TUStateColorSet.SetColor(None, Hover, Press, sNone, sHover, sPress: TColor);
 begin
-
+  FNone := None;
+  FHover := Hover;
+  FPress := Press;
+  FSelectedNone := sNone;
+  FSelectedHover := sHover;
+  FSelectedPress := sPress;
+  Changed;
 end;
 
 function TUStateColorSet.GetColor(State: TUButtonState): TColor;
 begin
+  Result := clNone;
   case State of
-    ubsNone:
-      Result := None;
-    ubsHover:
-      Result := Hover;
-    ubsPress:
-      Result := Press;
-    ubsSelectedNone:
-      Result := SelectedNone;
-    ubsSelectedHover:
-      Result := SelectedHover;
-    ubsSelectedPress:
-      Result := SelectedPress;
+    ubsNone: Result := None;
+
+    ubsHover: Result := Hover;
+
+    ubsPress: Result := Press;
+
+    ubsSelectedNone: Result := SelectedNone;
+
+    ubsSelectedHover: Result := SelectedHover;
+
+    ubsSelectedPress: Result := SelectedPress;
   end;
 end;
 

@@ -28,13 +28,13 @@ uses
   jpeg,
   //  UCL units
   UCL.TUThemeManager,
-  UCL.TUBorderlessForm,
   UCL.IntAnimation,
   UCL.IntAnimation.Helpers,
   UCL.Utils,
   UCL.Classes,
   UCL.SystemSettings,
   UCL.TUForm,
+  UCL.TUFormOverlay,
   UCL.TUScrollBox,
   UCL.TUCheckBox,
   UCL.TUProgressBar,
@@ -51,11 +51,10 @@ uses
   UCL.TUQuickButton,
   UCL.TUPopupMenu,
   UCL.TURadioButton,
-  UCL.TUShadow,
-  UCL.TUSmoothBox;
+  UCL.TUShadow;
 
 type
-  TformDemo = class(TUBorderlessForm)
+  TformDemo = class(TUForm)
     drawerNavigation: TUPanel;
     buttonOpenMenu: TUSymbolButton;
     buttonMenuSettings: TUSymbolButton;
@@ -63,9 +62,9 @@ type
     buttonMenuSave: TUSymbolButton;
     buttonMenuOpen: TUSymbolButton;
     buttonMenuRate: TUSymbolButton;
-    captionbarNewStyle: TUCaptionBar;
+    captionBarMain: TUCaptionBar;
     dialogSelectColor: TColorDialog;
-    panelRibbon: TUSmoothBox;
+    panelRibbon: TUScrollBox;
     buttonGoBack: TUSymbolButton;
     separator1: TUSeparator;
     buttonGoHome: TUSymbolButton;
@@ -83,7 +82,7 @@ type
     buttonReloadSettings: TUSymbolButton;
     buttonHighlight: TUButton;
     buttonDisabled: TUButton;
-    buttonToggle: TUButton;
+    buttonToggled: TUButton;
     radioA1: TURadioButton;
     radioA2: TURadioButton;
     radioA3: TURadioButton;
@@ -106,8 +105,8 @@ type
     textHeading: TUText;
     textTitle: TUText;
     buttonRunning: TButton;
-    buttonAniStart: TButton;
-    buttonAniInverse: TButton;
+    buttonAniToRight: TButton;
+    buttonAniToLeft: TButton;
     buttonWithImage: TUButton;
     sliderHorz: TUSlider;
     sliderDisabled: TUSlider;
@@ -117,7 +116,7 @@ type
     buttonWinMax: TUQuickButton;
     buttonWinMin: TUQuickButton;
     comboAppDPI: TComboBox;
-    boxSmoothScrolling: TUSmoothBox;
+    boxSettings: TUScrollBox;
     headingSettings: TUText;
     entryAppTheme: TUText;
     radioSystemTheme: TURadioButton;
@@ -155,10 +154,11 @@ type
     CopyCtrlC1: TMenuItem;
     PasteCtrlV1: TMenuItem;
     buttonAppListForm: TUSymbolButton;
+    buttonBlurForm: TUQuickButton;
     procedure buttonReloadSettingsClick(Sender: TObject);
-    procedure buttonAniStartClick(Sender: TObject);
+    procedure buttonAniToRightClick(Sender: TObject);
     procedure buttonRandomProgressClick(Sender: TObject);
-    procedure buttonAniInverseClick(Sender: TObject);
+    procedure buttonAniToLeftClick(Sender: TObject);
     procedure buttonOpenMenuClick(Sender: TObject);
     procedure radioSystemThemeClick(Sender: TObject);
     procedure radioLightThemeClick(Sender: TObject);
@@ -175,6 +175,8 @@ type
     procedure buttonImageFormClick(Sender: TObject);
     procedure buttonHighlightClick(Sender: TObject);
     procedure buttonAppListFormClick(Sender: TObject);
+    procedure buttonBlurFormClick(Sender: TObject);
+
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
     procedure AppThemeAfterUpdate(Sender: TObject);
@@ -197,8 +199,9 @@ uses
 
 procedure TformDemo.FormCreate(Sender: TObject);
 begin
-  Self.ThemeManager.OnBeforeUpdate := AppThemeBeforeUpdate;
-  Self.ThemeManager.OnAfterUpdate  := AppThemeAfterUpdate;
+  CaptionBar := captionBarMain;
+  ThemeManager.OnBeforeUpdate := AppThemeBeforeUpdate;
+  ThemeManager.OnAfterUpdate  := AppThemeAfterUpdate;
 end;
 
 procedure TformDemo.AppThemeBeforeUpdate(Sender: TObject);
@@ -216,20 +219,19 @@ begin
   //  Handle theme changed for formDemo
   if formDemo <> Nil then begin
     //  Theme changed
-    if Self.ThemeManager.UseSystemTheme then
-      formDemo.radioSystemTheme.IsChecked := true
-    else if Self.ThemeManager.CustomTheme = utLight then
-      formDemo.radioLightTheme.IsChecked := true
+    if ThemeManager.UseSystemTheme then
+      formDemo.radioSystemTheme.IsChecked := True
+    else if ThemeManager.CustomTheme = utLight then
+      formDemo.radioLightTheme.IsChecked := True
     else
-      formDemo.radioDarkTheme.IsChecked := true;
+      formDemo.radioDarkTheme.IsChecked := True;
 
     //  Accent color changed
-    formDemo.panelSelectAccentColor.CustomBackColor := Self.ThemeManager.AccentColor;
-    formDemo.panelSelectAccentColor.CustomTextColor :=
-      GetTextColorFromBackground(Self.ThemeManager.AccentColor);
+    formDemo.panelSelectAccentColor.Color := ThemeManager.AccentColor;
+    formDemo.panelSelectAccentColor.Font.Color := GetTextColorFromBackground(ThemeManager.AccentColor);
 
     //  Color on border changed
-    if Self.ThemeManager.ColorOnBorder then
+    if ThemeManager.ColorOnBorder then
       formDemo.checkColorBorder.State := cbsChecked
     else
       formDemo.checkColorBorder.State := cbsUnchecked;
@@ -238,12 +240,12 @@ begin
   //  Handle theme changed for formImageBackground
   if formImageBackground <> Nil then begin
     //  Theme changed
-    if Self.ThemeManager.UseSystemTheme then
-      formImageBackground.radioSystemTheme.IsChecked := true
-    else if Self.ThemeManager.CustomTheme = utLight then
-      formImageBackground.radioLightTheme.IsChecked := true
+    if ThemeManager.UseSystemTheme then
+      formImageBackground.radioSystemTheme.IsChecked := True
+    else if ThemeManager.CustomTheme = utLight then
+      formImageBackground.radioLightTheme.IsChecked := True
     else
-      formImageBackground.radioDarkTheme.IsChecked := true;
+      formImageBackground.radioDarkTheme.IsChecked := True;
   end;
 
   LockWindowUpdate(0);
@@ -251,28 +253,51 @@ end;
 
 //  ANIMATION TESTING
 
-procedure TformDemo.buttonAniStartClick(Sender: TObject);
+procedure TformDemo.buttonAniToRightClick(Sender: TObject);
 var
   Delta: Integer;
+  Ani: TIntAni;
 begin
   Delta := MulDiv(210, PPI, 96);
-  buttonRunning.AnimationFromCurrent(apLeft, Delta, 25, 250, akOut, afkQuartic,
-    procedure begin buttonRunning.SetFocus end);
+
+  Ani := TIntAni.Create(buttonRunning.Left, Delta,
+    procedure (V: Integer)
+    begin
+      buttonRunning.Left := V;
+    end,
+    procedure
+    begin
+      buttonRunning.SetFocus;
+    end);
+  Ani.AniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
+  Ani.Start;
 end;
 
-procedure TformDemo.buttonAniInverseClick(Sender: TObject);
+procedure TformDemo.buttonAniToLeftClick(Sender: TObject);
 var
   Delta: Integer;
+  Ani: TIntAni;
 begin
   Delta := -MulDiv(210, PPI, 96);
-  buttonRunning.AnimationFromCurrent(apLeft, Delta, 25, 250, akOut, afkQuartic,
-    procedure begin buttonRunning.SetFocus end);
+
+  Ani := TIntAni.Create(buttonRunning.Left, Delta,
+    procedure (V: Integer)
+    begin
+      buttonRunning.Left := V;
+    end,
+    procedure
+    begin
+      buttonRunning.SetFocus;
+    end);
+  Ani.AniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
+  Ani.Start;
 end;
 
 procedure TformDemo.buttonOpenMenuClick(Sender: TObject);
 var
   Opened: Boolean;
   Delta: Integer;
+  Ani: TIntAni;
 begin
   Opened := drawerNavigation.Width <> buttonOpenMenu.Width;
 
@@ -281,22 +306,38 @@ begin
   else
     Delta := -MulDiv(180, PPI, 96); //  Close
 
-  drawerNavigation.AnimationFromCurrent(apWidth, Delta, 30, 200, akOut, afkQuartic, nil);
+  Ani := TIntAni.Create(drawerNavigation.Width, Delta,
+    procedure (V: Integer)
+    begin
+      drawerNavigation.Width := V;
+    end, nil);
+  Ani.AniSet.QuickAssign(akOut, afkQuartic, 0, 200, 30);
+  Ani.Start;
 end;
 
 procedure TformDemo.buttonMenuSettingsClick(Sender: TObject);
 var
   Delta: Integer;
+  Ani: TIntAni;
 begin
-  boxSmoothScrolling.DisableAlign;  //  Pause align items for better performance
+  boxSettings.DisableAlign;  //  Pause align items for better performance
 
-  if boxSmoothScrolling.Width = 0 then
+  if boxSettings.Width = 0 then
     Delta := MulDiv(250, PPI, 96)   //  Open
   else
-    Delta := -boxSmoothScrolling.Width; //  Close
+    Delta := -boxSettings.Width; //  Close
 
-  boxSmoothScrolling.AnimationFromCurrent(apWidth, Delta, 30, 200, akOut, afkQuartic,
-    procedure begin boxSmoothScrolling.EnableAlign end);
+  Ani := TIntAni.Create(boxSettings.Width, Delta,
+    procedure (V: Integer)
+    begin
+      boxSettings.Width := V;
+    end,
+    procedure
+    begin
+      boxSettings.EnableAlign;
+    end);
+  Ani.AniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
+  Ani.Start;
 end;
 
 //  CONTROLS EVENTS
@@ -334,8 +375,18 @@ begin
   progressConnected.Value := sliderHorz.Value;
 end;
 
+procedure TformDemo.buttonBlurFormClick(Sender: TObject);
+begin
+  if OverlayType = otNone then
+    OverlayType := otBlur
+  else
+    OverlayType := otNone;
+end;
+
 procedure TformDemo.buttonRandomProgressClick(Sender: TObject);
 begin
+  buttonRandomProgress.Hint := 'This is line 1' + sLineBreak + 'This is' + sLineBreak + 'Nothing to do here, thanks';
+
   Randomize;
   progressCustomColor.GoToValue(Random(101));
   progressConnected.GoToValue(Random(101));
@@ -346,23 +397,23 @@ end;
 
 procedure TformDemo.buttonLoginFormClick(Sender: TObject);
 begin
-  if formLoginDialog = nil then
+  if formLoginDialog = Nil then
     Application.CreateForm(TformLoginDialog, formLoginDialog);
-  formLoginDialog.Show;
+  formLoginDialog.Visible := True;
 end;
 
 procedure TformDemo.buttonImageFormClick(Sender: TObject);
 begin
-  if formImageBackground = nil then
+  if formImageBackground = Nil then
     Application.CreateForm(TformImageBackground, formImageBackground);
-  formImageBackground.Show;
+  formImageBackground.Visible := true;
 end;
 
 procedure TformDemo.buttonAppListFormClick(Sender: TObject);
 begin
-  if formAppList = nil then
+  if formAppList = Nil then
     Application.CreateForm(TformAppList, formAppList);
-  formAppList.Show;
+  formAppList.Visible := true;
 end;
 
 //  THEME
@@ -398,23 +449,20 @@ begin
   Self.PPI := NewPPI;
   Self.ScaleForPPI(NewPPI);
 
-  if formAppList <> nil then
-    begin
-      formAppList.PPI := NewPPI;
-      formAppList.ScaleForPPI(NewPPI);
-    end;
+  if formAppList <> Nil then begin
+    formAppList.PPI := NewPPI;
+    formAppList.ScaleForPPI(NewPPI);
+  end;
 
-  if formLoginDialog <> nil then
-    begin
-      formLoginDialog.PPI := NewPPI;
-      formLoginDialog.ScaleForPPI(NewPPI);
-    end;
+  if formLoginDialog <> Nil then begin
+    formLoginDialog.PPI := NewPPI;
+    formLoginDialog.ScaleForPPI(NewPPI);
+  end;
 
-  if formImageBackground <> nil then
-    begin
-      formImageBackground.PPI := NewPPI;
-      formImageBackground.ScaleForPPI(NewPPI);
-    end;
+  if formImageBackground <> Nil then begin
+    formImageBackground.PPI := NewPPI;
+    formImageBackground.ScaleForPPI(NewPPI);
+  end;
 end;
 
 procedure TformDemo.panelSelectAccentColorClick(Sender: TObject);
@@ -422,15 +470,14 @@ var
   NewColor: TColor;
 begin
   //  Open dialog
-  if dialogSelectColor.Execute then
-    begin
-      NewColor := dialogSelectColor.Color;
+  if dialogSelectColor.Execute then begin
+    NewColor := dialogSelectColor.Color;
 
-      //  Change accent color
-      ThemeManager.UseSystemAccentColor := false;
-      ThemeManager.CustomAccentColor := NewColor;
-      ThemeManager.Reload;
-    end;
+    //  Change accent color
+    ThemeManager.UseSystemAccentColor := false;
+    ThemeManager.CustomAccentColor := NewColor;
+    ThemeManager.Reload;
+  end;
 end;
 
 procedure TformDemo.radioSystemThemeClick(Sender: TObject);
@@ -464,12 +511,11 @@ begin
     begin
       Edit := popupEdit.PopupComponent as TCustomEdit;
       case Index of
-        0:  //  Cut
-          Edit.CutToClipboard;
-        1:  //  Copy
-          Edit.CopyToClipboard;
-        2:  //  Paste
-          Edit.PasteFromClipboard;
+        0: Edit.CutToClipboard; //  Cut
+
+        1: Edit.CopyToClipboard; //  Copy
+
+        2: Edit.PasteFromClipboard; //  Paste
       end;
     end;
 end;
