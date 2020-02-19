@@ -25,9 +25,11 @@ type
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
     FCustomColor: TColor;
+    FUseSystemCaptionColor: Boolean;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager; // (const Value: TUThemeManager); // IUThemeComponent
+    procedure SetUseSystemCaptionColor(const Value: Boolean);
 
     //  Child events
     procedure BackColor_OnChange(Sender: TObject);
@@ -45,15 +47,16 @@ type
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure UpdateTheme;
+    procedure UpdateTheme; // IUThemeComponent
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
     property BackColor: TUThemeColorSet read FBackColor write FBackColor;
 
-    property DragMovement: Boolean read FDragMovement write FDragMovement default true;
-    property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default true;
-    property CustomColor: TColor read FCustomColor write FCustomColor default $D77800;
+    property DragMovement: Boolean read FDragMovement write FDragMovement default True;
+    property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default True;
+    property CustomColor: TColor read FCustomColor write FCustomColor default clNone;
+    property UseSystemCaptionColor: Boolean read FUseSystemCaptionColor write SetUseSystemCaptionColor default False;
 
     property Align default alTop;
     property Alignment default taLeftJustify;
@@ -65,6 +68,7 @@ implementation
 
 uses
   Types,
+  UCL.SystemSettings,
   UCL.TUForm;
 
 type
@@ -80,21 +84,47 @@ begin
   UpdateTheme;
 end;
 
+procedure TUCaptionBar.SetUseSystemCaptionColor(const Value: Boolean);
+begin
+  if FUseSystemCaptionColor <> Value then begin
+    FUseSystemCaptionColor := Value;
+    UpdateTheme;
+  end;
+end;
+
 procedure TUCaptionBar.UpdateTheme;
 var
   Back: TUThemeColorSet;
+  ParentForm: TCustomForm;
 begin
+  ParentForm := GetParentForm(Self, True);
   //  Background color
   if ThemeManager = Nil then
     //Color := CustomColor // do nothing
   else begin
     //  Select default or custom style
-    if not BackColor.Enabled then
-      Back := CAPTIONBAR_BACK
-    else
-      Back := BackColor;
+    if UseSystemCaptionColor then begin
+      if (ParentForm <> Nil) and (ParentForm is TForm) then begin
+        if ParentForm.Active then
+          Color := GetAccentColor
+        else
+          Color := ParentForm.Color;
+      end
+      else
+        Color := GetAccentColor;
+    end
+    else begin
+      if CustomColor <> clNone then
+        Color := CustomColor
+      else begin
+        if not BackColor.Enabled then
+          Back := CAPTIONBAR_BACK
+        else
+          Back := BackColor;
 
-    Color := Back.GetColor(ThemeManager);
+        Color := Back.GetColor(ThemeManager);
+      end;
+    end;
     Font.Color := GetTextColorFromBackground(Color);
   end;
 end;
@@ -122,7 +152,8 @@ begin
 
   FDragMovement := true;
   FSystemMenuEnabled := true;
-  FCustomColor := $D77800;
+  FCustomColor := clNone; // $D77800;
+  FUseSystemCaptionColor := False;
 
   Align := alTop;
   Alignment := taLeftJustify;

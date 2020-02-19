@@ -22,106 +22,106 @@ type
   TUQuickButtonStyle = (sbsNone, sbsQuit, sbsMax, sbsMin, sbsSysButton, sbsHighlight);
 
   TUCustomQuickButton = class(TGraphicControl, IUThemeComponent)
-    private var
-      BackColor: TColor;
-      TextColor: TColor;
+  private var
+    BackColor: TColor;
+    TextColor: TColor;
 
-    private
-      FThemeManager: TUThemeManager;
-      FButtonState: TUControlState;
-      FButtonStyle: TUQuickButtonStyle;
-      FLightColor: TColor;
-      FDarkColor: TColor;
-      FCustomAccentColor: TColor;
-      FPressBrightnessDelta: Integer;
-      FTransparent: Boolean;
+  private
+    FThemeManager: TUThemeManager;
+    FButtonState: TUControlState;
+    FButtonStyle: TUQuickButtonStyle;
+    FLightColor: TColor;
+    FDarkColor: TColor;
+    FCustomAccentColor: TColor;
+    FPressBrightnessDelta: Integer;
+    FTransparent: Boolean;
 
-      //  Internal
-      procedure UpdateColors;
+    //  Internal
+    procedure UpdateColors;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetButtonState(const Value: TUControlState);
-      procedure SetButtonStyle(const Value: TUQuickButtonStyle);
-      procedure SetTransparent(const Value: Boolean);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetButtonState(const Value: TUControlState);
+    procedure SetButtonStyle(const Value: TUQuickButtonStyle);
+    procedure SetTransparent(const Value: Boolean);
 
-      //  Messages
-      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    //  Messages
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-      procedure UpdateTheme;
+    procedure UpdateTheme;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-      property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
+    property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
 
-      property LightColor: TColor read FLightColor write FLightColor default $E6E6E6;
-      property DarkColor: TColor read FDarkColor write FDarkColor default $191919;
-      property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
-      property PressBrightnessDelta: Integer read FPressBrightnessDelta write FPressBrightnessDelta default 25;
-      property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property LightColor: TColor read FLightColor write FLightColor default $E6E6E6;
+    property DarkColor: TColor read FDarkColor write FDarkColor default $191919;
+    property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
+    property PressBrightnessDelta: Integer read FPressBrightnessDelta write FPressBrightnessDelta default 25;
+    property Transparent: Boolean read FTransparent write SetTransparent default false;
 
-      property Height default 32;
-      property Width default 45;
+    property Height default 32;
+    property Width default 45;
   end;
 
   TUQuickButton = class(TUCustomQuickButton)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      property Caption;
-      property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
+  published
+    property Align;
+    property Anchors;
+    property AutoSize;
+    property BiDiMode;
+    property Caption;
+    property Color;
+    property Constraints;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Touch;
+    property Visible;
+  {$IF CompilerVersion > 29}
+    property StyleElements;
+  {$IFEND}
 
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
+    property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDock;
+    property OnStartDrag;
   end;
 
 implementation

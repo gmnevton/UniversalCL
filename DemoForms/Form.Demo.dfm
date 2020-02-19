@@ -370,6 +370,7 @@ object formDemo: TformDemo
     BackColor.LightColor = 15921906
     BackColor.DarkColor = 2829099
     CustomColor = clWhite
+    UseSystemCaptionColor = True
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
@@ -487,7 +488,8 @@ object formDemo: TformDemo
         '100%'
         '125%'
         '150%'
-        '175%')
+        '175%'
+        '200%')
     end
     object comboAppBorderStyle: TComboBox
       AlignWithMargins = True

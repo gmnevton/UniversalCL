@@ -464,8 +464,12 @@ begin
     DoDrawBorder;
 
   //  Update cation bar
-  if CaptionBar <> Nil then
-    CaptionBar.Repaint;
+  if CaptionBar <> Nil then begin
+    if ThemeManager.IsThemeAvailable(CaptionBar) then
+      (CaptionBar as IUThemeComponent).UpdateTheme
+    else
+      CaptionBar.Repaint;
+  end;
 end;
 
 procedure TUForm.WMDPIChanged(var Msg: TWMDpi);

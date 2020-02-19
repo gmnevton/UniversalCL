@@ -438,10 +438,12 @@ procedure TformDemo.comboAppDPIChange(Sender: TObject);
 var
   NewPPI: Integer;
 begin
+  // 24 ppi intervals
   case comboAppDPI.ItemIndex of
     1: NewPPI := 120;
     2: NewPPI := 144;
     3: NewPPI := 168;
+    4: NewPPI := 192;
     else
       NewPPI := 96;
   end;
