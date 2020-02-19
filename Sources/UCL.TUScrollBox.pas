@@ -23,74 +23,78 @@ type
   TUScrollBarStyle = (sbsMini, sbsFull, sbsNo);
 
   TUMiniScrollBar = class(TCustomPanel)
-    private
-      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+  private
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
-    public
-      constructor Create(aOwner: TComponent); override;
+  public
+    constructor Create(aOwner: TComponent); override;
 
-    published
-      property Visible default False;
+  published
+    property Visible default False;
   end;
 
   TUScrollBox = class(TScrollBox, IUThemeComponent)
-    private var
-      MiniSB: TUMiniScrollBar;
-      MINI_SB_THICKNESS: Byte;
-      MINI_SB_MARGIN: Byte;
-      MINI_SB_COLOR: TColor;
-      MouseLeave: Boolean;
+  private var
+    MiniSB: TUMiniScrollBar;
+    MINI_SB_THICKNESS: Byte;
+    MINI_SB_MARGIN: Byte;
+    MINI_SB_COLOR: TColor;
 
-    private
-      FThemeManager: TUThemeManager;
-      FAniSet: TIntAniSet;
-      FBackColor: TUThemeColorSet;
+  private
+    FThemeManager: TUThemeManager;
+    FAniSet: TIntAniSet;
+    FBackColor: TUThemeColorSet;
 
-      FScrollCount: Integer;
-      FScrollOrientation: TUOrientation;      
-      FScrollBarStyle: TUScrollBarStyle;
-      FLengthPerStep: Integer;
-      FMaxScrollCount: Integer;
+    FScrollCount: Integer;
+    FScrollOrientation: TUOrientation;
+    FScrollBarStyle: TUScrollBarStyle;
+    FLengthPerStep: Integer;
+    FMaxScrollCount: Integer;
+    FMouseInControl: Boolean;
+    FScrollBarTimer: TTimer;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
 
-      //  Child events
-      procedure BackColor_OnChange(Sender: TObject);
+    //  Child events
+    procedure BackColor_OnChange(Sender: TObject);
+    procedure ScrollBar_OnTimer(Sender: TObject);
 
-      //  Messages
-      procedure WMSize(var Msg: TWMSize); message WM_SIZE;
-      procedure CMMouseWheel(var Msg: TWMMouseWheel); message CM_MOUSEWHEEL;
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    //  Messages
+    procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure CMMouseWheel(var Msg: TWMMouseWheel); message CM_MOUSEWHEEL;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+//    procedure WMNCMouseLeave(var Message: TMessage); message WM_NCMOUSELEAVE;
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-      procedure UpdateTheme;
+    procedure UpdateTheme;
 
-      procedure SetOldSBVisible(IsVisible: Boolean);
-      procedure UpdateMiniSB;
-      procedure SetMiniSBVisible(IsVisible: Boolean);
+    procedure SetOldSBVisible(IsVisible: Boolean);
+    procedure UpdateMiniSB;
+    procedure SetMiniSBVisible(IsVisible: Boolean);
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property AniSet: TIntAniSet read FAniSet write FAniSet;
-      property BackColor: TUThemeColorSet read FBackColor write FBackColor;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property AniSet: TIntAniSet read FAniSet write FAniSet;
+    property BackColor: TUThemeColorSet read FBackColor write FBackColor;
 
-      property ScrollCount: Integer read FScrollCount;
-      property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
-      property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
-      property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
-      property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
+    property ScrollCount: Integer read FScrollCount;
+    property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
+    property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
+    property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
+    property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
 
-      property BorderStyle default bsNone;
+    property BorderStyle default bsNone;
   end;
 
 implementation
@@ -151,7 +155,6 @@ begin
   FThemeManager := Nil;
 
   //  Internal
-  MouseLeave := true;
   MINI_SB_THICKNESS := 2;
   MINI_SB_MARGIN := 3;
   MINI_SB_COLOR := $7A7A7A;
@@ -167,6 +170,7 @@ begin
   FScrollBarStyle := sbsMini;
   FLengthPerStep := 4;
   FMaxScrollCount := 8;
+  FMouseInControl := False;
 
   //  Mini scrollbar
   MiniSB := TUMiniScrollBar.Create(Self);
@@ -184,6 +188,11 @@ begin
   FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(SCROLLBOX_BACK);
 
+  FScrollBarTimer := TTimer.Create(Nil);
+  FScrollBarTimer.Enabled := False;
+  FScrollBarTimer.Interval := 1000;
+  FScrollBarTimer.OnTimer := ScrollBar_OnTimer;
+
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 
@@ -195,6 +204,8 @@ begin
   MiniSB.Free;
   FAniSet.Free;
   FBackColor.Free;
+  FScrollBarTimer.Enabled := False;
+  FScrollBarTimer.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
@@ -328,27 +339,47 @@ begin
     SetOldSBVisible(False);
 end;
 
+procedure TUScrollBox.WMMouseMove(var Msg: TWMMouseMove);
+begin
+  if FMouseInControl and (ScrollBarStyle = sbsMini) and not MiniSB.Visible then begin
+    FScrollBarTimer.Enabled := False;
+    if ScrollBarStyle <> sbsFull then
+      SetOldSBVisible(False);
+    if ScrollBarStyle = sbsMini then
+      SetMiniSBVisible(True);
+    FScrollBarTimer.Enabled := True;
+  end;
+
+  inherited;
+end;
+
 procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
 begin
   if (Win32MajorVersion <> 10) and CanFocus then
     SetFocus;
 
-  if MouseLeave and PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
-    if ScrollBarStyle <> sbsFull then
-      SetOldSBVisible(False);
-    if ScrollBarStyle = sbsMini then
-      SetMiniSBVisible(True);
-  end;
+//  if not FMouseInControl and PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
+  FMouseInControl := True;
+  FScrollBarTimer.Enabled := True;
+
+  if ScrollBarStyle <> sbsFull then
+    SetOldSBVisible(False);
+  if ScrollBarStyle = sbsMini then
+    SetMiniSBVisible(True);
 
   inherited;
 end;
 
 procedure TUScrollBox.CMMouseLeave(var Msg: TMessage);
 begin
-  if (ScrollBarStyle = sbsMini) and not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+  if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then begin
+    FMouseInControl := False;
+    FScrollBarTimer.Enabled := False;
+  end;
+
+  if (ScrollBarStyle = sbsMini) and not FMouseInControl then begin
     if Msg.LParam = 1 then
       Msg.LParam := 0;
-    MouseLeave := True;
     SetMiniSBVisible(False);
   end;
 
@@ -363,8 +394,17 @@ var
 begin
   inherited;
 
-  if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
+//  if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
+  if not FMouseInControl then
     Exit;
+
+  FScrollBarTimer.Enabled := False;
+  if (ScrollBarStyle = sbsMini) and not MiniSB.Visible then begin
+    if ScrollBarStyle <> sbsFull then
+      SetOldSBVisible(False);
+    if ScrollBarStyle = sbsMini then
+      SetMiniSBVisible(True);
+  end;
 
   if ScrollOrientation = oVertical then
     SB := VertScrollBar
@@ -381,6 +421,7 @@ begin
     if ScrollBarStyle = sbsMini then
       UpdateMiniSB;
     EnableAlign;
+    FScrollBarTimer.Enabled := True;
   end
   //  Scroll by mouse
   else begin
@@ -424,6 +465,7 @@ begin
           FScrollCount := 0;
           EnableAlign;
           Mouse.Capture := 0;
+          FScrollBarTimer.Enabled := True;
         end;
       end;
     Ani.Start;
@@ -437,6 +479,14 @@ begin
   UpdateTheme;
 end;
 
+procedure TUScrollBox.ScrollBar_OnTimer(Sender: TObject);
+begin
+  if FMouseInControl and (ScrollBarStyle = sbsMini) then begin
+    FScrollBarTimer.Enabled := False;
+    SetMiniSBVisible(False);
+  end;
+end;
+
 { TUMiniScrollBar }
 
 constructor TUMiniScrollBar.Create(aOwner: TComponent);
@@ -445,7 +495,7 @@ begin
 
 {$IF CompilerVersion > 29}
   StyleElements :=[];
-{$ENDIF}
+{$IFEND}
   BevelOuter := bvNone;
   BevelInner := bvNone;
   FullRepaint := False;

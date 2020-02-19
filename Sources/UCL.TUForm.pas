@@ -93,6 +93,7 @@ type
     constructor Create(AOwner: TComponent); override;
     constructor CreateNew(aOwner: TComponent; Dummy: Integer = 0); override;
     destructor Destroy; override;
+    procedure AfterConstruction; override;
 
     procedure UpdateTheme; virtual; // IUThemeControl
   {$IF CompilerVersion < 30}
@@ -295,7 +296,7 @@ begin
   FCurrentPPI := FPPI;
 {$IFEND}
   FOverlayType := otNone;
-  FFitDesktopSize := true;
+  FFitDesktopSize := True;
 
   //  Common props
   Font.Name := 'Segoe UI';
@@ -328,7 +329,7 @@ begin
     SetWindowThemeAttribute(Self.Handle, WTA_NONCLIENT, @wta, SizeOf(WTA_OPTIONS));
 
     Flag := DWMNCRP_ENABLED;
-    DwmSetWindowAttribute(Handle, DWMWA_ALLOW_NCPAINT, @Flag, SizeOf(Flag));
+    DwmSetWindowAttribute(Self.Handle, DWMWA_ALLOW_NCPAINT, @Flag, SizeOf(Flag));
     SetWindowPos(Self.Handle, 0, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOSENDCHANGING or SWP_FRAMECHANGED);
   end;
 end;
@@ -348,6 +349,12 @@ begin
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
+end;
+
+procedure TUForm.AfterConstruction;
+begin
+  inherited;
+  ThemeManager.Reload;
 end;
 
 //  CUSTOM METHODS

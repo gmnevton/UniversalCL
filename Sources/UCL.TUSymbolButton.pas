@@ -91,6 +91,12 @@ type
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
+  {$IF CompilerVersion < 30}
+    FCurrentPPI: Integer;
+    FIsScaling: Boolean;
+    function GetDesignDpi: Integer; virtual;
+    function GetParentCurrentDpi: Integer; virtual;
+  {$IFEND}
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
@@ -102,6 +108,9 @@ type
     destructor Destroy; override;
 
     procedure UpdateTheme;
+  {$IF CompilerVersion < 30}
+    procedure ScaleForPPI(NewPPI: Integer); virtual;
+  {$IFEND}
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
@@ -181,6 +190,7 @@ type
 implementation
 
 uses
+  Forms,
   UCL.Types;
 
 { TUCustomSymbolButton }
@@ -199,6 +209,49 @@ begin
   UpdateRects;
   Repaint;
 end;
+
+{$REGION 'Compatibility with older Delphi'}
+{$IF CompilerVersion < 30}
+function TUCustomSymbolButton.GetDesignDpi: Integer;
+var
+  LForm: TCustomForm;
+begin
+  LForm := GetParentForm(Self);
+
+  if (LForm <> Nil) and (LForm is TForm) then
+    Result := TForm(LForm).PixelsPerInch
+  else
+    Result := Windows.USER_DEFAULT_SCREEN_DPI;
+end;
+
+function TUCustomSymbolButton.GetParentCurrentDpi: Integer;
+begin
+//  if Parent <> nil then
+//    Result := Parent.GetParentCurrentDpi
+//  else
+    Result := FCurrentPPI;
+end;
+
+procedure TUCustomSymbolButton.ScaleForPPI(NewPPI: Integer);
+begin
+  if not FIsScaling and (NewPPI > 0) then begin
+    FIsScaling := True;
+    try
+      if FCurrentPPI = 0 then
+        FCurrentPPI := GetDesignDpi;
+
+      if NewPPI <> FCurrentPPI then begin
+        ChangeScale(NewPPI, FCurrentPPI);
+        FCurrentPPI := NewPPI;
+      end
+    finally
+      FIsScaling := False;
+    end;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
 {
 procedure TUCustomSymbolButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin

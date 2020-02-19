@@ -67,9 +67,7 @@
 			<DCCReference Include="Sources\UCL.TUCaptionBar.pas"/>
 			<DCCReference Include="Sources\UCL.TUCheckBox.pas"/>
 			<DCCReference Include="Sources\UCL.TUEdit.pas"/>
-			<DCCReference Include="Sources\UCL.TUWPForm.pas"/>
 			<DCCReference Include="Sources\UCL.TUForm.pas"/>
-			<DCCReference Include="Sources\UCL.TUBorderlessForm.pas"/>
 			<DCCReference Include="Sources\UCL.TUHyperLink.pas"/>
 			<DCCReference Include="Sources\UCL.TUItemButton.pas"/>
 			<DCCReference Include="Sources\UCL.TUPanel.pas"/>
@@ -88,7 +86,7 @@
 			<DCCReference Include="Sources\UCL.TUTitleBar.pas"/>
 			<DCCReference Include="Sources\UCL.TUShadow.pas"/>
 			<DCCReference Include="Sources\UCL.TUTooltip.pas"/>
-			<DCCReference Include="Sources\UCL.TUSmoothBox.pas"/>
+			<DCCReference Include="Sources\UCL.TUFormOverlay.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>

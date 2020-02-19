@@ -45,9 +45,7 @@ contains
   UCL.TUCaptionBar in 'Sources\UCL.TUCaptionBar.pas',
   UCL.TUCheckBox in 'Sources\UCL.TUCheckBox.pas',
   UCL.TUEdit in 'Sources\UCL.TUEdit.pas',
-  UCL.TUWPForm in 'Sources\UCL.TUWPForm.pas',
   UCL.TUForm in 'Sources\UCL.TUForm.pas',
-  UCL.TUBorderlessForm in 'Sources\UCL.TUBorderlessForm.pas',
   UCL.TUHyperLink in 'Sources\UCL.TUHyperLink.pas',
   UCL.TUItemButton in 'Sources\UCL.TUItemButton.pas',
   UCL.TUPanel in 'Sources\UCL.TUPanel.pas',
@@ -66,7 +64,7 @@ contains
   UCL.TUTitleBar in 'Sources\UCL.TUTitleBar.pas',
   UCL.TUShadow in 'Sources\UCL.TUShadow.pas',
   UCL.TUTooltip in 'Sources\UCL.TUTooltip.pas',
-  UCL.TUSmoothBox in 'Sources\UCL.TUSmoothBox.pas';
+  UCL.TUFormOverlay in 'Sources\UCL.TUFormOverlay.pas';
 
 end.
 
