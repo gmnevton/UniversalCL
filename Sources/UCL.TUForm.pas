@@ -37,7 +37,7 @@ type
 
   protected
     FThemeManager: TUThemeManager;
-    FBackColor: TUThemeColorSet;
+    FBackColor: TUThemeControlColorSet;
     FCaptionBar: TControl;
     FOverlay: TUFormOverlay;
 
@@ -102,7 +102,7 @@ type
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-    property BackColor: TUThemeColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
     property CaptionBar: TControl read FCaptionBar write FCaptionBar;
 
     property PPI: Integer read FPPI write FPPI default 96;
@@ -312,7 +312,7 @@ begin
   FOverlay := TUFormOverlay.CreateNew(Self);
   FOverlay.AssignToForm(Self);
 
-  FBackColor := TUThemeColorSet.Create;
+  FBackColor := TUThemeControlColorSet.Create;
   FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(FORM_BACK);
 
@@ -427,7 +427,7 @@ end;
 
 procedure TUForm.UpdateTheme;
 var
-  Back: TUThemeColorSet;
+  Back: TUThemeControlColorSet;
 begin
   if ThemeManager = Nil then begin
     //  Do nothing
@@ -466,9 +466,8 @@ begin
   //  Update cation bar
   if CaptionBar <> Nil then begin
     if ThemeManager.IsThemeAvailable(CaptionBar) then
-      (CaptionBar as IUThemeComponent).UpdateTheme
-    else
-      CaptionBar.Repaint;
+      (CaptionBar as IUThemeComponent).UpdateTheme;
+    CaptionBar.Repaint;
   end;
 end;
 

@@ -20,7 +20,7 @@ type
   TUCaptionBar = class(TPanel, IUThemeComponent)
   private
     FThemeManager: TUThemeManager;
-    FBackColor: TUThemeColorSet;
+    FBackColor: TUThemeCaptionBarColorSet;
 
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
@@ -48,10 +48,11 @@ type
     destructor Destroy; override;
 
     procedure UpdateTheme; // IUThemeComponent
+    procedure UpdateChildControls;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-    property BackColor: TUThemeColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeCaptionBarColorSet read FBackColor write FBackColor;
 
     property DragMovement: Boolean read FDragMovement write FDragMovement default True;
     property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default True;
@@ -94,7 +95,7 @@ end;
 
 procedure TUCaptionBar.UpdateTheme;
 var
-  Back: TUThemeColorSet;
+  Back: TUThemeCaptionBarColorSet;
   ParentForm: TCustomForm;
 begin
   ParentForm := GetParentForm(Self, True);
@@ -103,12 +104,19 @@ begin
     //Color := CustomColor // do nothing
   else begin
     //  Select default or custom style
-    if UseSystemCaptionColor then begin
+    if UseSystemCaptionColor and IsColorOnBorderEnabled then begin
       if (ParentForm <> Nil) and (ParentForm is TForm) then begin
         if ParentForm.Active then
           Color := GetAccentColor
-        else
-          Color := ParentForm.Color;
+        else begin
+//          Color := ParentForm.Color;
+          if not BackColor.Enabled then
+            Back := CAPTIONBAR_BACK
+          else
+            Back := BackColor;
+
+          Color := Back.GetColor(ThemeManager, False);
+        end;
       end
       else
         Color := GetAccentColor;
@@ -122,10 +130,29 @@ begin
         else
           Back := BackColor;
 
-        Color := Back.GetColor(ThemeManager);
+        if (ParentForm <> Nil) and (ParentForm is TForm) then
+          Color := Back.GetColor(ThemeManager, ParentForm.Active)
+        else
+          Color := Back.GetColor(ThemeManager, False);
       end;
     end;
     Font.Color := GetTextColorFromBackground(Color);
+  end;
+  UpdateChildControls;
+end;
+
+procedure TUCaptionBar.UpdateChildControls;
+var
+  i: Integer;
+  comp: TComponent;
+begin
+  if ThemeManager = Nil then
+    Exit;
+
+  for i := 0 to ComponentCount - 1 do begin
+    comp := Components[i];
+    if ThemeManager.IsThemeAvailable(comp) then
+      (comp as IUThemeComponent).UpdateTheme;
   end;
 end;
 
@@ -165,7 +192,7 @@ begin
 //  Font.Size := 9;
 //  FullRepaint := True;
 
-  FBackColor := TUThemeColorSet.Create;
+  FBackColor := TUThemeCaptionBarColorSet.Create;
   FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(CAPTIONBAR_BACK);
 

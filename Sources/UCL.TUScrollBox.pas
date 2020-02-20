@@ -43,7 +43,7 @@ type
   private
     FThemeManager: TUThemeManager;
     FAniSet: TIntAniSet;
-    FBackColor: TUThemeColorSet;
+    FBackColor: TUThemeControlColorSet;
 
     FScrollCount: Integer;
     FScrollOrientation: TUOrientation;
@@ -86,7 +86,7 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
     property AniSet: TIntAniSet read FAniSet write FAniSet;
-    property BackColor: TUThemeColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
 
     property ScrollCount: Integer read FScrollCount;
     property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
@@ -118,7 +118,7 @@ end;
 
 procedure TUScrollBox.UpdateTheme;
 var
-  Back: TUThemeColorSet;
+  Back: TUThemeControlColorSet;
 begin
   //  Background color
   if ThemeManager = Nil then begin
@@ -184,7 +184,7 @@ begin
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10);
 
-  FBackColor := TUThemeColorSet.Create;
+  FBackColor := TUThemeControlColorSet.Create;
   FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(SCROLLBOX_BACK);
 
