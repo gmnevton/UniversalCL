@@ -80,7 +80,7 @@ object formDemo: TformDemo
   object textDescription: TUText
     Left = 390
     Top = 210
-    Width = 95
+    Width = 94
     Height = 15
     Caption = 'This is description'
     Font.Charset = DEFAULT_CHARSET
@@ -107,7 +107,7 @@ object formDemo: TformDemo
   object textEntry: TUText
     Left = 390
     Top = 170
-    Width = 73
+    Width = 74
     Height = 17
     Caption = 'This is entry'
     Font.Charset = DEFAULT_CHARSET
@@ -369,6 +369,8 @@ object formDemo: TformDemo
     BackColor.Color = clBlack
     BackColor.LightColor = 15921906
     BackColor.DarkColor = 2829099
+    BackColor.FocusedLightColor = 14120960
+    BackColor.FocusedDarkColor = 1525760
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
@@ -1486,7 +1488,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitWidth = 187
+      ExplicitWidth = 186
     end
     object headingAbout: TUText
       AlignWithMargins = True

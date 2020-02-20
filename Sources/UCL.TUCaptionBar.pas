@@ -44,11 +44,11 @@ type
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     procedure UpdateTheme; // IUThemeComponent
-    procedure UpdateChildControls;
+    procedure UpdateChildControls(const Root: TControl);
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
@@ -138,29 +138,35 @@ begin
     end;
     Font.Color := GetTextColorFromBackground(Color);
   end;
-  UpdateChildControls;
+  UpdateChildControls(Self);
 end;
 
-procedure TUCaptionBar.UpdateChildControls;
+procedure TUCaptionBar.UpdateChildControls(const Root: TControl);
 var
   i: Integer;
-  comp: TComponent;
+  control: TControl;
 begin
   if ThemeManager = Nil then
     Exit;
 
-  for i := 0 to ComponentCount - 1 do begin
-    comp := Components[i];
-    if ThemeManager.IsThemeAvailable(comp) then
-      (comp as IUThemeComponent).UpdateTheme;
+  if Root is TWinControl then begin
+    for i := 0 to TWinControl(Root).ControlCount - 1 do begin
+      control := TWinControl(Root).Controls[i];
+      if TUThemeManager.IsThemeAvailable(control) then
+        (control as IUThemeComponent).UpdateTheme;
+      //
+      if control is TWinControl then begin
+        if TWinControl(control).ControlCount > 0 then
+          UpdateChildControls(control);
+      end
+      else if control is TGraphicControl then begin
+        TGraphicControl(control).Repaint;
+      end;
+    end;
+  end
+  else if Root is TGraphicControl then begin
+    TGraphicControl(Root).Repaint;
   end;
-end;
-
-destructor TUCaptionBar.Destroy;
-begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
 end;
 {
 procedure TUCaptionBar.Notification(AComponent: TComponent; Operation: TOperation);
@@ -172,13 +178,13 @@ end;
 }
 // MAIN CLASS
 
-constructor TUCaptionBar.Create(aOwner: TComponent);
+constructor TUCaptionBar.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FThemeManager := Nil;
 
-  FDragMovement := true;
-  FSystemMenuEnabled := true;
+  FDragMovement := True;
+  FSystemMenuEnabled := True;
   FCustomColor := clNone; // $D77800;
   FUseSystemCaptionColor := False;
 
@@ -200,6 +206,14 @@ begin
     GetCommonThemeManager.Connect(Self);
 
 //  UpdateTheme;
+end;
+
+destructor TUCaptionBar.Destroy;
+begin
+  FBackColor.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
 end;
 
 // MESSAGES

@@ -86,6 +86,7 @@ type
   {$IFEND}
     procedure CreateParams(var Params: TCreateParams); override;
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Init;
     procedure Paint; override;
     procedure Resize; override;
 
@@ -279,12 +280,54 @@ end;
 //  MAIN CLASS
 
 constructor TUForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Init;
+end;
+
+constructor TUForm.CreateNew(AOwner: TComponent; Dummy: Integer = 0);
+begin
+  inherited CreateNew(AOwner, Dummy);
+  Init;
+end;
+
+destructor TUForm.Destroy;
+begin
+  FOverlay.Free;
+  FBackColor.Free;
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
+end;
+
+procedure TUForm.AfterConstruction;
+begin
+  inherited;
+  ThemeManager.Reload;
+end;
+
+//  CUSTOM METHODS
+
+procedure TUForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  //
+  //Params.style := Params.style or 200000;
+  //Params.Style := Params.Style or WS_OVERLAPPEDWINDOW;  //  Enabled aerosnap
+{.$IF CompilerVersion < 30}
+//  with Params do
+//    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
+{.$IFEND}
+  //
+  Params.WindowClass.style := Params.WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
+end;
+
+procedure TUForm.Init;
 var
   CurrentScreen: TMonitor;
   wta: WTA_OPTIONS;
   Flag: LongInt;
 begin
-  inherited Create(AOwner);
   //  New props
   FIsActive := True;
 
@@ -332,45 +375,6 @@ begin
     DwmSetWindowAttribute(Self.Handle, DWMWA_ALLOW_NCPAINT, @Flag, SizeOf(Flag));
     SetWindowPos(Self.Handle, 0, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE or SWP_NOSENDCHANGING or SWP_FRAMECHANGED);
   end;
-end;
-
-constructor TUForm.CreateNew(AOwner: TComponent; Dummy: Integer = 0);
-begin
-  inherited CreateNew(AOwner, Dummy);
-
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
-end;
-
-destructor TUForm.Destroy;
-begin
-  FOverlay.Free;
-  FBackColor.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
-end;
-
-procedure TUForm.AfterConstruction;
-begin
-  inherited;
-  ThemeManager.Reload;
-end;
-
-//  CUSTOM METHODS
-
-procedure TUForm.CreateParams(var Params: TCreateParams);
-begin
-  inherited CreateParams(Params);
-  //
-  //Params.style := Params.style or 200000;
-  //Params.Style := Params.Style or WS_OVERLAPPEDWINDOW;  //  Enabled aerosnap
-{.$IF CompilerVersion < 30}
-//  with Params do
-//    WindowClass.Style := WindowClass.Style or CS_DROPSHADOW;
-{.$IFEND}
-  //
-  Params.WindowClass.style := Params.WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
 end;
 
 procedure TUForm.Paint;
@@ -465,7 +469,7 @@ begin
 
   //  Update cation bar
   if CaptionBar <> Nil then begin
-    if ThemeManager.IsThemeAvailable(CaptionBar) then
+    if TUThemeManager.IsThemeAvailable(CaptionBar) then
       (CaptionBar as IUThemeComponent).UpdateTheme;
     CaptionBar.Repaint;
   end;

@@ -19,62 +19,63 @@ uses
 
 type
   TUCustomRadioButton = class(TGraphicControl, IUThemeComponent)
-    const
-      ICON_CIRCLE_BORDER = '';
-      ICON_CIRCLE_INSIDE = '';
+  private const
+    ICON_CIRCLE_BORDER = '';
+    ICON_CIRCLE_INSIDE = '';
 
-    private
-      var ActiveColor, TextColor: TColor;
-      var IconRect, TextRect: TRect;
+  private var
+    ActiveColor, TextColor: TColor;
+    IconRect, TextRect: TRect;
 
-      FThemeManager: TUThemeManager;
-      FIconFont: TFont;
+  private
+    FThemeManager: TUThemeManager;
+    FIconFont: TFont;
 
-      FAutoSize: Boolean;
-      FIsChecked: Boolean;
-      FGroup: string;
-      FCustomActiveColor: TColor;
-      FTextOnGlass: Boolean;
+    FAutoSize: Boolean;
+    FIsChecked: Boolean;
+    FGroup: string;
+    FCustomActiveColor: TColor;
+    FTextOnGlass: Boolean;
 
-      //  Internal
-      procedure UpdateColors;
-      procedure UpdateRects;
+    //  Internal
+    procedure UpdateColors;
+    procedure UpdateRects;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetAutoSize(const Value: Boolean); reintroduce;
-      procedure SetIsChecked(const Value: Boolean);
-      procedure SetTextOnGlass(const Value: Boolean);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetAutoSize(const Value: Boolean); reintroduce;
+    procedure SetIsChecked(const Value: Boolean);
+    procedure SetTextOnGlass(const Value: Boolean);
 
-      //  Messages
-      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    //  Messages
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
-      procedure Paint; override;
-      procedure Resize; override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure Paint; override;
+    procedure Resize; override;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-      procedure UpdateTheme;
+    procedure UpdateTheme;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property IconFont: TFont read FIconFont write FIconFont;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property IconFont: TFont read FIconFont write FIconFont;
 
-      property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
-      property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
-      property Group: string read FGroup write FGroup;
-      property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor;
-      property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
+    property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
+    property Group: string read FGroup write FGroup;
+    property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor;
+    property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
 
-      property ParentColor default true;
-      property Height default 30;
-      property Width default 180;
+    property ParentColor default true;
+    property Height default 30;
+    property Width default 180;
   end;
 
   TURadioButton = class(TUCustomRadioButton)
@@ -194,6 +195,7 @@ end;
 procedure TUCustomRadioButton.SetIsChecked(const Value: Boolean);
 var
   i: Integer;
+  control: TControl;
 begin
   if Value <> FIsChecked then begin
     FIsChecked := Value;
@@ -201,15 +203,16 @@ begin
     //  Uncheck all items with the same group
     if Value then begin
       for i := 0 to Parent.ControlCount - 1 do begin
-        if (Parent.Controls[i] <> Self) and (Parent.Controls[i] is TUCustomRadioButton) and ((Parent.Controls[i] as TUCustomRadioButton).Group = Group) then
-          (Parent.Controls[i] as TUCustomRadioButton).IsChecked := false;
+        control := Parent.Controls[i];
+        if (control = Self) or not (control is TUCustomRadioButton) then
+          Continue;
+        if TUCustomRadioButton(control).Group = Group then
+          TUCustomRadioButton(control).IsChecked := False;
       end;
-
-      Repaint;
     end;
+    Repaint;
   end;
 end;
-
 
 procedure TUCustomRadioButton.SetTextOnGlass(const Value: Boolean);
 begin
@@ -321,7 +324,7 @@ end;
 procedure TUCustomRadioButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled then
-    IsChecked := true;
+    IsChecked := True;
 
   inherited;
 end;
