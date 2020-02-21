@@ -270,10 +270,10 @@ begin
   if Value <> FOverlayType then begin
     FOverlayType := Value;
     FOverlay.OverlayType := Value;
-    if CanDrawBorder then
-      FOverlay.Top := 1
-    else
-      FOverlay.Top := 0;
+//    if CanDrawBorder then
+//      FOverlay.Top := 1
+//    else
+//      FOverlay.Top := 0;
   end;
 end;
 
