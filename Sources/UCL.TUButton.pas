@@ -361,11 +361,11 @@ begin
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
 
-    if Enabled and FMouseInClient then
-      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
-
     //  Draw border
     DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
+
+    if Enabled and FMouseInClient then
+      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
 
     //  Paint image
     if (Images <> Nil) and (ImageIndex >= 0) then begin
