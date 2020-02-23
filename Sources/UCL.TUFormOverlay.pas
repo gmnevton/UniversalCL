@@ -48,57 +48,11 @@ type
 implementation
 
 uses
+  Themes,
+  Dwmapi,
   UCL.Utils;
 
 { TUFormOverlay }
-
-//  SETTERS
-
-procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
-var
-  LParent: TWinControl;
-begin
-  if Value <> FOverlayType then begin
-    FOverlayType := Value;
-
-    //  Reset properties
-    LParent := Nil;
-    if Parent <> Nil then
-      LParent := Parent
-    else if FParent <> Nil then
-      LParent := FParent;
-
-    if (LParent <> Nil) and (LParent is TForm) then begin
-      Color := TForm(LParent).Color;
-      TransparentColorValue := Color;
-    end;
-
-    //  Apply changes
-    case FOverlayType of
-      otNone: begin
-        AlphaBlend := False;
-        Visible := False;
-      end;
-
-      otBlur: begin
-        AlphaBlendValue := 150;
-        AlphaBlend := True;
-        // UpdateLayeredWindowIndirect
-        Visible := True;
-        Repaint;
-        BringToFront;
-      end;
-
-      otSplash: begin
-        AlphaBlend := False;
-        Visible := True;
-        BringToFront;
-      end;
-    end;
-  end;
-end;
-
-//  MAIN CLASS
 
 constructor TUFormOverlay.CreateNew(AOwner: TComponent; Dummy: Integer);
 begin
@@ -122,8 +76,16 @@ procedure TUFormOverlay.AssignToForm(Form: TForm);
 //var
 //  P: TPoint;
 begin
+  Parent := Nil;
+  HandleNeeded;
   if CheckMaxWin32Version(6, 1) then begin // less-equal to win 7
   // NOTE: this is a test - probably not working at all
+  {$IF CompilerVersion < 30}
+    if HandleAllocated and ThemeServices.ThemesEnabled and DwmCompositionEnabled then
+  {$ELSE}
+    if HandleAllocated and StyleServices.Enabled and DwmCompositionEnabled then
+  {$IFEND}
+      EnableBlur(Handle, 3);
 
 //  FParent:=Form;
 //  //BoundsRect := Form.BoundsRect;
@@ -141,7 +103,52 @@ begin
   end;
 end;
 
-//  MESSAGES
+procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
+var
+  LParent: TWinControl;
+begin
+  if Value <> FOverlayType then begin
+    FOverlayType := Value;
+
+    //  Reset properties
+    LParent := Nil;
+    if Parent <> Nil then
+      LParent := Parent
+    else if FParent <> Nil then
+      LParent := FParent;
+
+    if (LParent <> Nil) and (LParent is TForm) then begin
+      Color := TForm(LParent).Color;
+//      if CheckMaxWin32Version(6, 1) then // less-equal to win 7
+        TransparentColorValue := Color;
+//      else
+//        TransparentColorValue := 0;
+    end;
+
+    //  Apply changes
+    case FOverlayType of
+      otNone: begin
+        AlphaBlend := False;
+        Visible := False;
+      end;
+
+      otBlur: begin
+        AlphaBlendValue := 150;
+        AlphaBlend := True;
+        //UpdateLayeredWindowIndirect
+        Visible := True;
+        //Repaint;
+        BringToFront;
+      end;
+
+      otSplash: begin
+        AlphaBlend := False;
+        Visible := True;
+        BringToFront;
+      end;
+    end;
+  end;
+end;
 
 procedure TUFormOverlay.WM_NCHitTest(var Msg: TWMNCHitTest);
 begin

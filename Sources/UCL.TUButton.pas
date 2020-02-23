@@ -22,150 +22,153 @@ uses
 
 type
   TUCustomButton = class(TCustomControl, IUThemeComponent)
-    const
-      DefBackColor: TDefColor = (
-        ($CCCCCC, $CCCCCC, $999999, $CCCCCC, $CCCCCC),
-        ($333333, $333333, $666666, $333333, $333333)
-      );
-      DefBorderColor: TDefColor = (
-        ($CCCCCC, $7A7A7A, $999999, $CCCCCC, $7A7A7A),
-        ($333333, $858585, $666666, $333333, $858585)
-      );
-      DefTextColor: TDefColor = (
-        ($000000, $000000, $000000, $666666, $000000),
-        ($FFFFFF, $FFFFFF, $FFFFFF, $666666, $FFFFFF)
-      );
+  private const
+    DefBackColor: TDefColor = (
+      ($CCCCCC, $CCCCCC, $999999, $CCCCCC, $CCCCCC),
+      ($333333, $333333, $666666, $333333, $333333)
+    );
+    DefBorderColor: TDefColor = (
+      ($CCCCCC, $7A7A7A, $999999, $CCCCCC, $7A7A7A),
+      ($333333, $858585, $666666, $333333, $858585)
+    );
+    DefTextColor: TDefColor = (
+      ($000000, $000000, $000000, $666666, $000000),
+      ($FFFFFF, $FFFFFF, $FFFFFF, $666666, $FFFFFF)
+    );
 
-    private
-      var BorderThickness: Integer;
-      var BorderColor, BackColor, TextColor: TColor;
-      var ImgRect, TextRect: TRect;
+  private var
+    BorderThickness: Integer;
+    BorderColor, BackColor, TextColor: TColor;
+    ImgRect, TextRect: TRect;
 
-      //  Theme
-      FThemeManager: TUThemeManager;
-      FCustomBorderColors: TControlStateColors;
-      FCustomBackColors: TControlStateColors;
-      FCustomTextColors: TControlStateColors;
+  private
+    //  Theme
+    FThemeManager: TUThemeManager;
+    FCustomBorderColors: TControlStateColors;
+    FCustomBackColors: TControlStateColors;
+    FCustomTextColors: TControlStateColors;
 
-      //  Fields
-      FButtonState: TUControlState;
-      FAlignment: TAlignment;
-      FImageIndex: Integer;
-      FImages: TCustomImageList;
-      FAllowFocus: Boolean;
-      FHighlight: Boolean;
-      FIsToggleButton: Boolean;
-      FIsToggled: Boolean;
-      FTransparent: Boolean;
+    //  Fields
+    FButtonState: TUControlState;
+    FAlignment: TAlignment;
+    FImageIndex: Integer;
+    FImages: TCustomImageList;
+    FAllowFocus: Boolean;
+    FHighlight: Boolean;
+    FIsToggleButton: Boolean;
+    FIsToggled: Boolean;
+    FTransparent: Boolean;
+    FMouseInClient: Boolean;
 
-      //  Internal
-      procedure UpdateColors;
-      procedure UpdateRects;
+    //  Internal
+    procedure UpdateColors;
+    procedure UpdateRects;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetButtonState(const Value: TUControlState);
-      procedure SetAlignment(const Value: TAlignment);
-      procedure SetImageIndex(const Value: Integer);
-      procedure SetHighlight(const Value: Boolean);
-      procedure SetTransparent(const Value: Boolean);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetButtonState(const Value: TUControlState);
+    procedure SetAlignment(const Value: TAlignment);
+    procedure SetImageIndex(const Value: Integer);
+    procedure SetHighlight(const Value: Boolean);
+    procedure SetTransparent(const Value: Boolean);
 
-      //  Messages
-      procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-      procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+    //  Messages
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
 
-      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
 
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-      procedure CMDialogKey(var Msg: TCMDialogKey); message CM_DIALOGKEY;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMDialogKey(var Msg: TCMDialogKey); message CM_DIALOGKEY;
 
-      //  Group property change
-      procedure DoCustomBorderColorsChange(Sender: TObject);
-      procedure DoCustomBackColorsChange(Sender: TObject);
-      procedure DoCustomTextColorsChange(Sender: TObject);
+    //  Group property change
+    procedure DoCustomBorderColorsChange(Sender: TObject);
+    procedure DoCustomBackColorsChange(Sender: TObject);
+    procedure DoCustomTextColorsChange(Sender: TObject);
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
-      procedure Resize; override;
-      procedure CreateWindowHandle(const Params: TCreateParams); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Resize; override;
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    public
-      constructor Create(aOwner: TComponent); override;
-      destructor Destroy; override;
-      procedure UpdateTheme;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure UpdateTheme;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property CustomBorderColors: TControlStateColors read FCustomBorderColors write FCustomBorderColors;
-      property CustomBackColors: TControlStateColors read FCustomBackColors write FCustomBackColors;
-      property CustomTextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property CustomBorderColors: TControlStateColors read FCustomBorderColors write FCustomBorderColors;
+    property CustomBackColors: TControlStateColors read FCustomBackColors write FCustomBackColors;
+    property CustomTextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
 
-      property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-      property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
-      property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
-      property Images: TCustomImageList read FImages write FImages;
-      property AllowFocus: Boolean read FAllowFocus write FAllowFocus default true;
-      property Highlight: Boolean read FHighlight write SetHighlight default false;
-      property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
-      property IsToggled: Boolean read FIsToggled write FIsToggled default false;
-      property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
+    property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
+    property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
+    property Images: TCustomImageList read FImages write FImages;
+    property AllowFocus: Boolean read FAllowFocus write FAllowFocus default true;
+    property Highlight: Boolean read FHighlight write SetHighlight default false;
+    property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
+    property IsToggled: Boolean read FIsToggled write FIsToggled default false;
+    property Transparent: Boolean read FTransparent write SetTransparent default false;
 
-      property Height default 30;
-      property Width default 135;
-      property TabStop default True;
+    property Height default 30;
+    property Width default 135;
+    property TabStop default True;
   end;
 
   TUButton = class(TUCustomButton)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      property Caption;
-      property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
+  published
+    property Align;
+    property Anchors;
+    property AutoSize;
+    property BiDiMode;
+    property Caption;
+    property Color;
+    property Constraints;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Touch;
+    property Visible;
+  {$IF CompilerVersion > 29}
+    property StyleElements;
+  {$IFEND}
 
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
+    property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDock;
+    property OnStartDrag;
   end;
 
 implementation
@@ -307,18 +310,20 @@ begin
   FButtonState := csNone;
   FAlignment := taCenter;
   FImageIndex := -1;
-  FAllowFocus := true;
-  FHighlight := false;
-  FIsToggleButton := false;
-  FIsToggled := false;
-  FTransparent := false;
+  FAllowFocus := True;
+  FHighlight := False;
+  FIsToggleButton := False;
+  FIsToggled := False;
+  FTransparent := False;
 
   //  Property
   Height := 30;
   Width := 135;
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 10;
-  TabStop := true;
+  TabStop := True;
+
+  InitBumpMap;
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
@@ -339,26 +344,45 @@ end;
 procedure TUCustomButton.Paint;
 var
   ImgX, ImgY: Integer;
+  bmp: TBitmap;
+  P: TPoint;
 begin
   inherited;
 
-  //  Paint background
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
-  Canvas.FillRect(Rect(0, 0, Width, Height));
+  bmp := TBitmap.Create;
+  try
+    bmp.SetSize(Width, Height);
+    //bmp.Canvas.Assign(Canvas);
 
-  //  Draw border
-  DrawBorder(Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
+    //  Paint background
+    bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+    bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
 
-  //  Paint image
-  if (Images <> Nil) and (ImageIndex >= 0) then begin
-    GetCenterPos(Images.Width, Images.Height, ImgRect, ImgX, ImgY);
-    Images.Draw(Canvas, ImgX, ImgY, ImageIndex, Enabled);
+    P:=Mouse.CursorPos;
+    P:=ScreenToClient(P);
+
+    if Enabled and FMouseInClient then
+      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
+
+    //  Draw border
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
+
+    //  Paint image
+    if (Images <> Nil) and (ImageIndex >= 0) then begin
+      GetCenterPos(Images.Width, Images.Height, ImgRect, ImgX, ImgY);
+      Images.Draw(bmp.Canvas, ImgX, ImgY, ImageIndex, Enabled);
+    end;
+
+    //  Paint text
+    bmp.Canvas.Font := Font;
+    bmp.Canvas.Font.Color := TextColor;
+    DrawTextRect(bmp.Canvas, Alignment, taVerticalCenter, TextRect, Caption, False);
+
+    //
+    Canvas.Draw(0, 0, bmp);
+  finally
+    bmp.Free;
   end;
-
-  //  Paint text
-  Canvas.Font := Font;
-  Canvas.Font.Color := TextColor;
-  DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, False);
 end;
 
 procedure TUCustomButton.Resize;
@@ -427,8 +451,16 @@ begin
   end;
 end;
 
+procedure TUCustomButton.WMMouseMove(var Msg: TWMMouseMove);
+begin
+  if Enabled then
+    Repaint;
+  inherited;
+end;
+
 procedure TUCustomButton.CMMouseEnter(var Msg: TMessage);
 begin
+  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -437,6 +469,7 @@ end;
 
 procedure TUCustomButton.CMMouseLeave(var Msg: TMessage);
 begin
+  FMouseInClient := False;
   if Enabled then begin
     //  Dont allow focus
     if not AllowFocus then

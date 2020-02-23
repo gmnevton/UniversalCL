@@ -5,9 +5,6 @@ program Demo;
 {$IFEND}
 
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListModules,
   Forms,
   UCL.HighDpiApp,
   Form.Demo in 'DemoForms\Form.Demo.pas' {formDemo},

@@ -59,6 +59,7 @@ type
     FTransparent: Boolean;
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
+    FMouseInClient: Boolean;
 
     //  Internal
     procedure UpdateColors;
@@ -84,6 +85,7 @@ type
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
 
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
@@ -479,6 +481,8 @@ begin
   Height := 40;
   Width := 250;
 
+  InitBumpMap;
+
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 end;
@@ -497,46 +501,65 @@ end;
 procedure TUCustomSymbolButton.Paint;
 var
   ImgX, ImgY: Integer;
+  bmp: TBitmap;
+  P: TPoint;
 begin
   inherited;
 
-  //  Paint background
-  Canvas.Brush.Style := bsSolid;
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
-  Canvas.FillRect(Rect(0, 0, Width, Height));
+  bmp := TBitmap.Create;
+  try
+    bmp.SetSize(Width, Height);
+    //bmp.Canvas.Assign(Canvas);
 
-  //  Paint icon
-  if ImageKind = ikFontIcon then begin
-    if ShowIcon then begin
-      Canvas.Font := SymbolFont;
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, False)
-    end;
-  end
-  else begin
-    if Images <> Nil then begin
-      GetCenterPos(Images.Width, Images.Height, IconRect, ImgX, ImgY);
-      Images.Draw(Canvas, ImgX, ImgY, ImageIndex, Enabled);
-    end;
-  end;
+    //  Paint background
+    bmp.Canvas.Brush.Style := bsSolid;
+    bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+    bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
 
-  //  Paint detail
-  if ShowDetail then begin
-    Canvas.Font := DetailFont;
-    Canvas.Font.Color := DetailColor;
+    P:=Mouse.CursorPos;
+    P:=ScreenToClient(P);
+
+    if Enabled and FMouseInClient then
+      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
+
+    //  Paint icon
+    if ImageKind = ikFontIcon then begin
+      if ShowIcon then begin
+        bmp.Canvas.Font := SymbolFont;
+        bmp.Canvas.Font.Color := TextColor;
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, False)
+      end;
+    end
+    else begin
+      if Images <> Nil then begin
+        GetCenterPos(Images.Width, Images.Height, IconRect, ImgX, ImgY);
+        Images.Draw(bmp.Canvas, ImgX, ImgY, ImageIndex, Enabled);
+      end;
+    end;
+
+    //  Paint detail
+    if ShowDetail then begin
+      bmp.Canvas.Font := DetailFont;
+      bmp.Canvas.Font.Color := DetailColor;
+      if Orientation = oHorizontal then
+        DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False)
+      else
+        DrawTextRect(bmp.Canvas, taCenter, taAlignTop, DetailRect, Detail, False);
+    end;
+
+    //  Paint text
+    bmp.Canvas.Font := Font;
+    bmp.Canvas.Font.Color := TextColor;
     if Orientation = oHorizontal then
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False)
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False)
     else
-      DrawTextRect(Canvas, taCenter, taAlignTop, DetailRect, Detail, False);
-  end;
+      DrawTextRect(bmp.Canvas, taCenter, taAlignTop, TextRect, Text, False);
 
-  //  Paint text
-  Canvas.Font := Font;
-  Canvas.Font.Color := TextColor;
-  if Orientation = oHorizontal then
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False)
-  else
-    DrawTextRect(Canvas, taCenter, taAlignTop, TextRect, Text, False);
+    //
+    Canvas.Draw(0, 0, bmp);
+  finally
+    bmp.Free;
+  end;
 end;
 
 procedure TUCustomSymbolButton.Resize;
@@ -594,8 +617,16 @@ begin
   end;
 end;
 
+procedure TUCustomSymbolButton.WMMouseMove(var Msg: TWMMouseMove);
+begin
+  if Enabled then
+    Repaint;
+  inherited;
+end;
+
 procedure TUCustomSymbolButton.CMMouseEnter(var Msg: TMessage);
 begin
+  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -604,8 +635,10 @@ end;
 
 procedure TUCustomSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
+  FMouseInClient := False;
   if Enabled then begin
     ButtonState := csNone;
+    Repaint;
     inherited;
   end;
 end;
