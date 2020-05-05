@@ -193,7 +193,8 @@ implementation
 
 uses
   Forms,
-  UCL.Types;
+  UCL.Types,
+  UCL.TUCaptionBar;
 
 { TUCustomSymbolButton }
 
@@ -267,11 +268,14 @@ end;
 procedure TUCustomSymbolButton.UpdateColors;
 var
   TempTheme: TUTheme;
+  ParentControl: TWinControl;
 begin
   if ThemeManager = Nil then
     TempTheme := utLight
   else
     TempTheme := ThemeManager.Theme;
+
+  ParentControl:=Self.Parent;
 
   //  Transparent enabled
   if (ButtonState = csNone) and Transparent then begin
@@ -288,9 +292,23 @@ begin
   end
   //  Default colors
   else begin
-    BackColor := DefBackColor[TempTheme, ButtonState];
-    TextColor := DefTextColor[TempTheme, ButtonState];
-    DetailColor := $808080;
+    if (ParentControl <> Nil) and (ParentControl is TUCaptionBar) then begin
+      BackColor := TUCaptionBar(ParentControl).Color;
+      TextColor := GetTextColorFromBackground(BackColor);
+      DetailColor := $808080;
+    end
+    else begin
+      BackColor := DefBackColor[TempTheme, ButtonState];
+      TextColor := DefTextColor[TempTheme, ButtonState];
+      DetailColor := $808080;
+    end;
+  end;
+  if (ButtonState = csPress) then begin
+    if (ThemeManager = Nil) or ((ThemeManager <> Nil) and (ThemeManager.Theme = utLight)) then
+      BackColor := BrightenColor(BackColor, 25)
+    else
+      BackColor := BrightenColor(BackColor, -25);
+    TextColor := GetTextColorFromBackground(BackColor);
   end;
 end;
 
