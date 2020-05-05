@@ -55,6 +55,7 @@ type
 
     //  Setters
     procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetScrollBarStyle(const Value: TUScrollBarStyle); // suppress default scrollbar blinking
 
     //  Child events
     procedure BackColor_OnChange(Sender: TObject);
@@ -68,10 +69,13 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 //    procedure WMNCMouseLeave(var Message: TMessage); message WM_NCMOUSELEAVE;
+    procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL; // suppress default scrollbar blinking
+    procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL; // suppress default scrollbar blinking
 
   protected
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure CreateParams(var Params: TCreateParams); override; // suppress default scrollbar blinking
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -89,7 +93,7 @@ type
     property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
 
     property ScrollCount: Integer read FScrollCount;
-    property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write FScrollBarStyle default sbsMini;
+    property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write SetScrollBarStyle default sbsMini;
     property ScrollOrientation: TUOrientation read FScrollOrientation write FScrollOrientation default oVertical;
     property LengthPerStep: Integer read FLengthPerStep write FLengthPerStep default 4;
     property MaxScrollCount: Integer read FMaxScrollCount write FMaxScrollCount default 8;
@@ -116,9 +120,17 @@ begin
   UpdateTheme;
 end;
 
+procedure TUScrollBox.SetScrollBarStyle(const Value: TUScrollBarStyle);
+begin
+  if FScrollBarStyle <> Value then begin
+    FScrollBarStyle := Value;
+    RecreateWnd;
+  end;
+end;
+
 procedure TUScrollBox.UpdateTheme;
 var
-  Back: TUThemeControlColorSet;
+  ColorSet: TUThemeControlColorSet;
 begin
   //  Background color
   if ThemeManager = Nil then begin
@@ -127,12 +139,12 @@ begin
   end
   else begin
     //  Select default or custom style
-    if not BackColor.Enabled then
-      Back := SCROLLBOX_BACK
+    if BackColor.Enabled then
+      ColorSet := BackColor
     else
-      Back := BackColor;
+      ColorSet := SCROLLBOX_BACK;
 
-    Color := Back.GetColor(ThemeManager);
+    Color := ColorSet.GetColor(ThemeManager);
     if ThemeManager.Theme = utLight then
       MiniSB.Color := MINI_SB_COLOR_LIGHT
     else
@@ -161,8 +173,8 @@ begin
 
   //  Parent properties
   BorderStyle := bsNone;
-  VertScrollBar.Tracking := true;
-  HorzScrollBar.Tracking := true;
+  VertScrollBar.Tracking := True;
+  HorzScrollBar.Tracking := True;
 
   //  Fields
   FScrollCount := 0;
@@ -182,7 +194,7 @@ begin
 
   //  Custom AniSet
   FAniSet := TIntAniSet.Create;
-  FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10);
+  FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10, True);
 
   FBackColor := TUThemeControlColorSet.Create;
   FBackColor.OnChange := BackColor_OnChange;
@@ -197,6 +209,16 @@ begin
     GetCommonThemeManager.Connect(Self);
 
 //  UpdateTheme;
+end;
+
+procedure TUScrollBox.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  if FScrollBarStyle = sbsMini then begin
+    Params.ExStyle := Params.ExStyle or WS_CLIPCHILDREN;
+    with Params.WindowClass do
+      style := style and not (CS_HREDRAW or CS_VREDRAW);
+  end;
 end;
 
 destructor TUScrollBox.Destroy;
@@ -470,6 +492,20 @@ begin
       end;
     Ani.Start;
   end;
+end;
+
+procedure TUScrollBox.WMHScroll(var Message: TWMHScroll);
+begin
+  inherited;
+  if ScrollBarStyle <> sbsFull then
+    SetOldSBVisible(False);
+end;
+
+procedure TUScrollBox.WMVScroll(var Message: TWMVScroll);
+begin
+  inherited;
+  if ScrollBarStyle <> sbsFull then
+    SetOldSBVisible(False);
 end;
 
 //  CHILD EVENTS

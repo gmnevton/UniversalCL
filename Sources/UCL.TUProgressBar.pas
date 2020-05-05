@@ -18,55 +18,69 @@ uses
   UCL.IntAnimation;
 
 type
+  TUCustomProgressBar = class;
+
+  TUWaterMarkPositionEvent = procedure (Sender: TUCustomProgressBar; var WaterMarkX, WaterMarkY: Integer; var Streatch: Boolean; var StreatchWidth, StreatchHeight: Integer) of object;
+  TUProgressBarPaintEvent = procedure (Sender: TUCustomProgressBar; const Canvas: TCanvas) of object;
+
   TUCustomProgressBar = class(TCustomControl, IUThemeComponent)
-    private
-      var FillColor: TColor;
-      var BackColor: TColor;
-      var FillRect: TRect;
-      var BackRect: TRect;
+  private var
+    FillColor: TColor;
+    BackColor: TColor;
+    FillRect: TRect;
+    BackRect: TRect;
 
-      FThemeManager: TUThemeManager;
-      FAniSet: TIntAniSet;
+  private
+    FThemeManager: TUThemeManager;
+    FAniSet: TIntAniSet;
 
-      FValue: Integer;
-      FOrientation: TUOrientation;
-      FCustomFillColor: TColor;
-      FCustomBackColor: TColor;
+    FValue: Integer;
+    FOrientation: TUOrientation;
+    FCustomFillColor: TColor;
+    FCustomBackColor: TColor;
+    FWaterMark: TPicture;
+    FOnWaterMarkPosition: TUWaterMarkPositionEvent;
+    FOnPaint: TUProgressBarPaintEvent;
 
-      //  Internal
-      procedure UpdateColors;
-      procedure UpdateRects;
+    //  Internal
+    procedure UpdateColors;
+    procedure UpdateRects;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetValue(const Value: Integer);
-      procedure SetOrientation(const Value: TUOrientation);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetWaterMark(const Value: TPicture);
+    procedure SetValue(const Value: Integer);
+    procedure SetOrientation(const Value: TUOrientation);
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
-      procedure Resize; override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Resize; override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    public
-      constructor Create(AOnwer: TComponent); override;
-      destructor Destroy; override;
+  public
+    constructor Create(AOnwer: TComponent); override;
+    destructor Destroy; override;
 
-      procedure UpdateTheme;
+    procedure UpdateTheme;
 
-      procedure GoToValue(Value: Integer);
+    procedure GoToValue(Value: Integer);
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property AniSet: TIntAniSet read FAniSet write FAniSet;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property AniSet: TIntAniSet read FAniSet write FAniSet;
 
-      property Value: Integer read FValue write SetValue;
-      property Orientation: TUOrientation read FOrientation write SetOrientation;
-      property CustomFillColor: TColor read FCustomFillColor write FCustomFillColor;
-      property CustomBackColor: TColor read FCustomBackColor write FCustomBackColor;
+    property Value: Integer read FValue write SetValue;
+    property Orientation: TUOrientation read FOrientation write SetOrientation;
+    property CustomFillColor: TColor read FCustomFillColor write FCustomFillColor;
+    property CustomBackColor: TColor read FCustomBackColor write FCustomBackColor;
 
-      property Height default 5;
-      property Width default 100;
+    property WaterMark: TPicture read FWaterMark write SetWaterMark;
+    property OnGetWaterMarkPosition: TUWaterMarkPositionEvent read FOnWaterMarkPosition write FOnWaterMarkPosition;
+    property OnPaint: TUProgressBarPaintEvent read FOnPaint write FOnPaint;
+
+    property Height default 5;
+    property Width default 100;
   end;
 
   TUProgressBar = class(TUCustomProgressBar)
@@ -117,6 +131,9 @@ type
   end;
 
 implementation
+
+type
+  TGraphicAccess = class(TGraphic);
 
 { TUCustomProgressBar }
 
@@ -176,6 +193,13 @@ end;
 
 //  SETTERS
 
+procedure TUCustomProgressBar.SetWaterMark(const Value: TPicture);
+begin
+  FWaterMark.Assign(Value);
+  UpdateRects;
+  Repaint;
+end;
+
 procedure TUCustomProgressBar.SetValue(const Value: Integer);
 begin
   if FValue <> Value then begin
@@ -200,6 +224,7 @@ constructor TUCustomProgressBar.Create(AOnwer: TComponent);
 begin
   inherited Create(AOnwer);
   FThemeManager := Nil;
+  FWaterMark := TPicture.Create;
 
   //  Parent properties
   Height := 5;
@@ -224,6 +249,7 @@ end;
 destructor TUCustomProgressBar.Destroy;
 begin
   FAniSet.Free;
+  FWaterMark.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
@@ -248,8 +274,13 @@ end;
 //  CUSTOM METHODS
 
 procedure TUCustomProgressBar.Paint;
+var
+  WaterMarkX, WaterMarkY: Integer;
+  Streach: Boolean;
+  StreatchWidth, StreatchHeight: Integer;
+  bmp: TBitmap;
 begin
-  inherited;
+//  inherited;
 
   //  Paint background
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
@@ -258,6 +289,32 @@ begin
   //  Paint Fillround
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(FillColor, 255);
   Canvas.FillRect(FillRect);
+
+  if FWaterMark.Graphic <> Nil then begin
+    WaterMarkX:=Width - FWaterMark.Width;
+    WaterMarkY:=0;
+    Streach:=False;
+    StreatchWidth:=-1;
+    StreatchHeight:=-1;
+    if Assigned(FOnWaterMarkPosition) then
+      FOnWaterMarkPosition(Self, WaterMarkX, WaterMarkY, Streach, StreatchWidth, StreatchHeight);
+    if Streach and (StreatchWidth > 0) and (StreatchHeight > 0) then begin
+      bmp:=TBitmap.Create;
+      try
+        bmp.PixelFormat:=pf32bit;
+        bmp.SetSize(FWaterMark.Width, FWaterMark.Height);
+        TGraphicAccess(WaterMark.Graphic).Draw(Canvas, Rect(0, 0, FWaterMark.Width, FWaterMark.Height));
+        Canvas.StretchDraw(Rect(WaterMarkX, WaterMarkY, WaterMarkX + StreatchWidth, WaterMarkY + StreatchHeight), bmp);
+      finally
+        bmp.Free;
+      end;
+    end
+    else
+      TGraphicAccess(WaterMark.Graphic).Draw(Canvas, Rect(WaterMarkX, WaterMarkY, WaterMarkX + FWaterMark.Width, WaterMarkY + FWaterMark.Height));
+  end;
+
+  if Assigned(FOnPaint) then
+    FOnPaint(Self, Canvas);
 end;
 
 procedure TUCustomProgressBar.Resize;

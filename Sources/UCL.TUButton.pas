@@ -285,6 +285,7 @@ procedure TUCustomButton.SetTransparent(const Value: Boolean);
 begin
   if Value <> FTransparent then begin
     FTransparent := Value;
+    UpdateColors;
     Repaint;
   end;
 end;

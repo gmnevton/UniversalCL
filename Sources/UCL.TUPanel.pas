@@ -43,6 +43,7 @@ type
       destructor Destroy; override;
 
       procedure UpdateTheme;
+      property Canvas;
 
     published
       property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
@@ -75,22 +76,18 @@ end;
 
 procedure TUPanel.UpdateTheme;
 var
-  Back: TUThemeControlColorSet;
+  ColorSet: TUThemeControlColorSet;
 begin
-  if ThemeManager = Nil then begin // do nothing
+  if (ThemeManager = Nil) or BackColor.Enabled then
 //    Color := CustomBackColor;
 //    Font.Color := CustomTextColor;
-  end
-  else begin
-    //  Select default or custom style
-    if not BackColor.Enabled then
-      Back := PANEL_BACK
-    else
-      Back := BackColor;
+    ColorSet := BackColor
+  else
+    //  Select default style
+    ColorSet := PANEL_BACK;
 
-    Color := Back.GetColor(ThemeManager);
-    Font.Color := GetTextColorFromBackground(Color);
-  end;  
+  Color := ColorSet.GetColor(ThemeManager);
+  Font.Color := GetTextColorFromBackground(Color);
 
   //  Repaint
   //  Do not repaint, because it does not override Paint method

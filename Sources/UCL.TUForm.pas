@@ -431,20 +431,20 @@ end;
 
 procedure TUForm.UpdateTheme;
 var
-  Back: TUThemeControlColorSet;
+  ColorSet: TUThemeControlColorSet;
 begin
   if ThemeManager = Nil then begin
     //  Do nothing
     HintWindowClass := THintWindow;
-  end  
+  end
   else begin
     //  Select default or custom style
-    if not BackColor.Enabled then
-      Back := FORM_BACK
+    if BackColor.Enabled then
+      ColorSet := BackColor
     else
-      Back := BackColor;
+      ColorSet := FORM_BACK;
 
-    Color := Back.GetColor(ThemeManager);
+    Color := ColorSet.GetColor(ThemeManager);
     if ThemeManager.Theme = utLight then
       HintWindowClass := TULightTooltip
     else

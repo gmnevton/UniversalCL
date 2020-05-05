@@ -33,17 +33,18 @@ type
       FDelayStartTime: Cardinal;
       FDuration: Cardinal;
       FStep: Cardinal;
+      FQueue: Boolean;
     public
       constructor Create;
       procedure Assign(Source: TPersistent); override;
-      procedure QuickAssign(AniKind: TAniKind; AniFunctionKind: TAniFunctionKind;
-        Delay, Duration, Step: Cardinal);
+      procedure QuickAssign(AniKind: TAniKind; AniFunctionKind: TAniFunctionKind; Delay, Duration, Step: Cardinal; Queue: Boolean = False);
     published
       property AniKind: TAniKind read FAniKind write FAniKind;
       property AniFunctionKind: TAniFunctionKind read FAniFunctionKind write FAniFunctionKind;
       property DelayStartTime: Cardinal read FDelayStartTime write FDelayStartTime;
       property Duration: Cardinal read FDuration write FDuration;
       property Step: Cardinal read FStep write FStep;
+      property Queue: Boolean read FQueue write FQueue default False;
   end;
 
   TIntAni = class(TThread)
@@ -66,8 +67,7 @@ type
       procedure Execute; override;
 
     public
-      constructor Create(aStartValue, aDeltaValue: Integer;
-        aSyncProc: TAniSyncProc; aDoneProc: TAniDoneProc);
+      constructor Create(aStartValue, aDeltaValue: Integer; aSyncProc: TAniSyncProc; aDoneProc: TAniDoneProc);
       destructor Destroy; override;
 
       //  Events
@@ -208,7 +208,8 @@ var
   t, d, TimePerStep: Cardinal;
   b, c: Integer;
 begin
-  if UpdateFunction = false then exit;
+  if not UpdateFunction then
+    Exit;
     ///  Update easing function
     ///  Depend on AniKind (In, Out,...) and AniFunctionKind (Linear,...)
     ///  If Result = false (error found), then exit
@@ -228,17 +229,26 @@ begin
     begin
       t := i * TimePerStep;
       CurrentValue := b + Round(c * AniFunction(t / d));
-      Synchronize(UpdateControl);
+      if AniSet.Queue then
+        Queue(UpdateControl)
+      else
+        Synchronize(UpdateControl);
       Sleep(TimePerStep);
     end;
 
   //  Last step
   t := d;
   CurrentValue := b + Round(c * AniFunction(t / d));
-  Synchronize(UpdateControl);
+  if AniSet.Queue then
+    Queue(UpdateControl)
+  else
+    Synchronize(UpdateControl);
 
   //  Finish
-  Synchronize(DoneControl);
+//  if AniSet.Queue then
+//    Queue(Nil, DoneControl)
+//  else
+    Synchronize(DoneControl);
 end;
 
 destructor TIntAni.Destroy;
@@ -269,30 +279,31 @@ begin
   FDelayStartTime := 0;
   FDuration := 200;
   FStep := 20;
+  FQueue := False;
 end;
 
 procedure TIntAniSet.Assign(Source: TPersistent);
 begin
-  if Source is TIntAniSet then
-    begin
-      FAniKind := (Source as TIntAniSet).AniKind;
-      FAniFunctionKind := (Source as TIntAniSet).AniFunctionKind;
-      FDelayStartTime := (Source as TIntAniSet).DelayStartTime;
-      FDuration := (Source as TIntAniSet).Duration;
-      FStep := (Source as TIntAniSet).Step;
-    end
+  if Source is TIntAniSet then begin
+    FAniKind := (Source as TIntAniSet).AniKind;
+    FAniFunctionKind := (Source as TIntAniSet).AniFunctionKind;
+    FDelayStartTime := (Source as TIntAniSet).DelayStartTime;
+    FDuration := (Source as TIntAniSet).Duration;
+    FStep := (Source as TIntAniSet).Step;
+    FQueue := (Source as TIntAniSet).Queue;
+  end
   else
     inherited;
 end;
 
-procedure TIntAniSet.QuickAssign(AniKind: TAniKind; AniFunctionKind: TAniFunctionKind;
-  Delay, Duration, Step: Cardinal);
+procedure TIntAniSet.QuickAssign(AniKind: TAniKind; AniFunctionKind: TAniFunctionKind; Delay, Duration, Step: Cardinal; Queue: Boolean = False);
 begin
   FAniKind := AniKind;
   FAniFunctionKind := AniFunctionKind;
   FDelayStartTime := Delay;
   FDuration := Duration;
   FStep := Step;
+  FQueue := Queue;
 end;
 
 end.
