@@ -153,6 +153,9 @@ begin
   if Root is TWinControl then begin
     for i := 0 to TWinControl(Root).ControlCount - 1 do begin
       control := TWinControl(Root).Controls[i];
+      if control = Root then
+        Continue;
+      //
       if TUThemeManager.IsThemeAvailable(control) then
         (control as IUThemeComponent).UpdateTheme;
       //

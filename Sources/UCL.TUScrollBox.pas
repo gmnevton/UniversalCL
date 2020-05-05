@@ -359,6 +359,7 @@ begin
   inherited;
   if ScrollBarStyle <> sbsFull then
     SetOldSBVisible(False);
+  Invalidate;
 end;
 
 procedure TUScrollBox.WMMouseMove(var Msg: TWMMouseMove);
