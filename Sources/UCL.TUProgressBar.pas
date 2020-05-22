@@ -278,7 +278,7 @@ var
   WaterMarkX, WaterMarkY: Integer;
   Streach: Boolean;
   StreatchWidth, StreatchHeight: Integer;
-  bmp: TBitmap;
+//  bmp: TBitmap;
 begin
 //  inherited;
 
@@ -299,15 +299,18 @@ begin
     if Assigned(FOnWaterMarkPosition) then
       FOnWaterMarkPosition(Self, WaterMarkX, WaterMarkY, Streach, StreatchWidth, StreatchHeight);
     if Streach and (StreatchWidth > 0) and (StreatchHeight > 0) then begin
-      bmp:=TBitmap.Create;
-      try
-        bmp.PixelFormat:=pf32bit;
-        bmp.SetSize(FWaterMark.Width, FWaterMark.Height);
-        TGraphicAccess(WaterMark.Graphic).Draw(Canvas, Rect(0, 0, FWaterMark.Width, FWaterMark.Height));
-        Canvas.StretchDraw(Rect(WaterMarkX, WaterMarkY, WaterMarkX + StreatchWidth, WaterMarkY + StreatchHeight), bmp);
-      finally
-        bmp.Free;
-      end;
+//      bmp:=TBitmap.Create;
+//      try
+//        bmp.PixelFormat:=pf32bit;
+//        bmp.SetSize(FWaterMark.Width, FWaterMark.Height);
+//        TGraphicAccess(WaterMark.Graphic).Draw(bmp.Canvas, Rect(0, 0, FWaterMark.Width, FWaterMark.Height));
+//        bmp.TransparentMode:=tmAuto;
+//        bmp.Transparent:=True;
+//        Canvas.StretchDraw(Rect(WaterMarkX, WaterMarkY, WaterMarkX + StreatchWidth, WaterMarkY + StreatchHeight), bmp);
+//      finally
+//        bmp.Free;
+//      end;
+      TGraphicAccess(WaterMark.Graphic).Draw(Canvas, Rect(WaterMarkX, WaterMarkY, WaterMarkX + StreatchWidth, WaterMarkY + StreatchHeight));
     end
     else
       TGraphicAccess(WaterMark.Graphic).Draw(Canvas, Rect(WaterMarkX, WaterMarkY, WaterMarkX + FWaterMark.Width, WaterMarkY + FWaterMark.Height));
@@ -321,12 +324,14 @@ procedure TUCustomProgressBar.Resize;
 begin
   inherited;
   UpdateRects;
+  Invalidate;
 end;
 
 procedure TUCustomProgressBar.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   UpdateRects;
+  Invalidate;
 end;
 
 end.

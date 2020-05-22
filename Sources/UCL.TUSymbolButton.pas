@@ -612,6 +612,8 @@ end;
 procedure TUCustomSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then begin
+    if IsToggleButton then
+      FIsToggled := not FIsToggled;
     ButtonState := csPress;
     inherited;
   end;
