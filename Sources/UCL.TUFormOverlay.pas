@@ -17,6 +17,11 @@ uses
 type
   TUOverlayType = (otNone, otBlur, otSplash);
 
+  // TIP:
+  // AlphaBlend only works for top-level windows in Windows 7 and below,
+  // to make it work we need to science the sh*t out of it.
+  // In Windows 8 and up it works for top-level and child windows as well - no need to do anything.
+
   TUFormOverlay = class(TForm)
   private
     FOverlayType: TUOverlayType;
@@ -42,50 +47,12 @@ type
 
 implementation
 
+uses
+  Themes,
+  Dwmapi,
+  UCL.Utils;
+
 { TUFormOverlay }
-
-//  SETTERS
-
-procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
-var
-  LParent: TWinControl;
-begin
-  if Value <> FOverlayType then begin
-    FOverlayType := Value;
-
-    //  Reset properties
-    if Parent <> Nil then
-      LParent := Parent
-    else if FParent <> Nil then
-      LParent := FParent;
-
-    if (LParent <> Nil) and (LParent is TForm) then
-      Color := TForm(LParent).Color;
-
-    //  Apply changes
-    case FOverlayType of
-      otNone: begin
-        AlphaBlend := False;
-        Visible := False;
-      end;
-
-      otBlur: begin
-        AlphaBlend := True;
-        AlphaBlendValue := 150;
-        Visible := True;
-        BringToFront;
-      end;
-
-      otSplash: begin
-        AlphaBlend := False;
-        Visible := True;
-        BringToFront;
-      end;
-    end;
-  end;
-end;
-
-//  MAIN CLASS
 
 constructor TUFormOverlay.CreateNew(AOwner: TComponent; Dummy: Integer);
 begin
@@ -106,24 +73,82 @@ begin
 end;
 
 procedure TUFormOverlay.AssignToForm(Form: TForm);
-var
-  P: TPoint;
+//var
+//  P: TPoint;
 begin
-{$IF CompilerVersion < 30}
-  FParent:=Form;
-//  BoundsRect := Form.BoundsRect;
-  P := ClientToScreen(Form.BoundsRect.TopLeft);
-  SetWindowLong(Handle, GWL_HWNDPARENT, Form.Handle);
-//  SetWindowPos(Handle, Form.Handle, 0, 0, 0, 0, SWP_NOSIZE or SWP_NOMOVE);
-  SetBounds(P.X, P.Y, Form.ClientWidth, Form.ClientHeight);
+  Parent := Nil;
+  HandleNeeded;
+  if CheckMaxWin32Version(6, 1) then begin // less-equal to win 7
+  // NOTE: this is a test - probably not working at all
+  {$IF CompilerVersion < 30}
+    if HandleAllocated and ThemeServices.ThemesEnabled and DwmCompositionEnabled then
+  {$ELSE}
+    if HandleAllocated and StyleServices.Enabled and DwmCompositionEnabled then
+  {$IFEND}
+      EnableBlur(Handle, 3);
+
+//  FParent:=Form;
+//  //BoundsRect := Form.BoundsRect;
+//  P := ClientToScreen(Form.BoundsRect.TopLeft);
+//  SetWindowLong(Handle, GWL_HWNDPARENT, Form.Handle);
+//  //SetWindowPos(Handle, Form.Handle, 0, 0, 0, 0, SWP_NOSIZE or SWP_NOMOVE);
+//  SetBounds(P.X, P.Y, Form.ClientWidth, Form.ClientHeight);
 //  SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
-{$ELSE}
-  Parent := Form;
-  SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
-{$IFEND}
+    Parent := Form;
+    SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
+  end
+  else begin
+    Parent := Form;
+    SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
+  end;
 end;
 
-//  MESSAGES
+procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
+var
+  LParent: TWinControl;
+begin
+  if Value <> FOverlayType then begin
+    FOverlayType := Value;
+
+    //  Reset properties
+    LParent := Nil;
+    if Parent <> Nil then
+      LParent := Parent
+    else if FParent <> Nil then
+      LParent := FParent;
+
+    if (LParent <> Nil) and (LParent is TForm) then begin
+      Color := TForm(LParent).Color;
+//      if CheckMaxWin32Version(6, 1) then // less-equal to win 7
+        TransparentColorValue := Color;
+//      else
+//        TransparentColorValue := 0;
+    end;
+
+    //  Apply changes
+    case FOverlayType of
+      otNone: begin
+        AlphaBlend := False;
+        Visible := False;
+      end;
+
+      otBlur: begin
+        AlphaBlendValue := 150;
+        AlphaBlend := True;
+        //UpdateLayeredWindowIndirect
+        Visible := True;
+        //Repaint;
+        BringToFront;
+      end;
+
+      otSplash: begin
+        AlphaBlend := False;
+        Visible := True;
+        BringToFront;
+      end;
+    end;
+  end;
+end;
 
 procedure TUFormOverlay.WM_NCHitTest(var Msg: TWMNCHitTest);
 begin

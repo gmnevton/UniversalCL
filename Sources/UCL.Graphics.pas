@@ -37,22 +37,25 @@ function PointInRect(const p: TSmallPoint; const Rect: TRect): Boolean; overload
 procedure GetCenterPos(Width, Height: Integer; Rect: TRect; out X, Y: Integer);
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Byte);
+procedure InitBumpMap;
+procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer);
 
 var
   DEFAULT_GLASSTEXT_GLOWSIZE: Byte;
 
 implementation
 
-{$REGION 'Older Delphi version'}
-{$IF CompilerVersion <= 30}
 uses
   // delphi stuff first
   SysUtils,
   DwmApi,
   UxTheme,
   // library stuff last
+  UCL.Classes,
   UCL.Types;
 
+{$REGION 'Older Delphi version'}
+{$IF CompilerVersion <= 30}
 type
   TStyleTextFlag = (stfTextColor, stfBorderColor, stfBorderSize, stfShadowColor, stfShadowOffset, stfGlowSize);
   TStyleTextFlags = set of TStyleTextFlag;
@@ -78,6 +81,11 @@ const
 {$IF CompilerVersion > 29}
   CStates: Array[Boolean] of TThemedTextLabel = (ttlTextLabelDisabled, ttlTextLabelNormal);
 {$IFEND}
+  BumpMapSize = 320;
+
+var
+  BumpMap: Array [0..BumpMapSize - 1, 0..BumpMapSize - 1] of Byte;
+  BumpMapInited: Boolean;
 
 function PointInRect(const X, Y: Integer; const Rect: TRect): Boolean;
 begin
@@ -260,7 +268,81 @@ begin
   end;
 end;
 
+function Mix(A, B: Byte): Byte;
+var
+  C: Integer;
+begin
+  C:=A + B;
+  if C > 255 then
+    C:=255;
+  Result:=C;
+end;
+
+procedure MulColor(var AColor: PQuadColor; Base: Byte); inline;
+begin
+  AColor.Blue  := Mix(AColor.Blue,  Base);
+  AColor.Green := Mix(AColor.Green, Base);
+  AColor.Red   := Mix(AColor.Red,   Base);
+  //AColor.Alpha := AColor.Alpha;
+end;
+
+procedure InitBumpMap;
+var
+  x, y: Integer;
+  cx, cy: Integer;
+  half_size: Integer;
+  sq: Real;
+begin
+  if BumpMapInited then
+    Exit;
+
+  half_size:=BumpMapSize div 2;
+  for y:=0 to BumpMapSize - 1 do begin
+    for x:=0 to BumpMapSize - 1 do begin
+      cx:=x - half_size;
+      cy:=y - half_size;
+      sq:=Round(sqrt((cx*cx) + (cy*cy)));
+      if sq > 120 then
+        sq:=120;
+      sq:=120 - sq;
+      //sq:=sq / 1.75;
+      BumpMap[y, x]:=Trunc(sq);
+    end;
+  end;
+
+  BumpMapInited := True;
+end;
+
+procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer);
+var
+  bmp: TBitmap;
+  ax, ay, half_size: Integer;
+  Pixel: PQuadColor;
+begin
+  bmp:=TBitmap.Create;
+  try
+    half_size:=BumpMapSize div 2;
+    bmp.PixelFormat:=pf32bit;
+    bmp.SetSize(BumpMapSize, BumpMapSize);
+    bmp.Canvas.CopyMode:=SRCCOPY;
+    bmp.Canvas.CopyRect(Rect(0, 0, BumpMapSize, BumpMapSize), Canvas, Rect(X - half_size, Y - half_size, X + half_size, Y + half_size));
+
+    for ay:=0 to BumpMapSize - 1 do begin
+      Pixel := bmp.ScanLine[ay];
+      for ax:=0 to BumpMapSize - 1 do begin
+        MulColor(Pixel, BumpMap[ay, ax]);
+        Inc(Pixel);
+      end;
+    end;
+
+    Canvas.Draw(X - half_size, Y - half_size, bmp);
+  finally
+    bmp.Free;
+  end;
+end;
+
 initialization
   DEFAULT_GLASSTEXT_GLOWSIZE := 0;
+  BumpMapInited := False;
 
 end.

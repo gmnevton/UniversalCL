@@ -95,13 +95,14 @@ end;
 
 procedure TUCaptionBar.UpdateTheme;
 var
-  Back: TUThemeCaptionBarColorSet;
+  ColorSet: TUThemeCaptionBarColorSet;
   ParentForm: TCustomForm;
 begin
   ParentForm := GetParentForm(Self, True);
   //  Background color
   if ThemeManager = Nil then
     //Color := CustomColor // do nothing
+    //ColorSet := BackColor
   else begin
     //  Select default or custom style
     if UseSystemCaptionColor and IsColorOnBorderEnabled then begin
@@ -111,11 +112,11 @@ begin
         else begin
 //          Color := ParentForm.Color;
           if not BackColor.Enabled then
-            Back := CAPTIONBAR_BACK
+            ColorSet := CAPTIONBAR_BACK
           else
-            Back := BackColor;
+            ColorSet := BackColor;
 
-          Color := Back.GetColor(ThemeManager, False);
+          Color := ColorSet.GetColor(ThemeManager, False);
         end;
       end
       else
@@ -125,15 +126,15 @@ begin
       if CustomColor <> clNone then
         Color := CustomColor
       else begin
-        if not BackColor.Enabled then
-          Back := CAPTIONBAR_BACK
+        if BackColor.Enabled then
+          ColorSet := BackColor
         else
-          Back := BackColor;
+          ColorSet := CAPTIONBAR_BACK;
 
         if (ParentForm <> Nil) and (ParentForm is TForm) then
-          Color := Back.GetColor(ThemeManager, ParentForm.Active)
+          Color := ColorSet.GetColor(ThemeManager, ParentForm.Active)
         else
-          Color := Back.GetColor(ThemeManager, False);
+          Color := ColorSet.GetColor(ThemeManager, False);
       end;
     end;
     Font.Color := GetTextColorFromBackground(Color);
@@ -152,6 +153,9 @@ begin
   if Root is TWinControl then begin
     for i := 0 to TWinControl(Root).ControlCount - 1 do begin
       control := TWinControl(Root).Controls[i];
+      if control = Root then
+        Continue;
+      //
       if TUThemeManager.IsThemeAvailable(control) then
         (control as IUThemeComponent).UpdateTheme;
       //

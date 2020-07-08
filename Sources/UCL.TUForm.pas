@@ -108,6 +108,7 @@ type
 
     property PPI: Integer read FPPI write FPPI default 96;
     property IsActive: Boolean read FIsActive default True;
+    property Overlay: TUFormOverlay read FOverlay;
     property OverlayType: TUOverlayType read FOverlayType write SetOverlayType default otNone;
     property FitDesktopSize: Boolean read FFitDesktopSize write FFitDesktopSize default true;
 
@@ -270,10 +271,10 @@ begin
   if Value <> FOverlayType then begin
     FOverlayType := Value;
     FOverlay.OverlayType := Value;
-//    if CanDrawBorder then
-//      FOverlay.Top := 1
-//    else
-//      FOverlay.Top := 0;
+    if CanDrawBorder and not IsLEWin7 then
+      FOverlay.Top := 1
+    else
+      FOverlay.Top := 0;
   end;
 end;
 
@@ -431,20 +432,20 @@ end;
 
 procedure TUForm.UpdateTheme;
 var
-  Back: TUThemeControlColorSet;
+  ColorSet: TUThemeControlColorSet;
 begin
   if ThemeManager = Nil then begin
     //  Do nothing
     HintWindowClass := THintWindow;
-  end  
+  end
   else begin
     //  Select default or custom style
-    if not BackColor.Enabled then
-      Back := FORM_BACK
+    if BackColor.Enabled then
+      ColorSet := BackColor
     else
-      Back := BackColor;
+      ColorSet := FORM_BACK;
 
-    Color := Back.GetColor(ThemeManager);
+    Color := ColorSet.GetColor(ThemeManager);
     if ThemeManager.Theme = utLight then
       HintWindowClass := TULightTooltip
     else

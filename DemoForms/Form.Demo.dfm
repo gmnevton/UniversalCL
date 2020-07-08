@@ -540,6 +540,7 @@ object formDemo: TformDemo
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 6
+    AniSet.Queue = True
     BackColor.Enabled = True
     BackColor.Color = clBlack
     BackColor.LightColor = 14342874
@@ -1077,7 +1078,7 @@ object formDemo: TformDemo
     Width = 45
     Height = 498
     Align = alLeft
-    Color = 15132390
+    Color = clWhite
     FullRepaint = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -1246,6 +1247,7 @@ object formDemo: TformDemo
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 10
+    AniSet.Queue = True
     BackColor.Enabled = False
     BackColor.Color = clBlack
     BackColor.LightColor = 15132390
@@ -1777,7 +1779,7 @@ object formDemo: TformDemo
       Margins.Bottom = 5
       Align = alTop
       Caption = 'Select custom accent color'
-      Color = 14120960
+      Color = -1
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
       Font.Height = -13

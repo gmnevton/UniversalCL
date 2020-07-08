@@ -46,7 +46,12 @@ var
   Data: WindowCompositionAttributeData;
   SetWindowCompositionAttribute: function (hWnd: HWND; var data: WindowCompositionAttributeData):integer; stdcall;
 begin
-  apiHandle := LoadLibrary('user32.dll');
+  apiHandle := GetModuleHandle(User32);
+//  if apiHandle = 0 then
+//    apiHandle := LoadLibrary(User32);
+  if apiHandle = 0 then
+    Exit(0);
+
   try
     @SetWindowCompositionAttribute := GetProcAddress(apiHandle, 'SetWindowCompositionAttribute');
     if @SetWindowCompositionAttribute = Nil then
@@ -61,7 +66,7 @@ begin
       Result := SetWindowCompositionAttribute(FormHandle, Data);
     end;
   finally
-    FreeLibrary(apiHandle);
+//    FreeLibrary(apiHandle);
   end;
 end;
 
@@ -216,8 +221,7 @@ end;
 function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 begin
   Result := (Win32MajorVersion <= AMajor) or
-            ((Win32MajorVersion = AMajor) and
-             (Win32MinorVersion <= AMinor));
+            ((Win32MajorVersion = AMajor) and (Win32MinorVersion <= AMinor));
 end;
 
 end.

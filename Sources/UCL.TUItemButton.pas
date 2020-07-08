@@ -21,196 +21,205 @@ uses
 
 type
   TUItemObjectKind = (iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon);
-
   TUItemButtonObjects = set of TUItemObjectKind;
 
+  TUCustomItemButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
+
   TUCustomItemButton = class(TCustomControl, IUThemeComponent)
-    const
-      ICON_CHECKED = '';
-      ICON_UNCHECKED = '';
+  private const
+    ICON_CHECKED = '';
+    ICON_UNCHECKED = '';
 
-      DefBackColor: TDefColor = (
-        ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
-        ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535));
-      DefTextColor: TDefColor = (
-        ($00000000, $00000000, $00000000, $00666666, $00000000),
-        ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF));
+    DefBackColor: TDefColor = (
+      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
+      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535));
+    DefTextColor: TDefColor = (
+      ($00000000, $00000000, $00000000, $00666666, $00000000),
+      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF));
 
-    private
-      var BackColor, TextColor, DetailColor, ActiveColor: TColor;
-      var CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
+  private var
+    BackColor, TextColor, DetailColor, ActiveColor: TColor;
+    CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
 
-      FThemeManager: TUThemeManager;
+  private
+    FThemeManager: TUThemeManager;
 
-      FObjectSelected: TUItemObjectKind;
-      FButtonState: TUControlState;
-      FLeftIconKind: TUImageKind;
-      FRightIconKind: TUImageKind;
+    FObjectSelected: TUItemObjectKind;
+    FButtonState: TUControlState;
+    FLeftIconKind: TUImageKind;
+    FRightIconKind: TUImageKind;
 
-      FImages: TCustomImageList;
-      FImageLeftIndex: Integer;
-      FImageRightIndex: Integer;
+    FImages: TCustomImageList;
+    FImageLeftIndex: Integer;
+    FImageRightIndex: Integer;
 
-      FIconFont: TFont;
-      FDetailFont: TFont;
+    FIconFont: TFont;
+    FDetailFont: TFont;
 
-      FObjectsVisible: TUItemButtonObjects;
+    FObjectsVisible: TUItemButtonObjects;
 
-      FIsChecked: Boolean;
-      FLeftIcon: string;
-      FText: string;
-      FDetail: string;
-      FRightIcon: string;
+    FIsChecked: Boolean;
+    FLeftIcon: string;
+    FText: string;
+    FDetail: string;
+    FRightIcon: string;
 
-      FAlignSpace: Integer;
+    FAlignSpace: Integer;
 
-      FCheckBoxWidth: Integer;
-      FLeftIconWidth: Integer;
-      FRightIconWidth: Integer;
+    FCheckBoxWidth: Integer;
+    FLeftIconWidth: Integer;
+    FRightIconWidth: Integer;
 
-      FCustomActiveColor: TColor;
-      FTransparent: Boolean;
-      FIsToggleButton: Boolean;
-      FIsToggled: Boolean;
+    FCustomActiveColor: TColor;
+    FTransparent: Boolean;
+    FIsToggleButton: Boolean;
+    FIsToggled: Boolean;
+    FMouseInClient: Boolean;
+    FToggleEvent: TUCustomItemButtonToggleEvent;
 
-      //  Internal
-      procedure UpdateColors;
-      procedure UpdateRects;
+    //  Internal
+    procedure UpdateColors;
+    procedure UpdateRects;
+    procedure DoToggle;
 
-      //  Setters
-      procedure SetThemeManager; // (const Value: TUThemeManager);
-      procedure SetButtonState(const Value: TUControlState);
-      procedure SetImageLeftIndex(const Value: Integer);
-      procedure SetImageRightIndex(const Value: Integer);
+    //  Setters
+    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetButtonState(const Value: TUControlState);
+    procedure SetImageLeftIndex(const Value: Integer);
+    procedure SetImageRightIndex(const Value: Integer);
 
-      procedure SetObjectsVisible(const Value: TUItemButtonObjects);
-      procedure SetObjectWidth(const Index: Integer; const Value: Integer);
+    procedure SetObjectsVisible(const Value: TUItemButtonObjects);
+    procedure SetObjectWidth(const Index: Integer; const Value: Integer);
 
-      procedure SetIsChecked(const Value: Boolean);
-      procedure SetLeftIcon(const Value: string);
-      procedure SetText(const Value: string);
-      procedure SetDetail(const Value: string);
-      procedure SetRightIcon(Const Value: string);
+    procedure SetIsChecked(const Value: Boolean);
+    procedure SetLeftIcon(const Value: string);
+    procedure SetText(const Value: string);
+    procedure SetDetail(const Value: string);
+    procedure SetRightIcon(Const Value: string);
 
-      procedure SetAlignSpace(const Value: Integer);
-      procedure SetCustomActiveColor(const Value: TColor);
-      procedure SetTransparent(const Value: Boolean);
-      procedure SetLeftIconKind(const Value: TUImageKind);
-      procedure SetRightIconKind(const Value: TUImageKind);
-      procedure SetIsToggled(const Value: Boolean);
+    procedure SetAlignSpace(const Value: Integer);
+    procedure SetCustomActiveColor(const Value: TColor);
+    procedure SetTransparent(const Value: Boolean);
+    procedure SetLeftIconKind(const Value: TUImageKind);
+    procedure SetRightIconKind(const Value: TUImageKind);
+    procedure SetIsToggled(const Value: Boolean);
 
-      //  Messages
-      procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
-      procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
-      procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    //  Messages
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
-      procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-      procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-      procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+  protected
+    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Resize; override;
+    procedure CreateWindowHandle(const Params: TCreateParams); override;
+    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-      procedure Paint; override;
-      procedure Resize; override;
-      procedure CreateWindowHandle(const Params: TCreateParams); override;
-      procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
+    procedure UpdateTheme;
 
-      procedure UpdateTheme;
+    property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
-      property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
+    //  Image
+    property Images: TCustomImageList read FImages write FImages;
+    property ImageLeftIndex: Integer read FImageLeftIndex write SetImageLeftIndex default -1;
+    property ImageRightIndex: Integer read FImageRightIndex write SetImageRightIndex default -1;
 
-      //  Image
-      property Images: TCustomImageList read FImages write FImages;
-      property ImageLeftIndex: Integer read FImageLeftIndex write SetImageLeftIndex default -1;
-      property ImageRightIndex: Integer read FImageRightIndex write SetImageRightIndex default -1;
+    //  Font
+    property IconFont: TFont read FIconFont write FIconFont;
+    property DetailFont: TFont read FDetailFont write FDetailFont;
 
-      //  Font
-      property IconFont: TFont read FIconFont write FIconFont;
-      property DetailFont: TFont read FDetailFont write FDetailFont;
+    //  Object visible
+    property ObjectsVisible: TUItemButtonObjects read FObjectsVisible write SetObjectsVisible
+      default [iokNone, iokLeftIcon, iokText, iokDetail];
 
-      //  Object visible
-      property ObjectsVisible: TUItemButtonObjects read FObjectsVisible write SetObjectsVisible
-        default [iokNone, iokLeftIcon, iokText, iokDetail];
+    //  Objects property
+    property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
+    property LeftIcon: string read FLeftIcon write SetLeftIcon;
+    property Text: string read FText write SetText;
+    property Detail: string read FDetail write SetDetail;
+    property RightIcon: string read FRightIcon write SetRightIcon;
 
-      //  Objects property
-      property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
-      property LeftIcon: string read FLeftIcon write SetLeftIcon;
-      property Text: string read FText write SetText;
-      property Detail: string read FDetail write SetDetail;
-      property RightIcon: string read FRightIcon write SetRightIcon;
+    //  Objects size
+    property CheckBoxWidth: Integer index 0 read FCheckBoxWidth write SetObjectWidth default 40;
+    property LeftIconWidth: Integer index 1 read FLeftIconWidth write SetObjectWidth default 40;
+    property RightIconWidth: Integer index 2 read FRightIconWidth write SetObjectWidth default 40;
 
-      //  Objects size
-      property CheckBoxWidth: Integer index 0 read FCheckBoxWidth write SetObjectWidth default 40;
-      property LeftIconWidth: Integer index 1 read FLeftIconWidth write SetObjectWidth default 40;
-      property RightIconWidth: Integer index 2 read FRightIconWidth write SetObjectWidth default 40;
+    //  Additional
+    property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 5;
+    property CustomActiveColor: TColor read FCustomActiveColor write SetCustomActiveColor;
+    property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property LeftIconKind: TUImageKind read FLeftIconKind write SetLeftIconKind default ikFontIcon;
+    property RightIconKind: TUImageKind read FRightIconKind write SetRightIconKind default ikFontIcon;
+    property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
+    property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
 
-      //  Additional
-      property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 5;
-      property CustomActiveColor: TColor read FCustomActiveColor write SetCustomActiveColor;
-      property Transparent: Boolean read FTransparent write SetTransparent default false;
-      property LeftIconKind: TUImageKind read FLeftIconKind write SetLeftIconKind default ikFontIcon;
-      property RightIconKind: TUImageKind read FRightIconKind write SetRightIconKind default ikFontIcon;
-      property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
-      property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
+    property TabStop default true;
+    property Height default 40;
+    property Width default 250;
 
-      property TabStop default true;
-      property Height default 40;
-      property Width default 250;
+    property OnToggle: TUCustomItemButtonToggleEvent read FToggleEvent write FToggleEvent;
   end;
 
   TUItemButton = class(TUCustomItemButton)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      //property Caption;
-      property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
+  published
+    property Align;
+    property Anchors;
+    property AutoSize;
+    property BiDiMode;
+    //property Caption;
+    property Color;
+    property Constraints;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property Touch;
+    property Visible;
+  {$IF CompilerVersion > 29}
+    property StyleElements;
+  {$IFEND}
 
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
+    property OnCanResize;
+    property OnClick;
+    property OnConstrainedResize;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnResize;
+    property OnStartDock;
+    property OnStartDrag;
   end;
 
 implementation
@@ -322,6 +331,12 @@ begin
     TextRect := Rect(LPos + AlignSpace, 0, RPos - AlignSpace, Height)
   else
     TextRect := TRect.Empty;
+end;
+
+procedure TUCustomItemButton.DoToggle;
+begin
+  if Assigned(FToggleEvent) then
+    FToggleEvent(Self, FIsToggled);
 end;
 
 //  SETTERS
@@ -472,6 +487,7 @@ begin
     FIsToggled := Value;
     UpdateColors;
     Repaint;
+    DoToggle;
   end;
 end;
 
@@ -526,6 +542,8 @@ begin
   Height := 40;
   Width := 250;
 
+  InitBumpMap;
+
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
 end;
@@ -544,62 +562,81 @@ end;
 procedure TUCustomItemButton.Paint;
 var
   ImgX, ImgY: Integer;
+  bmp: TBitmap;
+  P: TPoint;
 begin
   inherited;
 
-  //  Paint background
-  Canvas.Brush.Style := bsSolid;
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
-  Canvas.FillRect(Rect(0, 0, Width, Height));
+  bmp := TBitmap.Create;
+  try
+    bmp.SetSize(Width, Height);
+    //bmp.Canvas.Assign(Canvas);
 
-  Canvas.Font := IconFont;
+    //  Paint background
+    bmp.Canvas.Brush.Style := bsSolid;
+    bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+    bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
 
-  //  Paint checkbox
-  if iokCheckBox in ObjectsVisible then begin
-    if IsChecked then begin
-      Canvas.Font.Color := ActiveColor;
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_CHECKED, false);
-    end
-    else begin
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_UNCHECKED, false);
+    bmp.Canvas.Font := IconFont;
+
+    P:=Mouse.CursorPos;
+    P:=ScreenToClient(P);
+
+    if Enabled and FMouseInClient then
+      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
+
+    //  Paint checkbox
+    if iokCheckBox in ObjectsVisible then begin
+      if IsChecked then begin
+        bmp.Canvas.Font.Color := ActiveColor;
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_CHECKED, false);
+      end
+      else begin
+        bmp.Canvas.Font.Color := TextColor;
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_UNCHECKED, false);
+      end;
     end;
-  end;
 
-  Canvas.Font.Color := TextColor;
+    bmp.Canvas.Font.Color := TextColor;
 
-  //  Paint left icon
-  if iokLeftIcon in ObjectsVisible then begin
-    if LeftIconKind = ikFontIcon then
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, LeftIconRect, LeftIcon, false)
-    else if Images <> Nil then begin
-      GetCenterPos(Images.Width, Images.Height, LeftIconRect, ImgX, ImgY);
-      Images.Draw(Canvas, ImgX, ImgY, ImageLeftIndex, Enabled);
+    //  Paint left icon
+    if iokLeftIcon in ObjectsVisible then begin
+      if LeftIconKind = ikFontIcon then
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, LeftIconRect, LeftIcon, false)
+      else if Images <> Nil then begin
+        GetCenterPos(Images.Width, Images.Height, LeftIconRect, ImgX, ImgY);
+        Images.Draw(bmp.Canvas, ImgX, ImgY, ImageLeftIndex, Enabled);
+      end;
     end;
-  end;
 
-  //  Paint right icon
-  if iokRightIcon in ObjectsVisible then begin
-    if RightIconKind = ikFontIcon then
-      DrawTextRect(Canvas, taCenter, taVerticalCenter, RightIconRect, RightIcon, false)
-    else if Images <> Nil then begin
-      GetCenterPos(Images.Width, Images.Height, RightIconRect, ImgX, ImgY);
-      Images.Draw(Canvas, ImgX, ImgY, ImageRightIndex, Enabled);
+    //  Paint right icon
+    if iokRightIcon in ObjectsVisible then begin
+      if RightIconKind = ikFontIcon then
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, RightIconRect, RightIcon, false)
+      else if Images <> Nil then begin
+        GetCenterPos(Images.Width, Images.Height, RightIconRect, ImgX, ImgY);
+        Images.Draw(bmp.Canvas, ImgX, ImgY, ImageRightIndex, Enabled);
+      end;
     end;
-  end;
 
-  //  Paint detail
-  if iokDetail in ObjectsVisible then begin
-    Canvas.Font := DetailFont;
-    Canvas.Font.Color := DetailColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
-  end;
+    //  Paint detail
+    if iokDetail in ObjectsVisible then begin
+      bmp.Canvas.Font := DetailFont;
+      bmp.Canvas.Font.Color := DetailColor;
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
+    end;
 
-  //  Paint text
-  if iokText in ObjectsVisible then begin
-    Canvas.Font := Font;
-    Canvas.Font.Color := TextColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
+    //  Paint text
+    if iokText in ObjectsVisible then begin
+      bmp.Canvas.Font := Font;
+      bmp.Canvas.Font.Color := TextColor;
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
+    end;
+
+    //
+    Canvas.Draw(0, 0, bmp);
+  finally
+    bmp.Free;
   end;
 end;
 
@@ -686,16 +723,42 @@ begin
     end;
 
     //  Switch toggle state
-    if (IsToggleButton) and (FObjectSelected <> iokCheckBox) then
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
       FIsToggled := not FIsToggled;
 
     ButtonState := csHover;
+    inherited;
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
+      DoToggle;
+  end;
+end;
+
+procedure TUCustomItemButton.WMMouseMove(var Msg: TWMMouseMove);
+begin
+  if Enabled then
+    Repaint;
+  inherited;
+end;
+
+procedure TUCustomItemButton.WMSetFocus(var Msg: TWMSetFocus);
+begin
+  if Enabled then begin
+    ButtonState := csFocused;
+    inherited;
+  end;
+end;
+
+procedure TUCustomItemButton.WMKillFocus(var Msg: TWMKillFocus);
+begin
+  if Enabled then begin
+    ButtonState := csNone;
     inherited;
   end;
 end;
 
 procedure TUCustomItemButton.CMMouseEnter(var Msg: TMessage);
 begin
+  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -704,6 +767,7 @@ end;
 
 procedure TUCustomItemButton.CMMouseLeave(var Msg: TMessage);
 begin
+  FMouseInClient := False;
   if Enabled then begin
     ButtonState := csNone;
     inherited;
