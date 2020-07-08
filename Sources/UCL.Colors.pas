@@ -89,7 +89,7 @@ type
     property SelectedPress: TColor index 5 read FSelectedPress write SetColor;
   end;
 
-  TUThemeCaptionBarColorSet = class(TUThemeControlColorSet)
+  TUThemeControlWithFocusColorSet = class(TUThemeControlColorSet)
   private
     FFocusedLightColor: TColor;
     FFocusedDarkColor: TColor;
@@ -111,6 +111,8 @@ type
     property FocusedDarkColor: TColor index 4 read FFocusedDarkColor write SetColor;
   end;
 
+  TUThemeCaptionBarColorSet = class(TUThemeControlWithFocusColorSet);
+
 var
   MINI_SB_COLOR_NIL,
   MINI_SB_COLOR_LIGHT,
@@ -128,6 +130,8 @@ var
   PANEL_BACK: TUThemeControlColorSet;
   SCROLLBOX_BACK: TUThemeControlColorSet;
   CAPTIONBAR_BACK: TUThemeCaptionBarColorSet;
+  EDIT_BORDER: TUThemeControlWithFocusColorSet;
+//  EDIT_BACK:
 
   DETAIL_COLOR: TColor;
   DETAIL_COLOR_HIGHLIGHED: TColor;
@@ -355,44 +359,44 @@ begin
   end;
 end;
 
-{ TUThemeCaptionBarColorSet }
+{ TUThemeControlWithFocusColorSet }
 
-constructor TUThemeCaptionBarColorSet.Create;
+constructor TUThemeControlWithFocusColorSet.Create;
 begin
   inherited;
   SetColors;
 end;
 
-constructor TUThemeCaptionBarColorSet.Create(Color, LightColor, DarkColor, FocusedLightColor, FocusedDarkColor: TColor);
+constructor TUThemeControlWithFocusColorSet.Create(Color, LightColor, DarkColor, FocusedLightColor, FocusedDarkColor: TColor);
 begin
   Create;
   SetColors(Color, LightColor, DarkColor);
   SetColors(FocusedLightColor, FocusedDarkColor);
 end;
 
-procedure TUThemeCaptionBarColorSet.Assign(Source: TPersistent);
+procedure TUThemeControlWithFocusColorSet.Assign(Source: TPersistent);
 begin
-  if Source is TUThemeCaptionBarColorSet then begin
-    FFocusedLightColor := (Source as TUThemeCaptionBarColorSet).FocusedLightColor;
-    FFocusedDarkColor  := (Source as TUThemeCaptionBarColorSet).FocusedDarkColor;
+  if Source is TUThemeControlWithFocusColorSet then begin
+    FFocusedLightColor := (Source as TUThemeControlWithFocusColorSet).FocusedLightColor;
+    FFocusedDarkColor  := (Source as TUThemeControlWithFocusColorSet).FocusedDarkColor;
   end;
   inherited Assign(Source); // must be last - changed is called here
 end;
 
-procedure TUThemeCaptionBarColorSet.SetColors;
+procedure TUThemeControlWithFocusColorSet.SetColors;
 begin
   inherited;
   FFocusedLightColor := $00000000;
   FFocusedDarkColor  := $00000000;
 end;
 
-procedure TUThemeCaptionBarColorSet.SetColors(FocusedLightColor, FocusedDarkColor: TColor);
+procedure TUThemeControlWithFocusColorSet.SetColors(FocusedLightColor, FocusedDarkColor: TColor);
 begin
   FFocusedLightColor := FocusedLightColor;
   FFocusedDarkColor  := FocusedDarkColor;
 end;
 
-procedure TUThemeCaptionBarColorSet.SetColor(Index: Integer; const Value: TColor);
+procedure TUThemeControlWithFocusColorSet.SetColor(Index: Integer; const Value: TColor);
 begin
   inherited SetColor(Index, Value);
   case Index of
@@ -413,7 +417,7 @@ begin
   Changed;
 end;
 
-function TUThemeCaptionBarColorSet.GetColor(const TM: TUThemeManager; const Focused: Boolean): TColor;
+function TUThemeControlWithFocusColorSet.GetColor(const TM: TUThemeManager; const Focused: Boolean): TColor;
 begin
   if TM = Nil then
     Result := Color
@@ -451,6 +455,7 @@ initialization
   PANEL_BACK := TUThemeControlColorSet.Create(0, $E6E6E6, $1F1F1F);
   SCROLLBOX_BACK := TUThemeControlColorSet.Create(0, $E6E6E6, $1F1F1F);
   CAPTIONBAR_BACK := TUThemeCaptionBarColorSet.Create(0, $F2F2F2, $2B2B2B, $D77800, $174800);
+  EDIT_BORDER := TUThemeControlWithFocusColorSet.Create(0, $999999, $666666, $D77800, $D77800);
 
   DETAIL_COLOR := $808080;  //  Both light & dark
   DETAIL_COLOR_HIGHLIGHED := $C0C0C0;   //  Using when background is solid color
@@ -462,5 +467,6 @@ finalization
   PANEL_BACK.Free;
   SCROLLBOX_BACK.Free;
   CAPTIONBAR_BACK.Free;
+  EDIT_BORDER.Free;
 
 end.

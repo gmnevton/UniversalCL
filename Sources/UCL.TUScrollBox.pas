@@ -223,10 +223,10 @@ end;
 
 destructor TUScrollBox.Destroy;
 begin
+  FScrollBarTimer.Enabled := False;
   MiniSB.Free;
   FAniSet.Free;
   FBackColor.Free;
-  FScrollBarTimer.Enabled := False;
   FScrollBarTimer.Free;
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);

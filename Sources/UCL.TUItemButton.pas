@@ -21,8 +21,9 @@ uses
 
 type
   TUItemObjectKind = (iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon);
-
   TUItemButtonObjects = set of TUItemObjectKind;
+
+  TUCustomItemButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
 
   TUCustomItemButton = class(TCustomControl, IUThemeComponent)
   private const
@@ -74,10 +75,12 @@ type
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
     FMouseInClient: Boolean;
+    FToggleEvent: TUCustomItemButtonToggleEvent;
 
     //  Internal
     procedure UpdateColors;
     procedure UpdateRects;
+    procedure DoToggle;
 
     //  Setters
     procedure SetThemeManager; // (const Value: TUThemeManager);
@@ -106,7 +109,8 @@ type
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
-
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
@@ -167,6 +171,8 @@ type
     property TabStop default true;
     property Height default 40;
     property Width default 250;
+
+    property OnToggle: TUCustomItemButtonToggleEvent read FToggleEvent write FToggleEvent;
   end;
 
   TUItemButton = class(TUCustomItemButton)
@@ -327,6 +333,12 @@ begin
     TextRect := TRect.Empty;
 end;
 
+procedure TUCustomItemButton.DoToggle;
+begin
+  if Assigned(FToggleEvent) then
+    FToggleEvent(Self, FIsToggled);
+end;
+
 //  SETTERS
 
 procedure TUCustomItemButton.SetButtonState(const Value: TUControlState);
@@ -475,6 +487,7 @@ begin
     FIsToggled := Value;
     UpdateColors;
     Repaint;
+    DoToggle;
   end;
 end;
 
@@ -710,11 +723,13 @@ begin
     end;
 
     //  Switch toggle state
-    if (IsToggleButton) and (FObjectSelected <> iokCheckBox) then
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
       FIsToggled := not FIsToggled;
 
     ButtonState := csHover;
     inherited;
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
+      DoToggle;
   end;
 end;
 
@@ -723,6 +738,22 @@ begin
   if Enabled then
     Repaint;
   inherited;
+end;
+
+procedure TUCustomItemButton.WMSetFocus(var Msg: TWMSetFocus);
+begin
+  if Enabled then begin
+    ButtonState := csFocused;
+    inherited;
+  end;
+end;
+
+procedure TUCustomItemButton.WMKillFocus(var Msg: TWMKillFocus);
+begin
+  if Enabled then begin
+    ButtonState := csNone;
+    inherited;
+  end;
 end;
 
 procedure TUCustomItemButton.CMMouseEnter(var Msg: TMessage);

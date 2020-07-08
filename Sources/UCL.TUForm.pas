@@ -108,6 +108,7 @@ type
 
     property PPI: Integer read FPPI write FPPI default 96;
     property IsActive: Boolean read FIsActive default True;
+    property Overlay: TUFormOverlay read FOverlay;
     property OverlayType: TUOverlayType read FOverlayType write SetOverlayType default otNone;
     property FitDesktopSize: Boolean read FFitDesktopSize write FFitDesktopSize default true;
 
