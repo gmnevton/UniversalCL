@@ -3,32 +3,41 @@ unit UCL.TUFormOverlay;
 interface
 
 uses
-  Classes, SysUtils, Types, Messages, Windows, Graphics, Controls, Forms,
-  UCL.Classes, UCL.TUThemeManager;
+  SysUtils,
+  Classes,
+  Types,
+  Messages,
+  Windows,
+  Graphics,
+  Controls,
+  Forms,
+  UCL.Classes,
+  UCL.TUThemeManager;
 
 type
   TUOverlayType = (otNone, otBlur, otSplash);
 
   TUFormOverlay = class(TForm)
-    private
-      FOverlayType: TUOverlayType;
-      FCaptionBarHeight: Integer;
-      FAllowMove: Boolean;
+  private
+    FOverlayType: TUOverlayType;
+    FCaptionBarHeight: Integer;
+    FAllowMove: Boolean;
+    FParent: TWinControl;
 
-      //  Setters
-      procedure SetOverlayType(const Value: TUOverlayType);
+    //  Setters
+    procedure SetOverlayType(const Value: TUOverlayType);
 
-      //  Messages
-      procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    //  Messages
+    procedure WM_NCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
-    public
-      constructor CreateNew(aOwner: TComponent; Dummy: Integer = 0); override;
-      procedure AssignToForm(Form: TForm);
+  public
+    constructor CreateNew(AOwner: TComponent; Dummy: Integer = 0); override;
+    procedure AssignToForm(Form: TForm);
 
-    published
-      property OverlayType: TUOverlayType read FOverlayType write SetOverlayType default otNone;
-      property CaptionBarHeight: Integer read FCaptionBarHeight write FCaptionBarHeight default 32;
-      property AllowMove: Boolean read FAllowMove write FAllowMove default true;
+  published
+    property OverlayType: TUOverlayType read FOverlayType write SetOverlayType default otNone;
+    property CaptionBarHeight: Integer read FCaptionBarHeight write FCaptionBarHeight default 32;
+    property AllowMove: Boolean read FAllowMove write FAllowMove default True;
   end;
 
 implementation
@@ -38,61 +47,80 @@ implementation
 //  SETTERS
 
 procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
+var
+  LParent: TWinControl;
 begin
-  if Value <> FOverlayType then
-    begin
-      FOverlayType := Value;
+  if Value <> FOverlayType then begin
+    FOverlayType := Value;
 
-      //  Reset properties
+    //  Reset properties
+    if Parent <> Nil then
+      LParent := Parent
+    else if FParent <> Nil then
+      LParent := FParent;
 
-      //  Apply changes
-      case FOverlayType of
-        otNone:
-          begin
-            AlphaBlend := false;
-            Visible := false;
-          end;
+    if (LParent <> Nil) and (LParent is TForm) then
+      Color := TForm(LParent).Color;
 
-        otBlur:
-          begin
-            AlphaBlend := true;
-            AlphaBlendValue := 150;
-            Visible := true;
-          end;
+    //  Apply changes
+    case FOverlayType of
+      otNone: begin
+        AlphaBlend := False;
+        Visible := False;
+      end;
 
-        otSplash:
-          begin
-            AlphaBlend := false;
-            Visible := true;
-            //
-          end;
+      otBlur: begin
+        AlphaBlend := True;
+        AlphaBlendValue := 150;
+        Visible := True;
+        BringToFront;
+      end;
+
+      otSplash: begin
+        AlphaBlend := False;
+        Visible := True;
+        BringToFront;
       end;
     end;
+  end;
 end;
 
 //  MAIN CLASS
 
-constructor TUFormOverlay.CreateNew(aOwner: TComponent; Dummy: Integer);
+constructor TUFormOverlay.CreateNew(AOwner: TComponent; Dummy: Integer);
 begin
-  inherited;
+  inherited CreateNew(AOwner, Dummy);
 
   FOverlayType := otNone;
   FCaptionBarHeight := 32;
-  FAllowMove := true;
+  FAllowMove := True;
+  FParent := Nil;
 
   BorderStyle := bsNone;
   Color := $FFFFFF;
   Anchors := [akLeft, akTop, akRight, akBottom];
-  Visible := false;
+  Visible := False;
 
-  AlphaBlend := false;
+  AlphaBlend := False;
   AlphaBlendValue := 150;
 end;
 
 procedure TUFormOverlay.AssignToForm(Form: TForm);
+var
+  P: TPoint;
 begin
+{$IF CompilerVersion < 30}
+  FParent:=Form;
+//  BoundsRect := Form.BoundsRect;
+  P := ClientToScreen(Form.BoundsRect.TopLeft);
+  SetWindowLong(Handle, GWL_HWNDPARENT, Form.Handle);
+//  SetWindowPos(Handle, Form.Handle, 0, 0, 0, 0, SWP_NOSIZE or SWP_NOMOVE);
+  SetBounds(P.X, P.Y, Form.ClientWidth, Form.ClientHeight);
+//  SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
+{$ELSE}
   Parent := Form;
   SetBounds(0, 0, Form.ClientWidth, Form.ClientHeight);
+{$IFEND}
 end;
 
 //  MESSAGES
@@ -102,15 +130,16 @@ begin
   inherited;
 
   case OverlayType of
-    otNone:
-      Msg.Result := HTTRANSPARENT;
+    otNone: Msg.Result := HTTRANSPARENT;
 
-    otBlur:
-      if AllowMove and (Parent <> nil) then
+    otBlur: begin
+      if AllowMove and (Parent <> Nil) then
         if Msg.YPos - Parent.BoundsRect.Top <= CaptionBarHeight then
           Msg.Result := HTTRANSPARENT;
+    end;
 
-    otSplash: ;
+    otSplash: begin
+    end;
   end;
 end;
 
