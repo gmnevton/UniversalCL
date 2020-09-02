@@ -14,7 +14,7 @@ uses
 
 type
   TUTheme = (utLight, utDark);
-  TUThemeType = (ttAuto, ttLight, ttDark);
+  TUThemeType = (ttSystem, ttLight, ttDark);
 
   IUThemedComponent = interface ['{C9D5D479-2F52-4BB9-8023-6EA00B5084F0}']
     procedure SetThemeManager;
@@ -34,28 +34,38 @@ type
   // property to instance layed on the form
   TUThemeManager = class(TComponent)
     private
-      FAutoUpdateControls: Boolean;
-      FCompList: TList<TComponent>;
+      // System
+      ISystemTheme: TUTheme;
+      ISystemAccentColor: TColor;
+      ISystemColorOnBorder: Boolean;
 
-      //  Events
+      // Internal
+      FCompList: TList<TComponent>;
+      FTheme: TUThemeType;
+      FAutoUpdateControls: Boolean;
+      FAccentColor: TColor;
+      FColorOnBorder: TColor;
+      FUseSystemTheme: Boolean;
+      FUseSystemAccentColor: Boolean;
+      FUseSystemColorOnBorder: Boolean;
+      FUseColorOnBorder: Boolean;
+
+      // Events
       FOnBeforeColorLoading: TNotifyEvent;
       FOnBeforeUpdate: TNotifyEvent;
       FOnAfterUpdate: TNotifyEvent;
-
-      //  Internal
-      FTheme: TUTheme;
-      FAccentColor: TColor;
-      FColorOnBorder: Boolean;
-
-      //  System
-      FUseSystemTheme: Boolean;
-      FUseSystemAccentColor: Boolean;
-
-      //  Custom
-      FCustomTheme: TUTheme;
-      FCustomAccentColor: TColor;
     private
+      // Properties
+      procedure SetTheme(Value: TUThemeType);
+      procedure SetAutoUpdateControls(Value: Boolean);
+      procedure SetAccentColor(Value: TColor);
+      procedure SetColorOnBorder(Value: TColor);
+      procedure SetUseSystemAccentColor(Value: Boolean);
+      procedure SetUseSystemColorOnBorder(Value: Boolean);
+      procedure SetUseColorOnBorder(Value: Boolean);
+      //
       procedure CollectAndConnectControls(const Root: TComponent);
+      procedure Changed;
 
     public
       constructor Create(AOwner: TComponent); override;
@@ -63,32 +73,32 @@ type
       procedure AfterConstruction; override;
       procedure Loaded; override;
 
-      //  Utils
+      // Utils
       procedure Reload;
       procedure UpdateTheme;
 
-      //  Components connecting
+      // Components connecting
       class function IsThemeAvailable(const Comp: TComponent): Boolean;
       function ConnectedComponentCount: Integer;
       procedure Connect(const Comp: TComponent);
       procedure Disconnect(const Comp: TComponent);
 
     published
-      property AutoUpdateControls: Boolean read FAutoUpdateControls write FAutoUpdateControls default true;
+      // System
+      property SystemTheme: TUTheme read ISystemTheme stored False;
+      property SystemAccentColor: TColor read ISystemAccentColor stored False;
+      property SystemColorOnBorder: Boolean read ISystemColorOnBorder stored False;
 
-      //  System
-      property UseSystemTheme: Boolean read FUseSystemTheme write FUseSystemTheme default true;
-      property UseSystemAccentColor: Boolean read FUseSystemAccentColor write FUseSystemAccentColor default true;
+      // Properties
+      property Theme: TUThemeType read FTheme write SetTheme default ttSystem;
+      property AutoUpdateControls: Boolean read FAutoUpdateControls write SetAutoUpdateControls default True;
+      property AccentColor: TColor read FAccentColor write SetAccentColor default $D77800;
+      property ColorOnBorder: TColor read FColorOnBorder write SetColorOnBorder default $000000;
+      property UseSystemAccentColor: Boolean read FUseSystemAccentColor write SetUseSystemAccentColor default True;
+      property UseSytemColorOnBorder: Boolean read FUseSystemColorOnBorder write SetUseSystemColorOnBorder default True;
+      property UseColorOnBorder: Boolean read FUseColorOnBorder write SetUseColorOnBorder default True;
 
-      //  Custom
-      property CustomTheme: TUTheme read FCustomTheme write FCustomTheme default utLight;
-      property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
-
-      property Theme: TUTheme read FTheme stored false;
-      property AccentColor: TColor read FAccentColor stored false;
-      property ColorOnBorder: Boolean read FColorOnBorder stored false;
-
-      //  Events
+      // Events
       property OnBeforeColorLoading: TNotifyEvent read FOnBeforeColorLoading write FOnBeforeColorLoading;
       property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
       property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
@@ -117,22 +127,23 @@ begin
 
   CommonThemeManager := Self;
 
+  ISystemTheme := utLight;
+  if IsAppsUseDarkTheme then
+    ISystemTheme := utDark;
+  ISystemAccentColor := GetAccentColor;
+  ISystemColorOnBorder := IsColorOnBorderEnabled;
+
   //  Objects
   FCompList := TList<TComponent>.Create;
 
   //  Default properties
+  FTheme := ttSystem;
   FAutoUpdateControls := True;
-
-  FUseSystemTheme := True;
-  FUseSystemAccentColor := True;
-
-  FCustomTheme := utLight;
-  FCustomAccentColor := $D77800;
-
-  //  Default vars
-  FTheme := utLight;
-  FColorOnBorder := False;
   FAccentColor := $D77800;
+  FColorOnBorder := $000000;
+  FUseSystemAccentColor := True;
+  FUseSystemColorOnBorder := True;
+  FUseColorOnBorder := True;
 end;
 
 destructor TUThemeManager.Destroy;
@@ -153,42 +164,82 @@ begin
   inherited;
   if Assigned(OnBeforeColorLoading) then
     FOnBeforeColorLoading(Self);
-  Reload;
+  UpdateTheme;
+end;
+
+procedure TUThemeManager.SetTheme(Value: TUThemeType);
+begin
+  if FTheme <> Value then begin
+    FTheme := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetAutoUpdateControls(Value: Boolean);
+begin
+  if FAutoUpdateControls <> Value then begin
+    FAutoUpdateControls := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetAccentColor(Value: TColor);
+begin
+  if FAccentColor <> Value then begin
+    FAccentColor := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetColorOnBorder(Value: TColor);
+begin
+  if FColorOnBorder <> Value then begin
+    FColorOnBorder := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetUseColorOnBorder(Value: Boolean);
+begin
+  if FUseColorOnBorder <> Value then begin
+    FUseColorOnBorder := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetUseSystemAccentColor(Value: Boolean);
+begin
+  if FUseSystemAccentColor <> Value then begin
+    FUseSystemAccentColor := Value;
+    Changed;
+  end;
+end;
+
+procedure TUThemeManager.SetUseSystemColorOnBorder(Value: Boolean);
+begin
+  if FUseSystemColorOnBorder <> Value then begin
+    FUseSystemColorOnBorder := Value;
+    Changed;
+  end;
 end;
 
 procedure TUThemeManager.Reload;
 begin
-  if csDesigning in ComponentState then
-    Exit;
-
-  //  Theme
-  if not UseSystemTheme then
-    FTheme := CustomTheme
-  else begin
-    if IsAppsUseDarkTheme then
-      FTheme := utDark
-    else
-      FTheme := utLight;
-  end;
-
-  //  Accent color
-  if not UseSystemAccentColor then
-    FAccentColor := CustomAccentColor
-  else
-    FAccentColor := GetAccentColor;
-
-  //  Color on border (read only)
-  FColorOnBorder := IsColorOnBorderEnabled;
-
-  //  Update for controls
-  if AutoUpdateControls then
-    UpdateTheme;
+  ISystemTheme := utLight;
+  if IsAppsUseDarkTheme then
+    ISystemTheme := utDark;
+  ISystemAccentColor := GetAccentColor;
+  ISystemColorOnBorder := IsColorOnBorderEnabled;
+  UpdateTheme;
 end;
 
 procedure TUThemeManager.UpdateTheme;
 var
   Comp: TComponent;
 begin
+  if not AutoUpdateControls then
+    Exit;
+
   if Assigned(FOnBeforeUpdate) then
     FOnBeforeUpdate(Self);
 
@@ -205,14 +256,13 @@ end;
 
 class function TUThemeManager.IsThemeAvailable(const Comp: TComponent): Boolean;
 begin
-  Result := IsPublishedProp(Comp, 'ThemeManager') and Supports(Comp, IUThemedComponent);
+  Result := Supports(Comp, IUThemedComponent) and IsPublishedProp(Comp, 'ThemeManager');
 end;
 
 function TUThemeManager.ConnectedComponentCount: Integer;
 begin
-  if FCompList = Nil then
-    Result := -1
-  else
+  Result := -1;
+  if FCompList <> Nil then
     Result := FCompList.Count;
 end;
 
@@ -227,6 +277,11 @@ begin
     if Component.ComponentCount > 0 then
       CollectAndConnectControls(Component);
   end;
+end;
+
+procedure TUThemeManager.Changed;
+begin
+  UpdateTheme;
 end;
 
 procedure TUThemeManager.Connect(const Comp: TComponent);

@@ -206,6 +206,7 @@ implementation
 uses
   Forms,
   UCL.Types,
+  UCL.Colors,
   UCL.CaptionBar;
 
 { TUCustomSymbolButton }
@@ -279,11 +280,11 @@ end;
 
 procedure TUCustomSymbolButton.UpdateColors;
 var
-  TempTheme: TUTheme;
+  TempTheme: TUThemeType;
   ParentControl: TWinControl;
 begin
   if ThemeManager = Nil then
-    TempTheme := utLight
+    TempTheme := ttLight
   else
     TempTheme := ThemeManager.Theme;
 
@@ -294,7 +295,7 @@ begin
     TextColor := GetTextColorFromBackground(Color);
     DetailColor := $808080;
     if ButtonState in [csNone, csHover, csFocused] then begin
-      if (ThemeManager = Nil) or ((ThemeManager <> Nil) and (ThemeManager.Theme = utLight)) then
+      if (ThemeManager = Nil) or ((ThemeManager <> Nil) and (ThemeManager.Theme = ttLight)) then
         BackColor := BrightenColor(BackColor, 25)
       else
         BackColor := BrightenColor(BackColor, -25);
@@ -322,8 +323,9 @@ begin
         DetailColor := $808080;
       end
       else begin
-        BackColor := BUTTON_BACK.GetColor[TempTheme, ButtonState];
-        TextColor := DefTextColor[TempTheme, ButtonState];
+        BackColor := BUTTON_BACK.GetColor(TempTheme, ButtonState);
+        //TextColor := BUTTON_TEXT.GetColor(TempTheme, ButtonState);
+        TextColor := GetTextColorFromBackground(BackColor);
         DetailColor := $808080;
       end;
     end;

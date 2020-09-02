@@ -230,16 +230,20 @@ begin
     BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
 
   else if IsActive then begin //  Active window
-    if ThemeManager.ColorOnBorder then
-      BorderColor := GetAccentColor
-    else if ThemeManager.Theme = utLight then
+    if ThemeManager.UseSytemColorOnBorder then begin
+      if ThemeManager.UseColorOnBorder then
+        BorderColor := ThemeManager.ColorOnBorder
+      else
+        BorderColor := GetAccentColor;
+    end
+    else if ThemeManager.Theme = ttLight then
       BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
     else
       BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_DARK;
   end
 
   else begin //  In active window
-    if ThemeManager.Theme = utLight then
+    if ThemeManager.Theme = ttLight then
       BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_LIGHT
     else
       BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_DARK;
@@ -304,7 +308,7 @@ end;
 procedure TUForm.AfterConstruction;
 begin
   inherited;
-  ThemeManager.Reload;
+  ThemeManager.UpdateTheme;
 end;
 
 //  CUSTOM METHODS
@@ -446,7 +450,7 @@ begin
       ColorSet := FORM_BACK;
 
     Color := ColorSet.GetColor(ThemeManager);
-    if ThemeManager.Theme = utLight then
+    if ThemeManager.Theme = ttLight then
       HintWindowClass := TULightTooltip
     else
       HintWindowClass := TUDarkTooltip;
