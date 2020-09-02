@@ -1,4 +1,4 @@
-unit UCL.TUProgressBar;
+unit UCL.ProgressBar;
 
 interface
 

@@ -13,7 +13,7 @@ uses
   Graphics,
   Themes;
 
-{$REGION 'Older Delphi version'}
+{$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
 type
   // Note: tfComposited only supported by ThemeServices.DrawText
@@ -46,15 +46,13 @@ var
 implementation
 
 uses
-  // delphi stuff first
   SysUtils,
   DwmApi,
   UxTheme,
-  // library stuff last
   UCL.Classes,
   UCL.Types;
 
-{$REGION 'Older Delphi version'}
+{$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
 type
   TStyleTextFlag = (stfTextColor, stfBorderColor, stfBorderSize, stfShadowColor, stfShadowOffset, stfGlowSize);
@@ -109,7 +107,7 @@ begin
   Y := Rect.Top + (Rect.Height - Height) div 2;
 end;
 
-{$REGION 'Compatible code'}
+{$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
 function TextFlagsToTextFormat(Value: Cardinal): TTextFormat;
 begin
@@ -268,7 +266,7 @@ begin
   end;
 end;
 
-function Mix(A, B: Byte): Byte;
+function Mix(A, B: Byte): Byte; inline;
 var
   C: Integer;
 begin

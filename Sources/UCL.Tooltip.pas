@@ -1,4 +1,4 @@
-unit UCL.TUTooltip;
+unit UCL.Tooltip;
 
 interface
 

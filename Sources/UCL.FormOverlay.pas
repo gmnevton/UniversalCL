@@ -1,4 +1,4 @@
-unit UCL.TUFormOverlay;
+unit UCL.FormOverlay;
 
 interface
 
@@ -12,7 +12,7 @@ uses
   Controls,
   Forms,
   UCL.Classes,
-  UCL.TUThemeManager;
+  UCL.ThemeManager;
 
 type
   TUOverlayType = (otNone, otBlur, otSplash);

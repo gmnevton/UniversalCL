@@ -1,4 +1,4 @@
-unit UCL.TUPanel;
+unit UCL.Panel;
 
 interface
 

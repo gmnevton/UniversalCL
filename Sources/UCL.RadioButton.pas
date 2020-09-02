@@ -1,4 +1,4 @@
-﻿unit UCL.TURadioButton;
+﻿unit UCL.RadioButton;
 
 interface
 

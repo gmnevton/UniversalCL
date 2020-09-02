@@ -1,25 +1,37 @@
-unit UCL.TUThemeManager;
+unit UCL.ThemeManager;
 
 interface
 
 uses
-  // delphi stuff first
   SysUtils,
   Classes,
   TypInfo,
   Controls,
   Graphics,
   Generics.Collections,
-  // library stuff last
   UCL.Classes,
   UCL.SystemSettings;
 
 type
-  IUThemeComponent = interface ['{C9D5D479-2F52-4BB9-8023-6EA00B5084F0}']
+  TUTheme = (utLight, utDark);
+  TUThemeType = (ttAuto, ttLight, ttDark);
+
+  IUThemedComponent = interface ['{C9D5D479-2F52-4BB9-8023-6EA00B5084F0}']
     procedure SetThemeManager;
     procedure UpdateTheme;
   end;
 
+  // @Info: GM; 2-09-2020
+  // the goal is to have one ThemeManager for whole application,
+  // automatically created and disposed when first instance of TUForm is created
+  // this allows us to manage all settings from one place
+  // if You want to be able to visually make changes to properties inside ThemeManager,
+  // than You must place it on any form in Your application
+  // 
+  // this approch is not limiting You from using individual ThemeManager for any control 
+  // in Your application, You must only place additional ThemeManagers for any control 
+  // You want to be able to individually or group controlled and change its ThemeManager 
+  // property to instance layed on the form
   TUThemeManager = class(TComponent)
     private
       FAutoUpdateControls: Boolean;
@@ -96,10 +108,9 @@ end;
 
 { TUThemeManager }
 
-//  MAIN CLASS
-
 constructor TUThemeManager.Create(AOwner: TComponent);
 begin
+  //just for now we are limiting use of ThemeManager to only one
   if not (csLoading in ComponentState) and (CommonThemeManager <> Nil) then
     raise Exception.Create('TUThemeManager allready used in application!');
   inherited;
@@ -145,8 +156,6 @@ begin
   Reload;
 end;
 
-//  UTILS
-
 procedure TUThemeManager.Reload;
 begin
   if csDesigning in ComponentState then
@@ -185,7 +194,7 @@ begin
 
   for Comp in FCompList do begin
     if Comp <> Nil then
-      (Comp as IUThemeComponent).UpdateTheme;
+      (Comp as IUThemedComponent).UpdateTheme;
   end;
 
   if Assigned(FOnAfterUpdate) then
@@ -196,7 +205,7 @@ end;
 
 class function TUThemeManager.IsThemeAvailable(const Comp: TComponent): Boolean;
 begin
-  Result := IsPublishedProp(Comp, 'ThemeManager') and Supports(Comp, IUThemeComponent);
+  Result := IsPublishedProp(Comp, 'ThemeManager') and Supports(Comp, IUThemedComponent);
 end;
 
 function TUThemeManager.ConnectedComponentCount: Integer;
@@ -223,13 +232,13 @@ end;
 procedure TUThemeManager.Connect(const Comp: TComponent);
 var
   ConnectedYet: Boolean;
-  ThemedComponent: IUThemeComponent;
+  ThemedComponent: IUThemedComponent;
 begin
   if IsThemeAvailable(Comp) then begin
     ConnectedYet := (FCompList.IndexOf(Comp) <> -1);
     if not ConnectedYet then begin
       FCompList.Add(Comp);
-      if Supports(Comp, IUThemeComponent, ThemedComponent) then
+      if Supports(Comp, IUThemedComponent, ThemedComponent) then
         ThemedComponent.SetThemeManager;
     end;
   end;

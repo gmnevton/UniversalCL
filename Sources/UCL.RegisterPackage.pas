@@ -1,4 +1,4 @@
-unit RegisterPackage_UCL;
+unit UCL.RegisterPackage;
 
 interface
 
@@ -11,32 +11,32 @@ implementation
 
 uses
   UCL.IntAnimation,
-  UCL.TUThemeManager,
-  UCL.TUForm,
-  UCL.TUCaptionBar,
-  UCL.TUSymbolButton,
-  UCL.TUButton,
-  UCL.TUText,
-  UCL.TUHyperLink,
-  UCL.TUPanel,
-  UCL.TUCheckBox,
-  UCL.TUProgressBar,
-  UCL.TUScrollBox,
-  UCL.TURadioButton,
-  UCL.TUItemButton,
-  UCL.TUSeparator,
-  UCL.TUEdit,
-  UCL.TUSlider,
-  UCL.TUPopupMenu,
-  UCL.TUQuickButton,
-  UCL.TUTitleBar,
-  UCL.TUShadow;
+  UCL.ThemeManager,
+  UCL.Form,
+  UCL.CaptionBar,
+  UCL.SymbolButton,
+  UCL.Button,
+  UCL.Text,
+  UCL.HyperLink,
+  UCL.Panel,
+  UCL.CheckBox,
+  UCL.ProgressBar,
+  UCL.ScrollBox,
+  UCL.RadioButton,
+  UCL.ItemButton,
+  UCL.Separator,
+  UCL.Edit,
+  UCL.Slider,
+  UCL.PopupMenu,
+  UCL.QuickButton,
+  UCL.TitleBar,
+  UCL.Shadow;
 
 procedure Register;
 begin
   RegisterComponents('Universal CL', [
     TUThemeManager,
-    //TUForm,
+    TUForm,
     TUCaptionBar,
     TUSymbolButton,
     TUButton,

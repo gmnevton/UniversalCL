@@ -1,4 +1,4 @@
-unit UCL.TUTitleBar;
+unit UCL.TitleBar;
 
 interface
 

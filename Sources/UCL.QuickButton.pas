@@ -1,4 +1,4 @@
-﻿unit UCL.TUQuickButton;
+﻿unit UCL.QuickButton;
 
 interface
 

@@ -1,4 +1,4 @@
-unit UCL.TUSlider;
+unit UCL.Slider;
 
 interface
 

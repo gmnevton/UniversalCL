@@ -1,4 +1,4 @@
-unit UCL.TUSeparator;
+unit UCL.Separator;
 
 interface
 

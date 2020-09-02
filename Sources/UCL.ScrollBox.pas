@@ -1,4 +1,4 @@
-unit UCL.TUScrollBox;
+unit UCL.ScrollBox;
 
 interface
 

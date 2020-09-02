@@ -1,4 +1,4 @@
-﻿unit UCL.TUItemButton;
+﻿unit UCL.ItemButton;
 
 interface
 
@@ -20,10 +20,13 @@ uses
   UCL.Graphics;
 
 type
+  TUCustomItemButton = class;
+
   TUItemObjectKind = (iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon);
   TUItemButtonObjects = set of TUItemObjectKind;
 
-  TUCustomItemButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
+  TUCustomItemButtonCanToggleEvent = procedure (Sender: TUCustomItemButton; var ToggleAllowed: Boolean) of object;
+  TUCustomItemButtonToggleEvent = procedure (Sender: TUCustomItemButton; State: Boolean) of object;
 
   TUCustomItemButton = class(TCustomControl, IUThemeComponent)
   private const
@@ -75,11 +78,13 @@ type
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
     FMouseInClient: Boolean;
+    FCanToggleEvent: TUCustomItemButtonCanToggleEvent;
     FToggleEvent: TUCustomItemButtonToggleEvent;
 
     //  Internal
     procedure UpdateColors;
     procedure UpdateRects;
+    function  DoCanToggle: Boolean;
     procedure DoToggle;
 
     //  Setters
@@ -172,6 +177,7 @@ type
     property Height default 40;
     property Width default 250;
 
+    property OnCanToggle: TUCustomItemButtonCanToggleEvent read FCanToggleEvent write FCanToggleEvent;
     property OnToggle: TUCustomItemButtonToggleEvent read FToggleEvent write FToggleEvent;
   end;
 
@@ -333,6 +339,13 @@ begin
     TextRect := TRect.Empty;
 end;
 
+function TUCustomItemButton.DoCanToggle: Boolean;
+begin
+  Result:=True;
+  if Assigned(FCanToggleEvent) then
+    FCanToggleEvent(Self, Result);
+end;
+
 procedure TUCustomItemButton.DoToggle;
 begin
   if Assigned(FToggleEvent) then
@@ -483,7 +496,7 @@ end;
 
 procedure TUCustomItemButton.SetIsToggled(const Value: Boolean);
 begin
-  if Value <> FIsToggled then begin
+  if FIsToggleButton and (Value <> FIsToggled) and DoCanToggle then begin
     FIsToggled := Value;
     UpdateColors;
     Repaint;
@@ -686,6 +699,8 @@ begin
 end;
 
 procedure TUCustomItemButton.WMLButtonUp(var Msg: TWMLButtonUp);
+var
+  OldState: Boolean;
 begin
   if Enabled then begin
 //      if Msg.XPos < CheckBoxWidth then
@@ -723,12 +738,13 @@ begin
     end;
 
     //  Switch toggle state
-    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
+    OldState:=FIsToggled;
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) and DoCanToggle then
       FIsToggled := not FIsToggled;
 
     ButtonState := csHover;
     inherited;
-    if IsToggleButton and (FObjectSelected <> iokCheckBox) then
+    if IsToggleButton and (FObjectSelected <> iokCheckBox) and (FIsToggled <> OldState) then
       DoToggle;
   end;
 end;

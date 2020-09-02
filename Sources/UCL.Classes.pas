@@ -9,6 +9,7 @@ interface
 uses
   Classes,
   Windows,
+  Controls,
   Graphics,
   Forms;
 
@@ -47,8 +48,6 @@ type
 {$ENDREGION}
 
 type
-  TUTheme = (utLight, utDark);
-
   TUOrientation = (oHorizontal, oVertical);
 
   TUDirection = (dLeft, dTop, dRight, dBottom);
@@ -60,7 +59,7 @@ type
 
   TUImageKind = (ikFontIcon, ikImage);
 
-  TDefColor = array [TUTheme, TUControlState] of TColor;
+//  TDefColor = array [TUTheme, TUControlState] of TColor;
 
   AccentPolicy = packed record
     AccentState: Integer;
@@ -111,6 +110,100 @@ type
       property Focused: TColor index 4 read FFocused write SetStateColor default $000000;
 
       property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+  TUCustomControl = class(TCustomControl)
+    published
+      property Align;
+      property Anchors;
+      property AutoSize;
+      property BiDiMode;
+      property Caption;
+      //property Color;
+      property Constraints;
+      property DragCursor;
+      property DragKind;
+      property DragMode;
+      property Enabled;
+      property Font;
+      property ParentBiDiMode;
+      property ParentColor;
+      property ParentFont;
+      property ParentShowHint;
+      property PopupMenu;
+      property ShowHint;
+      property Touch;
+      property Visible;
+      {$IF CompilerVersion > 29}
+        property StyleElements;
+      {$IFEND}
+
+      property OnCanResize;
+      property OnClick;
+      property OnConstrainedResize;
+      property OnContextPopup;
+      property OnDblClick;
+      property OnDragDrop;
+      property OnDragOver;
+      property OnEndDock;
+      property OnEndDrag;
+      property OnGesture;
+      property OnMouseActivate;
+      property OnMouseDown;
+      property OnMouseEnter;
+      property OnMouseLeave;
+      property OnMouseMove;
+      property OnMouseUp;
+      property OnResize;
+      property OnStartDock;
+      property OnStartDrag;
+  end;
+
+  TUGraphicControl = class(TGraphicControl)
+    published
+      property Align;
+      property Anchors;
+      property AutoSize;
+      property BiDiMode;
+      //property Caption;
+      property Color;
+      property Constraints;
+      property DragCursor;
+      property DragKind;
+      property DragMode;
+      property Enabled;
+      property Font;
+      property ParentBiDiMode;
+      property ParentColor;
+      property ParentFont;
+      property ParentShowHint;
+      property PopupMenu;
+      property ShowHint;
+      property Touch;
+      property Visible;
+      {$IF CompilerVersion > 29}
+        property StyleElements;
+      {$IFEND}
+
+      property OnCanResize;
+      property OnClick;
+      property OnConstrainedResize;
+      property OnContextPopup;
+      property OnDblClick;
+      property OnDragDrop;
+      property OnDragOver;
+      property OnEndDock;
+      property OnEndDrag;
+      property OnGesture;
+      property OnMouseActivate;
+      property OnMouseDown;
+      property OnMouseEnter;
+      property OnMouseLeave;
+      property OnMouseMove;
+      property OnMouseUp;
+      property OnResize;
+      property OnStartDock;
+      property OnStartDrag;
   end;
 
 function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;

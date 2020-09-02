@@ -1,4 +1,4 @@
-unit UCL.TUForm;
+unit UCL.Form;
 
 interface
 
@@ -18,12 +18,12 @@ uses
   UCL.Colors,
 //  UCL.Utils,
 //  UCL.SystemSettings,
-  UCL.TUThemeManager,
-  UCL.TUTooltip,
-  UCL.TUFormOverlay;
+  UCL.ThemeManager,
+  UCL.Tooltip,
+  UCL.FormOverlay;
 
 type
-  TUForm = class(TForm, IUThemeComponent)
+  TUForm = class(TForm, IUThemedComponent)
   public type
     TBorderSide = (bsDefault, bsTop, bsLeft, bsBottom, bsRight);
   public const
@@ -471,7 +471,7 @@ begin
   //  Update cation bar
   if CaptionBar <> Nil then begin
     if TUThemeManager.IsThemeAvailable(CaptionBar) then
-      (CaptionBar as IUThemeComponent).UpdateTheme;
+      (CaptionBar as IUThemedComponent).UpdateTheme;
     CaptionBar.Repaint;
   end;
 end;

@@ -1,4 +1,4 @@
-unit UCL.TUPopupMenu;
+unit UCL.PopupMenu;
 
 interface
 

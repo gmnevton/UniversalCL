@@ -1,4 +1,4 @@
-unit UCL.TUHyperLink;
+unit UCL.HyperLink;
 
 interface
 

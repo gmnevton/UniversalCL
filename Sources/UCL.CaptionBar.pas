@@ -1,4 +1,4 @@
-unit UCL.TUCaptionBar;
+unit UCL.CaptionBar;
 
 interface
 
@@ -13,11 +13,11 @@ uses
   Graphics,
   UCL.Classes,
   UCL.Colors,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUCaptionBar = class(TPanel, IUThemeComponent)
+  TUCaptionBar = class(TPanel, IUThemedComponent)
   private
     FThemeManager: TUThemeManager;
     FBackColor: TUThemeCaptionBarColorSet;
@@ -70,7 +70,7 @@ implementation
 uses
   Types,
   UCL.SystemSettings,
-  UCL.TUForm;
+  UCL.Form;
 
 type
   TUFormAccess = class(TUForm);
@@ -157,7 +157,7 @@ begin
         Continue;
       //
       if TUThemeManager.IsThemeAvailable(control) then
-        (control as IUThemeComponent).UpdateTheme;
+        (control as IUThemedComponent).UpdateTheme;
       //
       if control is TWinControl then begin
         if TWinControl(control).ControlCount > 0 then

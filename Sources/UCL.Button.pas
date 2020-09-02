@@ -1,4 +1,4 @@
-unit UCL.TUButton;
+unit UCL.Button;
 
 interface
 
@@ -16,43 +16,28 @@ uses
   Graphics,
   ImgList,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.Utils,
-  UCL.Graphics;
+  UCL.Graphics,
+  UCL.Colors;
 
 type
-  TUCustomButton = class(TCustomControl, IUThemeComponent)
-  private const
-    DefBackColor: TDefColor = (
-      ($CCCCCC, $CCCCCC, $999999, $CCCCCC, $CCCCCC),
-      ($333333, $333333, $666666, $333333, $333333)
-    );
-    DefBorderColor: TDefColor = (
-      ($CCCCCC, $7A7A7A, $999999, $CCCCCC, $7A7A7A),
-      ($333333, $858585, $666666, $333333, $858585)
-    );
-    DefTextColor: TDefColor = (
-      ($000000, $000000, $000000, $666666, $000000),
-      ($FFFFFF, $FFFFFF, $FFFFFF, $666666, $FFFFFF)
-    );
-
+  TUButton = class(TUCustomControl, IUThemedComponent)
   private var
     BorderThickness: Integer;
     BorderColor, BackColor, TextColor: TColor;
     ImgRect, TextRect: TRect;
 
   private
-    //  Theme
     FThemeManager: TUThemeManager;
-    FCustomBorderColors: TControlStateColors;
-    FCustomBackColors: TControlStateColors;
-    FCustomTextColors: TControlStateColors;
+    FBackColor: TControlStateColors;
+    FBorderColor: TControlStateColors;
+    FTextColor: TControlStateColors;
 
-    //  Fields
     FButtonState: TUControlState;
     FAlignment: TAlignment;
-    FImageIndex: Integer;
     FImages: TCustomImageList;
+    FImageIndex: Integer;
     FAllowFocus: Boolean;
     FHighlight: Boolean;
     FIsToggleButton: Boolean;
@@ -60,23 +45,27 @@ type
     FTransparent: Boolean;
     FMouseInClient: Boolean;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
 
-    //  Setters
+    // Setters
     procedure SetThemeManager; // (const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetAlignment(const Value: TAlignment);
+    procedure SetImages(const Value: TCustomImageList);
     procedure SetImageIndex(const Value: Integer);
+    procedure SetAllowFocus(const Value: Boolean);
     procedure SetHighlight(const Value: Boolean);
+    procedure SetIsToggleButton(const Value: Boolean);
+    procedure SetIsToggled(const Value: Boolean);
     procedure SetTransparent(const Value: Boolean);
 
-    //  Messages
+    // Messages
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
 
-    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    //procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
@@ -85,11 +74,12 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
     procedure CMDialogKey(var Msg: TCMDialogKey); message CM_DIALOGKEY;
+    procedure CMTextChanged(var Msg: TMessage); message CM_TEXTCHANGED;
 
-    //  Group property change
-    procedure DoCustomBorderColorsChange(Sender: TObject);
-    procedure DoCustomBackColorsChange(Sender: TObject);
-    procedure DoCustomTextColorsChange(Sender: TObject);
+    // Childs property change events
+    procedure BackColorChange(Sender: TObject);
+    procedure BorderColorChange(Sender: TObject);
+    procedure TextColorChange(Sender: TObject);
 
   protected
     //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -101,111 +91,64 @@ type
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
+    // IUThemedComponent
     procedure UpdateTheme;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-    property CustomBorderColors: TControlStateColors read FCustomBorderColors write FCustomBorderColors;
-    property CustomBackColors: TControlStateColors read FCustomBackColors write FCustomBackColors;
-    property CustomTextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
+    property BackColors: TControlStateColors read FCustomBackColors write FCustomBackColors;
+    property BorderColors: TControlStateColors read FCustomBorderColors write FCustomBorderColors;
+    property TextColors: TControlStateColors read FCustomTextColors write FCustomTextColors;
 
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
+    property Images: TCustomImageList read FImages write SetImages;
     property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
-    property Images: TCustomImageList read FImages write FImages;
-    property AllowFocus: Boolean read FAllowFocus write FAllowFocus default true;
+    property AllowFocus: Boolean read FAllowFocus write SetAllowFocus default True;
     property Highlight: Boolean read FHighlight write SetHighlight default false;
-    property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
-    property IsToggled: Boolean read FIsToggled write FIsToggled default false;
-    property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property IsToggleButton: Boolean read FIsToggleButton write SetIsToggleButton default False;
+    property IsToggled: Boolean read FIsToggled write SetIsToggled default False;
+    property Transparent: Boolean read FTransparent write SetTransparent default False;
 
     property Height default 30;
     property Width default 135;
     property TabStop default True;
   end;
 
-  TUButton = class(TUCustomButton)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
 implementation
 
-{ TUCustomButton }
+{ TUButton }
 
-//  THEME
+// IUThemedComponent
 
-procedure TUCustomButton.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUButton.SetThemeManager; // (const Value: TUThemeManager);
 begin
   FThemeManager := GetCommonThemeManager;
   UpdateTheme;
 end;
 
-procedure TUCustomButton.UpdateTheme;
+procedure TUButton.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
-  Repaint;
+  Invalidate;
 end;
 {
-procedure TUCustomButton.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TUButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
     FThemeManager := nil;
 end;
 }
-//  INTERNAL
 
-procedure TUCustomButton.UpdateColors;
+procedure TUButton.UpdateColors;
 begin
   //  Not connect ThemeManager, use custom colors
   if ThemeManager = Nil then begin
-    BorderColor := CustomBorderColors.GetStateColor(ButtonState);
-    BackColor := CustomBackColors.GetStateColor(ButtonState);
-    TextColor := CustomTextColors.GetStateColor(ButtonState);
+    BackColor   := BackColors.GetStateColor(ButtonState);
+    BorderColor := BorderColors.GetStateColor(ButtonState);
+    TextColor   := TextColors.GetStateColor(ButtonState);
   end
   //  Highlight button
   else if (Highlight or (IsToggleButton and IsToggled)) and //  Is highlight button, or toggle on
@@ -219,13 +162,13 @@ begin
   end
   //  Default colors
   else begin
+    BackColor   := DefBackColor[ThemeManager.Theme, ButtonState];
     BorderColor := DefBorderColor[ThemeManager.Theme, ButtonState];
-    BackColor := DefBackColor[ThemeManager.Theme, ButtonState];
-    TextColor := DefTextColor[ThemeManager.Theme, ButtonState];
+    TextColor   := DefTextColor[ThemeManager.Theme, ButtonState];
   end;
 
   //  Transparent
-  if (ButtonState = csNone) and (Transparent) then begin
+  if (ButtonState = csNone) and Transparent then begin
     ParentColor := True;
     BackColor := Color;
     BorderColor := Color; //  The same background, because of button state
@@ -233,7 +176,7 @@ begin
   end;
 end;
 
-procedure TUCustomButton.UpdateRects;
+procedure TUButton.UpdateRects;
 begin
   //  Calc rects
   if (Images <> Nil) and (ImageIndex >= 0) then begin
@@ -244,69 +187,103 @@ begin
     TextRect := Rect(0, 0, Width, Height);
 end;
 
-//  SETTERS
-
-procedure TUCustomButton.SetButtonState(const Value: TUControlState);
+procedure TUButton.SetButtonState(const Value: TUControlState);
 begin
   if Value <> FButtonState then begin
     FButtonState := Value;
     UpdateColors;
-    Repaint;
+    Invalidate;;
   end;
 end;
 
-procedure TUCustomButton.SetAlignment(const Value: TAlignment);
+procedure TUButton.SetAlignment(const Value: TAlignment);
 begin
   if Value <> FAlignment then begin
     FAlignment := Value;
-    Repaint;
+    Invalidate;
   end;
 end;
 
-procedure TUCustomButton.SetImageIndex(const Value: Integer);
+procedure TUButton.SetImages(const Value: TCustomImageList);
+begin
+  if Value <> FImages then begin
+    FImages := Value;
+    UpdateRects;
+    Invalidate;
+  end;
+end;
+
+procedure TUButton.SetImageIndex(const Value: Integer);
 begin
   if Value <> FImageIndex then begin
     FImageIndex := Value;
     UpdateRects;
-    Repaint;
+    Invalidate;
   end;
 end;
 
-procedure TUCustomButton.SetHighlight(const Value: Boolean);
+procedure TUButton.SetAllowFocus(const Value: Boolean);
+begin
+  if Value <> FAllowFocus then begin
+    FAllowFocus := Value;
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TUButton.SetHighlight(const Value: Boolean);
 begin
   if Value <> FHighlight then begin
     FHighlight := Value;
     UpdateColors;
-    Repaint;
+    Invalidate;
   end;
 end;
 
-procedure TUCustomButton.SetTransparent(const Value: Boolean);
+procedure TUButton.SetIsToggleButton(const Value: Boolean);
+begin
+  if Value <> FIsToggleButton then begin
+    FIsToggleButton := Value;
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TUButton.SetIsToggled(const Value: Boolean);
+begin
+  if Value <> FIsToggled then begin
+    FIsToggled := Value;
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TUButton.SetTransparent(const Value: Boolean);
 begin
   if Value <> FTransparent then begin
     FTransparent := Value;
     UpdateColors;
-    Repaint;
+    Invalidate;
   end;
 end;
 
-//  MAIN CLASS
-
-constructor TUCustomButton.Create(aOwner: TComponent);
+constructor TUButton.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
+  ControlStyle := ControlStyle - [csDoubleClicks];
+  
   FThemeManager := Nil;
 
   BorderThickness := 2;
 
   //  New properties
-  FCustomBorderColors := TControlStateColors.Create($F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
-  FCustomBackColors := TControlStateColors.Create($F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
-  FCustomTextColors := TControlStateColors.Create(clBlack, clBlack, clBlack, clGray, clBlack);
+  FBackColors := TControlStateColors.Create($F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FBorderColors := TControlStateColors.Create($F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FTextColors := TControlStateColors.Create(clBlack, clBlack, clBlack, clGray, clBlack);
 
-  FCustomBorderColors.OnChange := DoCustomBorderColorsChange;
-  FCustomBackColors.OnChange := DoCustomBackColorsChange;
-  FCustomTextColors.OnChange := DoCustomTextColorsChange;
+  FBackColors.OnChange := DoCustomBackColorsChange;
+  FBorderColors.OnChange := DoCustomBorderColorsChange;
+  FTextColors.OnChange := DoCustomTextColorsChange;
 
   FButtonState := csNone;
   FAlignment := taCenter;
@@ -330,7 +307,7 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
-destructor TUCustomButton.Destroy;
+destructor TUButton.Destroy;
 begin
   FCustomBorderColors.Free;
   FCustomBackColors.Free;
@@ -340,9 +317,7 @@ begin
   inherited;
 end;
 
-//  CUSTOM METHODS
-
-procedure TUCustomButton.Paint;
+procedure TUButton.Paint;
 var
   ImgX, ImgY: Integer;
   bmp: TBitmap;
@@ -386,29 +361,27 @@ begin
   end;
 end;
 
-procedure TUCustomButton.Resize;
+procedure TUButton.Resize;
 begin
   inherited;
   UpdateRects;
 end;
 
-procedure TUCustomButton.CreateWindowHandle(const Params: TCreateParams);
+procedure TUButton.CreateWindowHandle(const Params: TCreateParams);
 begin
   inherited;
   UpdateColors;
   UpdateRects;
 end;
 
-procedure TUCustomButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   BorderThickness := MulDiv(BorderThickness, M, D);
   UpdateRects;
 end;
 
-//  MESSAGES
-
-procedure TUCustomButton.WMSetFocus(var Msg: TWMSetFocus);
+procedure TUButton.WMSetFocus(var Msg: TWMSetFocus);
 begin
   if Enabled and AllowFocus then begin
     ButtonState := csFocused;
@@ -416,7 +389,7 @@ begin
   end;
 end;
 
-procedure TUCustomButton.WMKillFocus(var Msg: TWMKillFocus);
+procedure TUButton.WMKillFocus(var Msg: TWMKillFocus);
 begin
   if Enabled then begin
     ButtonState := csNone;
@@ -424,15 +397,17 @@ begin
   end;
 end;
 
-procedure TUCustomButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+{
+procedure TUButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then begin
     ButtonState := csPress;
     inherited;
   end;
 end;
+}
 
-procedure TUCustomButton.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
     if AllowFocus then
@@ -442,24 +417,27 @@ begin
   end;
 end;
 
-procedure TUCustomButton.WMLButtonUp(var Msg: TWMLButtonUp);
+procedure TUButton.WMLButtonUp(var Msg: TWMLButtonUp);
+var
+  MousePoint: TPoint;
 begin
   if Enabled then begin
-    if IsToggleButton then
+    MousePoint := ScreenToClient(Mouse.CursorPos);
+    if IsToggleButton and PtInRect(GetClientRect, MousePoint) then begin
       FIsToggled := not FIsToggled;
     ButtonState := csHover;
     inherited;
   end;
 end;
 
-procedure TUCustomButton.WMMouseMove(var Msg: TWMMouseMove);
+procedure TUButton.WMMouseMove(var Msg: TWMMouseMove);
 begin
   if Enabled then
-    Repaint;
+    Invalidate;
   inherited;
 end;
 
-procedure TUCustomButton.CMMouseEnter(var Msg: TMessage);
+procedure TUButton.CMMouseEnter(var Msg: TMessage);
 begin
   FMouseInClient := True;
   if Enabled then begin
@@ -468,7 +446,7 @@ begin
   end;
 end;
 
-procedure TUCustomButton.CMMouseLeave(var Msg: TMessage);
+procedure TUButton.CMMouseLeave(var Msg: TMessage);
 begin
   FMouseInClient := False;
   if Enabled then begin
@@ -486,7 +464,7 @@ begin
   end;
 end;
 
-procedure TUCustomButton.CMEnabledChanged(var Msg: TMessage);
+procedure TUButton.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then
@@ -494,10 +472,10 @@ begin
   else
     FButtonState := csNone;
   UpdateColors;
-  Repaint;
+  Invalidate;
 end;
 
-procedure TUCustomButton.CMDialogKey(var Msg: TWMKey);
+procedure TUButton.CMDialogKey(var Msg: TWMKey);
 begin
   if AllowFocus and Focused and (Msg.CharCode = VK_RETURN) then begin
     Click;
@@ -507,24 +485,28 @@ begin
     inherited;
 end;
 
-//  GROUP PROPERTY CHANGE
-
-procedure TUCustomButton.DoCustomBorderColorsChange(Sender: TObject);
+procedure TUButton.CM_TextChanged(var Msg: TMessage);
 begin
-  UpdateColors;
-  Repaint;
+  inherited;
+  Invalidate;
 end;
 
-procedure TUCustomButton.DoCustomBackColorsChange(Sender: TObject);
+procedure TUButton.BackColorChange(Sender: TObject);
 begin
   UpdateColors;
-  Repaint;
+  Invalidate;
 end;
 
-procedure TUCustomButton.DoCustomTextColorsChange(Sender: TObject);
+procedure TUButton.BorderColorChange(Sender: TObject);
 begin
   UpdateColors;
-  Repaint;
+  Invalidate;
+end;
+
+procedure TUButton.TextColorChange(Sender: TObject);
+begin
+  UpdateColors;
+  Invalidate;
 end;
 
 end.

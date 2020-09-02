@@ -1,4 +1,4 @@
-unit UCL.TUText;
+unit UCL.Text;
 
 interface
 

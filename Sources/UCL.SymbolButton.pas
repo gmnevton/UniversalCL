@@ -1,4 +1,4 @@
-﻿unit UCL.TUSymbolButton;
+﻿unit UCL.SymbolButton;
 
 interface
 
@@ -16,23 +16,23 @@ uses
   ImgList,
   UCL.Classes,
   UCL.SystemSettings,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
   TUCustomSymbolButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
 
-  TUCustomSymbolButton = class(TCustomControl, IUThemeComponent)
-  private const
-    DefBackColor: TDefColor = (
-      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
-      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535)
-    );
-    DefTextColor: TDefColor = (
-      ($00000000, $00000000, $00000000, $00666666, $00000000),
-      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF)
-    );
+  TUCustomSymbolButton = class(TCustomControl, IUThemedComponent)
+//  private const
+//    DefBackColor: TDefColor = (
+//      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
+//      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535)
+//    );
+//    DefTextColor: TDefColor = (
+//      ($00000000, $00000000, $00000000, $00666666, $00000000),
+//      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF)
+//    );
 
   private var
     BackColor, TextColor, DetailColor: TColor;
@@ -206,7 +206,7 @@ implementation
 uses
   Forms,
   UCL.Types,
-  UCL.TUCaptionBar;
+  UCL.CaptionBar;
 
 { TUCustomSymbolButton }
 
@@ -322,7 +322,7 @@ begin
         DetailColor := $808080;
       end
       else begin
-        BackColor := DefBackColor[TempTheme, ButtonState];
+        BackColor := BUTTON_BACK.GetColor[TempTheme, ButtonState];
         TextColor := DefTextColor[TempTheme, ButtonState];
         DetailColor := $808080;
       end;

@@ -1,4 +1,4 @@
-unit UCL.TUEdit;
+unit UCL.Edit;
 
 interface
 
