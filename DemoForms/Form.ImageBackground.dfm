@@ -26,10 +26,11 @@ object formImageBackground: TformImageBackground
     Top = 0
     Width = 200
     Height = 352
+    Align = alLeft
+    Color = clWhite
+    ParentColor = False
     AlphaA = 0
     Direction = dRight
-    Align = alLeft
-    ParentColor = False
   end
   object imgBackground: TImage
     Left = 200
@@ -14504,50 +14505,50 @@ object formImageBackground: TformImageBackground
     Left = 20
     Top = 60
     Width = 151
+    AutoSize = True
+    OnClick = radioSystemThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
-    AutoSize = True
     IsChecked = True
     Group = 'Theme'
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Use system settings'
-    OnClick = radioSystemThemeClick
   end
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
     Width = 64
+    AutoSize = True
+    OnClick = radioLightThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
-    AutoSize = True
     Group = 'Theme'
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Light'
-    OnClick = radioLightThemeClick
   end
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
     Width = 63
+    AutoSize = True
+    OnClick = radioDarkThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
-    AutoSize = True
     Group = 'Theme'
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Dark'
-    OnClick = radioDarkThemeClick
   end
   object entryChooseTheme: TUText
     Left = 20
@@ -14556,7 +14557,7 @@ object formImageBackground: TformImageBackground
     Height = 17
     Caption = 'Theme'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWhite
     Font.Height = -13
     Font.Name = 'Segoe UI Semibold'
     Font.Style = []
@@ -14567,13 +14568,7 @@ object formImageBackground: TformImageBackground
     Left = 566
     Top = 1
     Hint = 'Close'
-    ButtonStyle = sbsQuit
-    LightColor = 2298344
-    DarkColor = 2298344
-    PressBrightnessDelta = 32
-    Transparent = True
     Anchors = [akTop, akRight]
-    Caption = #57606
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -12
@@ -14582,18 +14577,18 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
+    ButtonStyle = sbsQuit
+    LightColor = 2298344
+    DarkColor = 2298344
+    PressBrightnessDelta = 32
+    Transparent = True
+    Caption = #57606
   end
   object buttonAppMinimized: TUQuickButton
     Left = 521
     Top = 1
     Hint = 'Minimize'
-    ButtonStyle = sbsMin
-    LightColor = 13619151
-    DarkColor = 3947580
-    PressBrightnessDelta = -32
-    Transparent = True
     Anchors = [akTop, akRight]
-    Caption = #59192
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -15
@@ -14602,14 +14597,19 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
+    ButtonStyle = sbsMin
+    LightColor = 13619151
+    DarkColor = 3947580
+    PressBrightnessDelta = -32
+    Transparent = True
+    Caption = #59192
   end
   object titlebarMain: TUTitleBar
     Left = 0
     Top = 0
     Width = 520
     Anchors = [akLeft, akTop, akRight]
-    Caption = 'Transparent caption bar form'
-    Color = clBtnFace
+    Color = clWhite
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -14617,6 +14617,7 @@ object formImageBackground: TformImageBackground
     Font.Style = []
     ParentColor = False
     ParentFont = False
+    Caption = 'Transparent caption bar form'
   end
   object progressMain: TUProgressBar
     Left = 240
@@ -14630,14 +14631,13 @@ object formImageBackground: TformImageBackground
     AniSet.Step = 25
     Value = 45
     Orientation = oHorizontal
-    CustomFillColor = 2469894
-    CustomBackColor = 15132390
   end
   object buttonSide: TUSymbolButton
     Left = 530
     Top = 60
     Width = 81
     Height = 90
+    Anchors = [akTop, akRight]
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
     SymbolFont.Height = -16
@@ -14653,7 +14653,8 @@ object formImageBackground: TformImageBackground
     Text = 'Help'
     Detail = 'F1'
     IsToggleButton = True
-    Anchors = [akTop, akRight]
+    KeepOrginalColor = False
+    TabOrder = 1
   end
   object panelBottom: TUPanel
     Left = 0
@@ -14662,7 +14663,7 @@ object formImageBackground: TformImageBackground
     Height = 58
     Align = alBottom
     Caption = 'panelBottom'
-    Color = 15132390
+    Color = 2039583
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -14683,19 +14684,8 @@ object formImageBackground: TformImageBackground
       Left = 465
       Top = 14
       Width = 131
-      CustomBorderColors.None = 15921906
-      CustomBorderColors.Hover = 15132390
-      CustomBorderColors.Press = 13421772
-      CustomBorderColors.Disabled = 15921906
-      CustomBorderColors.Focused = 15921906
-      CustomBackColors.None = 15921906
-      CustomBackColors.Hover = 15132390
-      CustomBackColors.Press = 13421772
-      CustomBackColors.Disabled = 15921906
-      CustomBackColors.Focused = 15921906
-      CustomTextColors.Disabled = clGray
-      Highlight = True
       Align = alRight
+      Highlight = True
       Caption = 'OK'
     end
     object buttonCancel: TUButton
@@ -14707,17 +14697,6 @@ object formImageBackground: TformImageBackground
       Margins.Top = 0
       Margins.Right = 14
       Margins.Bottom = 0
-      CustomBorderColors.None = 15921906
-      CustomBorderColors.Hover = 15132390
-      CustomBorderColors.Press = 13421772
-      CustomBorderColors.Disabled = 15921906
-      CustomBorderColors.Focused = 15921906
-      CustomBackColors.None = 15921906
-      CustomBackColors.Hover = 15132390
-      CustomBackColors.Press = 13421772
-      CustomBackColors.Disabled = 15921906
-      CustomBackColors.Focused = 15921906
-      CustomTextColors.Disabled = clGray
       Align = alRight
       Caption = 'Cancel'
     end
@@ -14729,6 +14708,12 @@ object formImageBackground: TformImageBackground
       Align = alClient
       Caption = 'editEmail'
       TabOrder = 2
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = clBlack
+      BorderColor.DarkColor = clBlack
+      BorderColor.FocusedLightColor = clBlack
+      BorderColor.FocusedDarkColor = clBlack
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 283

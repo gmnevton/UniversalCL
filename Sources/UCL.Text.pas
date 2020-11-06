@@ -9,32 +9,35 @@ uses
   Controls,
   StdCtrls,
   UCL.Classes,
-  UCL.TUThemeManager;
+  UCL.ThemeManager;
 
 type
   TUTextKind = (tkCustom, tkNormal, tkDescription, tkEntry, tkHeading, tkTitle);
 
-  TUText = class(TLabel, IUThemeComponent)
+  TUText = class(TLabel, IUThemedComponent)
   private
     FThemeManager: TUThemeManager;
     FTextKind: TUTextKind;
     FUseAccentColor: Boolean;
 
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetTextKind(const Value: TUTextKind);
     procedure SetUseAccentColor(const Value: Boolean);
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property TextKind: TUTextKind read FTextKind write SetTextKind default tkNormal;
     property UseAccentColor: Boolean read FUseAccentColor write SetUseAccentColor default false;
   end;
@@ -46,38 +49,94 @@ uses
 
 { TUText }
 
+//  MAIN CLASS
+
+constructor TUText.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+
+  //  New properties
+  FTextKind := tkNormal;
+  FUseAccentColor := False;
+
+  Font.Name := 'Segoe UI';
+  Font.Size := 10;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
+//  UpdateTheme;
+end;
+
+destructor TUText.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
+
 //  THEME
 
-procedure TUText.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUText.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
 procedure TUText.UpdateTheme;
+var
+  TM: TUCustomThemeManager;
 begin
+  TM:=SelectThemeManager(Self);
   //  Font color
   if TextKind = tkDescription then
     Font.Color := $666666
-  else if ThemeManager = Nil then
-    Font.Color := $000000
   else begin
     if UseAccentColor then
-      Font.Color := ThemeManager.AccentColor
-    else if ThemeManager.Theme = utLight then
+      Font.Color := TM.AccentColor
+    else if TM.ThemeUsed = utLight then
       Font.Color := $000000
     else
       Font.Color := $FFFFFF;
   end;
 end;
-{
+
+function TUText.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUText.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+
 procedure TUText.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  SETTERS
 
 procedure TUText.SetTextKind(const Value: TUTextKind);
@@ -102,6 +161,7 @@ begin
     end;
 
     UpdateTheme;
+    Repaint;
   end;
 end;
 
@@ -110,34 +170,8 @@ begin
   if Value <> FUseAccentColor then begin
     FUseAccentColor := Value;
     UpdateTheme;
+    Repaint;
   end;
-end;
-
-//  MAIN CLASS
-
-constructor TUText.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FThemeManager := Nil;
-
-  //  New properties
-  FTextKind := tkNormal;
-  FUseAccentColor := False;
-
-  Font.Name := 'Segoe UI';
-  Font.Size := 10;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
-//  UpdateTheme;
-end;
-
-destructor TUText.Destroy;
-begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
 end;
 
 end.

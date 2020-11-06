@@ -12,19 +12,19 @@ uses
   UCL.Classes,
   UCL.Types;
 
-//  Form
+// Form
 function EnableBlur(FormHandle: HWND; AccentState: Integer): Integer;
 
-//  Glass support
+// Glass support
 function CreatePreMultipliedRGBQuad(Color: TColor; Alpha: Byte = $FF): TRGBQuad;
 function CreateSolidBrushWithAlpha(Color: TColor; Alpha: Byte = $FF): HBRUSH;
 
-//  Color
+// Color
 function BrightenColor(aColor: TColor; Delta: Integer): TColor;
 function GetTextColorFromBackground(BackColor: TColor): TColor;
 function MulColor(aColor: TColor; Base: Single): TColor;
 
-//  Blend support
+// Blend support
 function CreateBlendFunc(Alpha: Byte; Gradient: Boolean): BLENDFUNCTION;
 procedure AssignBlendBitmap(const Bmp: TBitmap; Color: TColor);
 procedure AssignGradientBlendBitmap(const Bmp: TBitmap; Color: TColor; A1, A2: Byte; Direction: TUDirection);
@@ -33,9 +33,16 @@ procedure PaintBlendBitmap(const Canvas: TCanvas; DestRect: TRect; const BlendBi
 // OS
 function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 
+// Internal
+function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
+function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
+
 implementation
 
-//  FORM
+uses
+  Classes;
+
+// FORM
 
 function EnableBlur(FormHandle: HWND; AccentState: Integer): Integer;
 const
@@ -70,7 +77,7 @@ begin
   end;
 end;
 
-//  GLASS SUPPORT
+// GLASS SUPPORT
 
 function CreatePreMultipliedRGBQuad(Color: TColor; Alpha: Byte = $FF): TRGBQuad;
 begin
@@ -98,7 +105,7 @@ begin
   Result := CreateDIBPatternBrushPt(@Info, 0);
 end;
 
-//  COLOR
+// COLOR
 
 function BrightenColor(aColor: TColor; Delta: Integer): TColor;
 var
@@ -145,7 +152,7 @@ begin
   Result := RGB(R, G, B);
 end;
 
-//  BLEND SUPPORT
+// BLEND SUPPORT
 
 function CreateBlendFunc(Alpha: Byte; Gradient: Boolean): BLENDFUNCTION;
 begin
@@ -218,10 +225,48 @@ begin
     BlendFunc);
 end;
 
+// OS
+
 function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 begin
   Result := (Win32MajorVersion <= AMajor) or
             ((Win32MajorVersion = AMajor) and (Win32MinorVersion <= AMinor));
+end;
+
+// INTERNAL
+
+function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
+var
+  ResStream: TResourceStream;
+  FontsCount: DWORD;
+begin
+  try
+    ResStream := TResourceStream.Create(hInstance, ResourceName, ResType);
+    try
+      Result := (AddFontMemResourceEx(ResStream.Memory, ResStream.Size, Nil, @FontsCount) <> 0);
+    finally
+      ResStream.Free;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
+var
+  ResStream: TResourceStream;
+  FontsCount: DWORD;
+begin
+  try
+    ResStream := TResourceStream.CreateFromID(hInstance, ResourceID, ResType);
+    try
+      Result := (AddFontMemResourceEx(ResStream.Memory, ResStream.Size, Nil, @FontsCount) <> 0);
+    finally
+      ResStream.Free;
+    end;
+  except
+    Result := False;
+  end;
 end;
 
 end.

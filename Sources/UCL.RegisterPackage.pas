@@ -34,6 +34,7 @@ uses
 
 procedure Register;
 begin
+  RegisterClass(TUForm);
   RegisterComponents('Universal CL', [
     TUThemeManager,
     TUForm,

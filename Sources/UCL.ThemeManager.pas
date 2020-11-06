@@ -16,116 +16,144 @@ type
   TUTheme = (utLight, utDark);
   TUThemeType = (ttSystem, ttLight, ttDark);
 
+  TUCustomThemeManager = class;
+
   IUThemedComponent = interface ['{C9D5D479-2F52-4BB9-8023-6EA00B5084F0}']
-    procedure SetThemeManager;
+//    procedure SetThemeManager;
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
   end;
 
-  // @Info: GM; 2-09-2020
-  // the goal is to have one ThemeManager for whole application,
+  // @Info:
+  //
+  // The goal is to have one ThemeManager for whole application,
   // automatically created and disposed when first instance of TUForm is created
   // this allows us to manage all settings from one place
   // if You want to be able to visually make changes to properties inside ThemeManager,
   // than You must place it on any form in Your application
-  // 
-  // this approch is not limiting You from using individual ThemeManager for any control 
-  // in Your application, You must only place additional ThemeManagers for any control 
-  // You want to be able to individually or group controlled and change its ThemeManager 
+  //
+  // This approch is not limiting You from using individual ThemeManagers for any control
+  // in Your application, You must only place additional ThemeManagers for any control
+  // You want to be able to individually or group controlled and change its ThemeManager
   // property to instance layed on the form
-  TUThemeManager = class(TComponent)
-    private
-      // System
-      ISystemTheme: TUTheme;
-      ISystemAccentColor: TColor;
-      ISystemColorOnBorder: Boolean;
+  //
+  // >>> 2-09-2020; GM
+  //
+  TUCustomThemeManager = class(TComponent)
+  private
+    // System
+    ISystemTheme: TUTheme;
+    ISystemAccentColor: TColor;
+    ISystemColorOnBorder: Boolean;
 
-      // Internal
-      FCompList: TList<TComponent>;
-      FTheme: TUThemeType;
-      FAutoUpdateControls: Boolean;
-      FAccentColor: TColor;
-      FColorOnBorder: TColor;
-      FUseSystemTheme: Boolean;
-      FUseSystemAccentColor: Boolean;
-      FUseSystemColorOnBorder: Boolean;
-      FUseColorOnBorder: Boolean;
+    // Internal
+    FCompList: TList<TComponent>;
+    FTheme: TUThemeType;
+    FAutoUpdateControls: Boolean;
+    FAccentColor: TColor;
+    FColorOnBorder: TColor;
+    FUseSystemAccentColor: Boolean;
+    FUseSystemColorOnBorder: Boolean;
+    FUseColorOnBorder: Boolean;
 
-      // Events
-      FOnBeforeColorLoading: TNotifyEvent;
-      FOnBeforeUpdate: TNotifyEvent;
-      FOnAfterUpdate: TNotifyEvent;
-    private
-      // Properties
-      procedure SetTheme(Value: TUThemeType);
-      procedure SetAutoUpdateControls(Value: Boolean);
-      procedure SetAccentColor(Value: TColor);
-      procedure SetColorOnBorder(Value: TColor);
-      procedure SetUseSystemAccentColor(Value: Boolean);
-      procedure SetUseSystemColorOnBorder(Value: Boolean);
-      procedure SetUseColorOnBorder(Value: Boolean);
-      //
-      procedure CollectAndConnectControls(const Root: TComponent);
-      procedure Changed;
+    // Events
+    FOnBeforeColorLoading: TNotifyEvent;
+    FOnBeforeUpdate: TNotifyEvent;
+    FOnAfterUpdate: TNotifyEvent;
+  private
+    // Properties
+    procedure SetTheme(Value: TUThemeType);
+    procedure SetAutoUpdateControls(Value: Boolean);
+    procedure SetAccentColor(Value: TColor);
+    procedure SetColorOnBorder(Value: TColor);
+    procedure SetUseSystemAccentColor(Value: Boolean);
+    procedure SetUseSystemColorOnBorder(Value: Boolean);
+    procedure SetUseColorOnBorder(Value: Boolean);
+    //
+    procedure Changed;
 
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
-      procedure AfterConstruction; override;
-      procedure Loaded; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
+    procedure Loaded; override;
 
-      // Utils
-      procedure Reload;
-      procedure UpdateTheme;
+    // Utils
+    procedure Reload;
+    procedure UpdateTheme;
 
-      // Components connecting
-      class function IsThemeAvailable(const Comp: TComponent): Boolean;
-      function ConnectedComponentCount: Integer;
-      procedure Connect(const Comp: TComponent);
-      procedure Disconnect(const Comp: TComponent);
+    // Components connecting
+    class function IsThemeAvailable(const Comp: TComponent): Boolean;
+    function ConnectedComponentCount: Integer;
+    procedure Connect(const Comp: TComponent);
+    procedure Disconnect(const Comp: TComponent);
+    procedure CollectAndConnectControls(const Root: TComponent);
+    function ThemeUsed: TUTheme;
 
-    published
-      // System
-      property SystemTheme: TUTheme read ISystemTheme stored False;
-      property SystemAccentColor: TColor read ISystemAccentColor stored False;
-      property SystemColorOnBorder: Boolean read ISystemColorOnBorder stored False;
+  published
+    // System
+    // indicates current system settings
+    // right now NOT auto-updated internally; use Reload to update (see TUForm.WMDWMColorizationColorChanged)
+    property SystemTheme: TUTheme read ISystemTheme stored False;
+    property SystemAccentColor: TColor read ISystemAccentColor stored False;
+    property SystemColorOnBorder: Boolean read ISystemColorOnBorder stored False;
 
-      // Properties
-      property Theme: TUThemeType read FTheme write SetTheme default ttSystem;
-      property AutoUpdateControls: Boolean read FAutoUpdateControls write SetAutoUpdateControls default True;
-      property AccentColor: TColor read FAccentColor write SetAccentColor default $D77800;
-      property ColorOnBorder: TColor read FColorOnBorder write SetColorOnBorder default $000000;
-      property UseSystemAccentColor: Boolean read FUseSystemAccentColor write SetUseSystemAccentColor default True;
-      property UseSytemColorOnBorder: Boolean read FUseSystemColorOnBorder write SetUseSystemColorOnBorder default True;
-      property UseColorOnBorder: Boolean read FUseColorOnBorder write SetUseColorOnBorder default True;
+    // Properties
+    property Theme: TUThemeType read FTheme write SetTheme default ttSystem;
+    property AutoUpdateControls: Boolean read FAutoUpdateControls write SetAutoUpdateControls default True;
+    property AccentColor: TColor read FAccentColor write SetAccentColor default $D77800;
+    property ColorOnBorder: TColor read FColorOnBorder write SetColorOnBorder default $000000;
+    property UseSystemAccentColor: Boolean read FUseSystemAccentColor write SetUseSystemAccentColor default True;
+    property UseSytemColorOnBorder: Boolean read FUseSystemColorOnBorder write SetUseSystemColorOnBorder default True;
+    property UseColorOnBorder: Boolean read FUseColorOnBorder write SetUseColorOnBorder default True;
 
-      // Events
-      property OnBeforeColorLoading: TNotifyEvent read FOnBeforeColorLoading write FOnBeforeColorLoading;
-      property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
-      property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
+    // Events
+    property OnBeforeColorLoading: TNotifyEvent read FOnBeforeColorLoading write FOnBeforeColorLoading;
+    property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
+    property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
   end;
 
-function GetCommonThemeManager: TUThemeManager;
+  TUApplicationThemeManager = class(TUCustomThemeManager)
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TUThemeManager = class(TUCustomThemeManager);
+
+function GetCommonThemeManager: TUCustomThemeManager;
 
 implementation
 
-var
-  CommonThemeManager: TUThemeManager;
+uses
+  Windows,
+  Forms,
+  UCL.Utils;
 
-function GetCommonThemeManager: TUThemeManager;
+type
+  TComponentAccess = class(TComponent);
+
+var
+  CommonThemeManager: TUCustomThemeManager;
+
+function GetCommonThemeManager: TUCustomThemeManager;
 begin
+  if CommonThemeManager = Nil then
+    CommonThemeManager:=TUApplicationThemeManager.Create(Nil);
+  //
   Result := CommonThemeManager;
 end;
 
-{ TUThemeManager }
+{ TUCustomThemeManager }
 
-constructor TUThemeManager.Create(AOwner: TComponent);
+constructor TUCustomThemeManager.Create(AOwner: TComponent);
 begin
   //just for now we are limiting use of ThemeManager to only one
-  if not (csLoading in ComponentState) and (CommonThemeManager <> Nil) then
-    raise Exception.Create('TUThemeManager allready used in application!');
+//  if not (csLoading in ComponentState) and (CommonThemeManager <> Nil) then
+//    raise Exception.Create('TUThemeManager allready used in application!');
   inherited;
 
-  CommonThemeManager := Self;
+//  CommonThemeManager := Self;
 
   ISystemTheme := utLight;
   if IsAppsUseDarkTheme then
@@ -146,20 +174,34 @@ begin
   FUseColorOnBorder := True;
 end;
 
-destructor TUThemeManager.Destroy;
+destructor TUCustomThemeManager.Destroy;
+var
+  Comp: TComponent;
+  i: Integer;
 begin
+  // If any components are connected than notify them of self-destroying
+  for i:=FCompList.Count -1 downto 0 do begin
+    Comp:=FCompList.Items[i];
+    try // @hack for now
+      if Comp <> Nil then
+        TComponentAccess(Comp).Notification(Self, opRemove);
+    except
+    end;
+  end;
   FCompList.Free;
-  CommonThemeManager := Nil;
+  if CommonThemeManager = Self then
+    CommonThemeManager := Nil;
   inherited;
 end;
 
-procedure TUThemeManager.AfterConstruction;
+procedure TUCustomThemeManager.AfterConstruction;
 begin
   inherited;
-  CollectAndConnectControls(Self.Owner);
+  if (Application.MainForm <> Nil) and not (fsCreating in Application.MainForm.FormState) and (Self.Owner <> Nil) then
+    CollectAndConnectControls(Self.Owner);
 end;
 
-procedure TUThemeManager.Loaded;
+procedure TUCustomThemeManager.Loaded;
 begin
   inherited;
   if Assigned(OnBeforeColorLoading) then
@@ -167,7 +209,7 @@ begin
   UpdateTheme;
 end;
 
-procedure TUThemeManager.SetTheme(Value: TUThemeType);
+procedure TUCustomThemeManager.SetTheme(Value: TUThemeType);
 begin
   if FTheme <> Value then begin
     FTheme := Value;
@@ -175,7 +217,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetAutoUpdateControls(Value: Boolean);
+procedure TUCustomThemeManager.SetAutoUpdateControls(Value: Boolean);
 begin
   if FAutoUpdateControls <> Value then begin
     FAutoUpdateControls := Value;
@@ -183,7 +225,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetAccentColor(Value: TColor);
+procedure TUCustomThemeManager.SetAccentColor(Value: TColor);
 begin
   if FAccentColor <> Value then begin
     FAccentColor := Value;
@@ -191,7 +233,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetColorOnBorder(Value: TColor);
+procedure TUCustomThemeManager.SetColorOnBorder(Value: TColor);
 begin
   if FColorOnBorder <> Value then begin
     FColorOnBorder := Value;
@@ -199,7 +241,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetUseColorOnBorder(Value: Boolean);
+procedure TUCustomThemeManager.SetUseColorOnBorder(Value: Boolean);
 begin
   if FUseColorOnBorder <> Value then begin
     FUseColorOnBorder := Value;
@@ -207,7 +249,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetUseSystemAccentColor(Value: Boolean);
+procedure TUCustomThemeManager.SetUseSystemAccentColor(Value: Boolean);
 begin
   if FUseSystemAccentColor <> Value then begin
     FUseSystemAccentColor := Value;
@@ -215,7 +257,7 @@ begin
   end;
 end;
 
-procedure TUThemeManager.SetUseSystemColorOnBorder(Value: Boolean);
+procedure TUCustomThemeManager.SetUseSystemColorOnBorder(Value: Boolean);
 begin
   if FUseSystemColorOnBorder <> Value then begin
     FUseSystemColorOnBorder := Value;
@@ -223,7 +265,12 @@ begin
   end;
 end;
 
-procedure TUThemeManager.Reload;
+procedure TUCustomThemeManager.Changed;
+begin
+  UpdateTheme;
+end;
+
+procedure TUCustomThemeManager.Reload;
 begin
   ISystemTheme := utLight;
   if IsAppsUseDarkTheme then
@@ -233,7 +280,7 @@ begin
   UpdateTheme;
 end;
 
-procedure TUThemeManager.UpdateTheme;
+procedure TUCustomThemeManager.UpdateTheme;
 var
   Comp: TComponent;
 begin
@@ -254,19 +301,45 @@ end;
 
 //  COMPONENTS CONNECTING
 
-class function TUThemeManager.IsThemeAvailable(const Comp: TComponent): Boolean;
+class function TUCustomThemeManager.IsThemeAvailable(const Comp: TComponent): Boolean;
 begin
   Result := Supports(Comp, IUThemedComponent) and IsPublishedProp(Comp, 'ThemeManager');
 end;
 
-function TUThemeManager.ConnectedComponentCount: Integer;
+function TUCustomThemeManager.ConnectedComponentCount: Integer;
 begin
   Result := -1;
   if FCompList <> Nil then
     Result := FCompList.Count;
 end;
 
-procedure TUThemeManager.CollectAndConnectControls(const Root: TComponent);
+procedure TUCustomThemeManager.Connect(const Comp: TComponent);
+var
+  ConnectedYet: Boolean;
+  ThemedComponent: IUThemedComponent;
+begin
+  if IsThemeAvailable(Comp) then begin
+    ConnectedYet := (FCompList.IndexOf(Comp) <> -1);
+    if not ConnectedYet then begin
+      if Supports(Comp, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and not ThemedComponent.IsCustomThemed then begin
+        FCompList.Add(Comp);
+        //ThemedComponent.SetThemeManager;
+        ThemedComponent.UpdateTheme;
+      end;
+    end;
+  end;
+end;
+
+procedure TUCustomThemeManager.Disconnect(const Comp: TComponent);
+var
+  Index: Integer;
+begin
+  Index := FCompList.IndexOf(Comp);
+  if Index <> -1 then
+    FCompList.Delete(Index);
+end;
+
+procedure TUCustomThemeManager.CollectAndConnectControls(const Root: TComponent);
 var
   i: Integer;
   Component: TComponent;
@@ -279,40 +352,32 @@ begin
   end;
 end;
 
-procedure TUThemeManager.Changed;
+function TUCustomThemeManager.ThemeUsed: TUTheme;
 begin
-  UpdateTheme;
+  Result:=TUTheme(-1);
+  if ((Theme = ttSystem) and (SystemTheme = utLight)) or (Theme = ttLight) then
+    Result:=utLight
+  else if ((Theme = ttSystem) and (SystemTheme = utDark)) or (Theme = ttDark) then
+    Result:=utDark;
 end;
 
-procedure TUThemeManager.Connect(const Comp: TComponent);
-var
-  ConnectedYet: Boolean;
-  ThemedComponent: IUThemedComponent;
-begin
-  if IsThemeAvailable(Comp) then begin
-    ConnectedYet := (FCompList.IndexOf(Comp) <> -1);
-    if not ConnectedYet then begin
-      FCompList.Add(Comp);
-      if Supports(Comp, IUThemedComponent, ThemedComponent) then
-        ThemedComponent.SetThemeManager;
-    end;
-  end;
-end;
+{ TUApplicationThemeManager }
 
-procedure TUThemeManager.Disconnect(const Comp: TComponent);
-var
-  Index: Integer;
+constructor TUApplicationThemeManager.Create(AOwner: TComponent);
 begin
-  Index := FCompList.IndexOf(Comp);
-  if Index <> -1 then
-    FCompList.Delete(Index);
+  inherited Create(AOwner);
+  Name:='ApplicationThemeManager';
 end;
 
 initialization
   CommonThemeManager := Nil;
+  LoadResourceFontByName('SEGOEUI', RT_RCDATA);
+  LoadResourceFontByName('SEGOEMDL2ASSETS', RT_RCDATA);
+  LoadResourceFontByName('SEGOEUISEMIBOLD', RT_RCDATA);
+//  LoadResourceFontByID(2, RT_FONT);
 
-//finalization
-//  if CommonThemeManager <> Nil then
-//    CommonThemeManager.Free;
+finalization
+  if CommonThemeManager <> Nil then
+    CommonThemeManager.Free;
 
 end.

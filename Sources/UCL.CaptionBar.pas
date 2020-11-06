@@ -18,42 +18,59 @@ uses
 
 type
   TUCaptionBar = class(TPanel, IUThemedComponent)
+  private var
+    BackColor, TextColor: TColor;
+
   private
     FThemeManager: TUThemeManager;
-    FBackColor: TUThemeCaptionBarColorSet;
+    FBackColors: TUThemeCaptionBarColorSet;
 
+    FCollapsed: Boolean;
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
     FCustomColor: TColor;
     FUseSystemCaptionColor: Boolean;
 
-    //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager); // IUThemeComponent
+    // Internal
+    procedure UpdateColors;
+
+    // Setters
+    procedure SetThemeManager(const Value: TUThemeManager);
+    procedure SetCollapsed(const Value: Boolean);
     procedure SetUseSystemCaptionColor(const Value: Boolean);
 
-    //  Child events
+    // Child events
     procedure BackColor_OnChange(Sender: TObject);
 
-    //  Messages
+    // Messages
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure UpdateTheme; // IUThemeComponent
+    // IUThemedComponent
+    procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
+
+    //
     procedure UpdateChildControls(const Root: TControl);
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-    property BackColor: TUThemeCaptionBarColorSet read FBackColor write FBackColor;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    property BackColors: TUThemeCaptionBarColorSet read FBackColors;
 
+    property Collapsed: Boolean read FCollapsed write SetCollapsed default False;
     property DragMovement: Boolean read FDragMovement write FDragMovement default True;
     property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default True;
     property CustomColor: TColor read FCustomColor write FCustomColor default clNone;
@@ -63,6 +80,7 @@ type
     property Alignment default taLeftJustify;
     property BevelOuter default bvNone;
     property Height default 32;
+    property ParentBackground default False;
   end;
 
 implementation
@@ -70,19 +88,155 @@ implementation
 uses
   Types,
   UCL.SystemSettings,
-  UCL.Form;
+  UCL.Form,
+  UCL.IntAnimation,
+  UCL.Graphics;
 
 type
   TUFormAccess = class(TUForm);
 
 { TUCustomCaptionBar }
 
+// MAIN CLASS
+
+constructor TUCaptionBar.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+
+  FCollapsed := False;
+  FDragMovement := True;
+  FSystemMenuEnabled := True;
+  FCustomColor := clNone; // $D77800;
+  FUseSystemCaptionColor := False;
+
+  Align := alTop;
+  Alignment := taLeftJustify;
+  Caption := '   Caption bar';
+  BevelOuter := bvNone;
+//  TabStop := False;
+  Height := 32;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 9;
+//  FullRepaint := True;
+
+  FBackColors := TUThemeCaptionBarColorSet.Create;
+  FBackColors.Assign(CAPTIONBAR_BACK);
+  FBackColors.OnChange := BackColor_OnChange;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+end;
+
+destructor TUCaptionBar.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  FBackColors.Free;
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
+
+procedure TUCaptionBar.UpdateColors;
+var
+  TM: TUCustomThemeManager;
+  ColorSet: TUThemeCaptionBarColorSet;
+  ParentForm: TCustomForm;
+begin
+  TM := SelectThemeManager(Self);
+  ParentForm := GetParentForm(Self, True);
+
+  //  Select default or custom style
+  if UseSystemCaptionColor and IsColorOnBorderEnabled then begin
+    if (ParentForm <> Nil) and (ParentForm is TForm) then begin
+      if ParentForm.Active then
+        BackColor := GetAccentColor
+      else begin
+//          Color := ParentForm.Color;
+        if not BackColors.Enabled then
+          ColorSet := CAPTIONBAR_BACK
+        else
+          ColorSet := BackColors;
+
+        BackColor := ColorSet.GetColor(TM, False);
+      end;
+    end
+    else
+      BackColor := GetAccentColor;
+  end
+  else begin
+    if CustomColor <> clNone then
+      BackColor := CustomColor
+    else begin
+      if BackColors.Enabled then
+        ColorSet := BackColors
+      else
+        ColorSet := CAPTIONBAR_BACK;
+
+      if (ParentForm <> Nil) and (ParentForm is TForm) then
+        BackColor := ColorSet.GetColor(TM, ParentForm.Active)
+      else
+        BackColor := ColorSet.GetColor(TM, False);
+    end;
+  end;
+//  Font.Color := GetTextColorFromBackground(Color);
+  TextColor := GetTextColorFromBackground(BackColor);
+
+  //  Update Color for container (let children using ParentColor)
+  Color := BackColor;
+end;
+
 //  THEME
 
-procedure TUCaptionBar.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUCaptionBar.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
+end;
+
+procedure TUCaptionBar.SetCollapsed(const Value: Boolean);
+var
+  Ani: TIntAni;
+  Delta: Integer;
+begin
+  if Value <> FCollapsed then begin
+    FCollapsed := Value;
+
+    if csDesigning in ComponentState then
+      Exit;
+
+    ShowCaption := not Value;
+    if Value then
+      Padding.Bottom := 1
+    else
+      Padding.Bottom := 0;
+    if Value then
+      Delta := 1 - Height
+    else
+      Delta := 32 - Height;
+
+    Ani := TIntAni.Create(Height, Delta,
+      procedure (V: Integer)
+      begin
+        Height := V;
+      end, Nil);
+    Ani.AniSet.QuickAssign(akOut, afkQuartic, 0, 120, 12);
+    Ani.Start;
+  end;
 end;
 
 procedure TUCaptionBar.SetUseSystemCaptionColor(const Value: Boolean);
@@ -94,52 +248,36 @@ begin
 end;
 
 procedure TUCaptionBar.UpdateTheme;
-var
-  ColorSet: TUThemeCaptionBarColorSet;
-  ParentForm: TCustomForm;
 begin
-  ParentForm := GetParentForm(Self, True);
-  //  Background color
-  if ThemeManager = Nil then
-    //Color := CustomColor // do nothing
-    //ColorSet := BackColor
-  else begin
-    //  Select default or custom style
-    if UseSystemCaptionColor and IsColorOnBorderEnabled then begin
-      if (ParentForm <> Nil) and (ParentForm is TForm) then begin
-        if ParentForm.Active then
-          Color := GetAccentColor
-        else begin
-//          Color := ParentForm.Color;
-          if not BackColor.Enabled then
-            ColorSet := CAPTIONBAR_BACK
-          else
-            ColorSet := BackColor;
-
-          Color := ColorSet.GetColor(ThemeManager, False);
-        end;
-      end
-      else
-        Color := GetAccentColor;
-    end
-    else begin
-      if CustomColor <> clNone then
-        Color := CustomColor
-      else begin
-        if BackColor.Enabled then
-          ColorSet := BackColor
-        else
-          ColorSet := CAPTIONBAR_BACK;
-
-        if (ParentForm <> Nil) and (ParentForm is TForm) then
-          Color := ColorSet.GetColor(ThemeManager, ParentForm.Active)
-        else
-          Color := ColorSet.GetColor(ThemeManager, False);
-      end;
-    end;
-    Font.Color := GetTextColorFromBackground(Color);
-  end;
+  UpdateColors;
+  Invalidate;
   UpdateChildControls(Self);
+end;
+
+function TUCaptionBar.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+procedure TUCaptionBar.Paint;
+begin
+  //  Do not inherited
+  //inherited;
+  //  Paint background
+  Canvas.Brush.Color := BackColor;
+  Canvas.FillRect(Rect(0, 0, Width, Height));
+
+  //  Draw text
+  if ShowCaption then begin
+    Canvas.Font.Assign(Font);
+    Canvas.Font.Color := TextColor;
+    DrawTextRect(Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
+  end;
+end;
+
+function TUCaptionBar.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
 end;
 
 procedure TUCaptionBar.UpdateChildControls(const Root: TControl);
@@ -147,9 +285,6 @@ var
   i: Integer;
   control: TControl;
 begin
-  if ThemeManager = Nil then
-    Exit;
-
   if Root is TWinControl then begin
     for i := 0 to TWinControl(Root).ControlCount - 1 do begin
       control := TWinControl(Root).Controls[i];
@@ -164,60 +299,22 @@ begin
           UpdateChildControls(control);
       end
       else if control is TGraphicControl then begin
-        TGraphicControl(control).Repaint;
+        TGraphicControl(control).Invalidate;
       end;
     end;
   end
   else if Root is TGraphicControl then begin
-    TGraphicControl(Root).Repaint;
+    TGraphicControl(Root).Invalidate;
   end;
 end;
-{
+
 procedure TUCaptionBar.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
-// MAIN CLASS
-
-constructor TUCaptionBar.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FThemeManager := Nil;
-
-  FDragMovement := True;
-  FSystemMenuEnabled := True;
-  FCustomColor := clNone; // $D77800;
-  FUseSystemCaptionColor := False;
-
-  Align := alTop;
-  Alignment := taLeftJustify;
-  Caption := '   TUCaptionBar';
-  BevelOuter := bvNone;
-//  TabStop := False;
-  Height := 32;
-//  Font.Name := 'Segoe UI';
-//  Font.Size := 9;
-//  FullRepaint := True;
-
-  FBackColor := TUThemeCaptionBarColorSet.Create;
-  FBackColor.OnChange := BackColor_OnChange;
-  FBackColor.Assign(CAPTIONBAR_BACK);
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
-//  UpdateTheme;
-end;
-
-destructor TUCaptionBar.Destroy;
-begin
-  FBackColor.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
 end;
 
 // MESSAGES
@@ -228,7 +325,7 @@ var
 begin
   inherited;
 
-  ParentForm := GetParentForm(Self, true);
+  ParentForm := GetParentForm(Self, True);
   if (ParentForm is TForm) and (biMaximize in (ParentForm as TForm).BorderIcons) then begin
     if ParentForm.WindowState = wsMaximized then
       ParentForm.WindowState := wsNormal
@@ -281,6 +378,27 @@ begin
     if P.Y < BorderSpace then
       Msg.Result := HTTRANSPARENT;  //  Send event to parent
   end;
+end;
+
+procedure TUCaptionBar.CMMouseEnter(var Msg: TMessage);
+var
+  ParentForm: TCustomForm;
+begin
+  inherited;
+  ParentForm := GetParentForm(Self, True);
+  if (ParentForm is TUForm) and (ParentForm as TUForm).FullScreen then
+    Collapsed := False;
+end;
+
+procedure TUCaptionBar.CMMouseLeave(var Msg: TMessage);
+var
+  ParentForm: TCustomForm;
+begin
+  inherited;
+  ParentForm := GetParentForm(Self, True);
+  if (ParentForm is TUForm) and (ParentForm as TUForm).FullScreen then
+    if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then
+      Collapsed := True;
 end;
 
 //  CHILD EVENTS

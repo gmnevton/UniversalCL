@@ -12,11 +12,12 @@ uses
   Controls,
   Graphics,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.Types,
+  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUCustomSeparator = class(TGraphicControl, IUThemeComponent)
+  TUSeparator = class(TUGraphicControl, IUThemedComponent)
   private var
     LineColor: TColor;
 
@@ -33,7 +34,7 @@ type
     procedure UpdateColors;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetCustomColor(const Value: TColor);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetAlignSpace(const Value: Integer);
@@ -48,10 +49,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
 
     property CustomColor: TColor read FCustomColor write SetCustomColor default $999999;
     property Orientation: TUOrientation read FOrientation write SetOrientation default oVertical;
@@ -63,142 +67,13 @@ type
       property Width default 20;
   end;
 
-  TUSeparator = class(TUCustomSeparator)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    //property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
 implementation
 
-{ TUCustomSeparator }
-
-//  THEME
-
-procedure TUCustomSeparator.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
-end;
-
-procedure TUCustomSeparator.UpdateTheme;
-begin
-  UpdateColors;
-  Repaint;
-end;
-{
-procedure TUCustomSeparator.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
-//  INTERNAL
-
-procedure TUCustomSeparator.UpdateColors;
-begin
-  if ThemeManager = Nil then
-    LineColor := CustomColor
-  else if UseAccentColor then
-    LineColor := ThemeManager.AccentColor
-  else if ThemeManager.Theme = utLight then
-    LineColor := $999999
-  else
-    LineColor := $666666;
-end;
-
-//  SETTERS
-
-procedure TUCustomSeparator.SetAlignSpace(const Value: Integer);
-begin
-  if Value <> FAlignSpace then begin
-    FAlignSpace := Value;
-    //
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSeparator.SetCustomColor(const Value: TColor);
-begin
-  if Value <> FCustomColor then begin
-    FCustomColor := Value;
-    UpdateColors;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSeparator.SetLineBetween(const Value: Boolean);
-begin
-  if Value <> FLineBetween then begin
-    FLineBetween := Value;
-    //
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSeparator.SetOrientation(const Value: TUOrientation);
-begin
-  if Value <> FOrientation then begin
-    FOrientation := Value;
-    //
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSeparator.SetUseAccentColor(const Value: Boolean);
-begin
-  if Value <> FUseAccentColor then begin
-    FUseAccentColor := Value;
-    UpdateColors;
-    Repaint;
-  end;
-end;
+{ TUSeparator }
 
 //  MAIN CLASS
 
-constructor TUCustomSeparator.Create(AOwner: TComponent);
+constructor TUSeparator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FThemeManager := Nil;
@@ -218,16 +93,122 @@ begin
   UpdateColors;
 end;
 
-destructor TUCustomSeparator.Destroy;
+destructor TUSeparator.Destroy;
 begin
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
 end;
 
+//  THEME
+
+procedure TUSeparator.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUSeparator.UpdateTheme;
+begin
+  UpdateColors;
+  Repaint;
+end;
+
+function TUSeparator.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUSeparator.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+{
+procedure TUSeparator.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FThemeManager) then
+    FThemeManager := nil;
+end;
+}
+//  INTERNAL
+
+procedure TUSeparator.UpdateColors;
+begin
+  if ThemeManager = Nil then
+    LineColor := CustomColor
+  else if UseAccentColor then
+    LineColor := ThemeManager.AccentColor
+  else if ThemeManager.Theme = ttLight then
+    LineColor := $999999
+  else
+    LineColor := $666666;
+end;
+
+//  SETTERS
+
+procedure TUSeparator.SetAlignSpace(const Value: Integer);
+begin
+  if Value <> FAlignSpace then begin
+    FAlignSpace := Value;
+    //
+    Repaint;
+  end;
+end;
+
+procedure TUSeparator.SetCustomColor(const Value: TColor);
+begin
+  if Value <> FCustomColor then begin
+    FCustomColor := Value;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+
+procedure TUSeparator.SetLineBetween(const Value: Boolean);
+begin
+  if Value <> FLineBetween then begin
+    FLineBetween := Value;
+    //
+    Repaint;
+  end;
+end;
+
+procedure TUSeparator.SetOrientation(const Value: TUOrientation);
+begin
+  if Value <> FOrientation then begin
+    FOrientation := Value;
+    //
+    Repaint;
+  end;
+end;
+
+procedure TUSeparator.SetUseAccentColor(const Value: Boolean);
+begin
+  if Value <> FUseAccentColor then begin
+    FUseAccentColor := Value;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+
 //  CUSTOM METHODS
 
-procedure TUCustomSeparator.Paint;
+procedure TUSeparator.Paint;
 begin
   inherited;
 

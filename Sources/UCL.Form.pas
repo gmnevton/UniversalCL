@@ -45,8 +45,11 @@ type
     FIsActive: Boolean;
     FOverlayType: TUOverlayType;
     FFitDesktopSize: Boolean;
+    FFullScreen: Boolean;
 
     //  Setters
+    procedure SetThemeManager(const Value: TUThemeManager);
+    procedure SetFullScreen(const Value: Boolean);
     procedure SetOverlayType(const Value: TUOverlayType);
 
     //  Child events
@@ -71,8 +74,6 @@ type
     function GetBorderSpace(const Side: TBorderSide): Integer; virtual;
     function GetBorderSpaceWin7(const Side: TBorderSide): Integer; virtual;
 
-    procedure SetThemeManager; virtual; // IUThemeControl
-
     function CanDrawBorder: Boolean; virtual;
     procedure UpdateBorderColor; virtual;
     procedure DoDrawBorder; virtual;
@@ -85,7 +86,7 @@ type
     function GetParentCurrentDpi: Integer; virtual;
   {$IFEND}
     procedure CreateParams(var Params: TCreateParams); override;
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Init;
     procedure Paint; override;
     procedure Resize; override;
@@ -95,14 +96,17 @@ type
     constructor CreateNew(aOwner: TComponent; Dummy: Integer = 0); override;
     destructor Destroy; override;
     procedure AfterConstruction; override;
-
-    procedure UpdateTheme; virtual; // IUThemeControl
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
 
+     // IUThemedControl
+    procedure UpdateTheme; virtual;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
+
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
     property CaptionBar: TControl read FCaptionBar write FCaptionBar;
 
@@ -110,7 +114,8 @@ type
     property IsActive: Boolean read FIsActive default True;
     property Overlay: TUFormOverlay read FOverlay;
     property OverlayType: TUOverlayType read FOverlayType write SetOverlayType default otNone;
-    property FitDesktopSize: Boolean read FFitDesktopSize write FFitDesktopSize default true;
+    property FitDesktopSize: Boolean read FFitDesktopSize write FFitDesktopSize default True;
+    property FullScreen: Boolean read FFullScreen write SetFullScreen default False;
 
     property Padding stored False;
   end;
@@ -129,6 +134,40 @@ uses
 
 { TUForm }
 
+//  MAIN CLASS
+
+constructor TUForm.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  Init;
+end;
+
+constructor TUForm.CreateNew(AOwner: TComponent; Dummy: Integer = 0);
+begin
+  inherited CreateNew(AOwner, Dummy);
+  Init;
+end;
+
+destructor TUForm.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  FOverlay.Free;
+  FBackColor.Free;
+  TM := SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
+
+procedure TUForm.AfterConstruction;
+var
+  TM: TUCustomThemeManager;
+begin
+  inherited;
+  TM := SelectThemeManager(Self);
+  TM.UpdateTheme;
+end;
+
 {$REGION 'Internal functions'}
 function TUForm.IsLEWin7: Boolean;
 begin
@@ -138,6 +177,15 @@ end;
 function TUForm.IsResizeable: Boolean;
 begin
   Result := BorderStyle in [bsSizeable, bsSizeToolWin];
+end;
+
+procedure TUForm.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
+  inherited Notification(AComponent, Operation);
 end;
 
 function TUForm.IsBorderless: Boolean;
@@ -225,25 +273,30 @@ begin
 end;
 
 procedure TUForm.UpdateBorderColor;
+var
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager = Nil then
-    BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
-
-  else if IsActive then begin //  Active window
-    if ThemeManager.UseSytemColorOnBorder then begin
-      if ThemeManager.UseColorOnBorder then
-        BorderColor := ThemeManager.ColorOnBorder
-      else
-        BorderColor := GetAccentColor;
+  TM := SelectThemeManager(Self);
+//  if ThemeManager = Nil then
+//    BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
+//  else
+  if IsActive then begin //  Active window
+    if TM.UseSytemColorOnBorder then begin
+      if TM.UseColorOnBorder then begin
+        if TM.UseSytemColorOnBorder then
+          BorderColor := GetAccentColor
+        else
+          BorderColor := TM.ColorOnBorder
+      end;
     end
-    else if ThemeManager.Theme = ttLight then
+    else if TM.Theme = ttLight then
       BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_LIGHT
     else
       BorderColor := DEFAULT_BORDERCOLOR_ACTIVE_DARK;
   end
 
   else begin //  In active window
-    if ThemeManager.Theme = ttLight then
+    if TM.Theme = ttLight then
       BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_LIGHT
     else
       BorderColor := DEFAULT_BORDERCOLOR_INACTIVE_DARK;
@@ -270,6 +323,30 @@ end;
 
 //  SETTERS
 
+procedure TUForm.SetFullScreen(const Value: Boolean);
+begin
+  if Value <> FFullScreen then begin
+    FFullScreen := Value;
+
+    LockWindowUpdate(Handle);
+    // Go full screen
+    if Value then begin
+      BorderStyle := bsNone;
+      if WindowState = wsMaximized then
+        WindowState := wsNormal;
+      WindowState := wsMaximized;
+      FormStyle := fsStayOnTop;
+    end
+    // Exit full screen
+    else begin
+      BorderStyle := bsSizeable;
+      WindowState := wsNormal;
+      FormStyle := fsNormal;
+    end;
+    LockWindowUpdate(0);
+  end;
+end;
+
 procedure TUForm.SetOverlayType(const Value: TUOverlayType);
 begin
   if Value <> FOverlayType then begin
@@ -280,35 +357,6 @@ begin
     else
       FOverlay.Top := 0;
   end;
-end;
-
-//  MAIN CLASS
-
-constructor TUForm.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  Init;
-end;
-
-constructor TUForm.CreateNew(AOwner: TComponent; Dummy: Integer = 0);
-begin
-  inherited CreateNew(AOwner, Dummy);
-  Init;
-end;
-
-destructor TUForm.Destroy;
-begin
-  FOverlay.Free;
-  FBackColor.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
-end;
-
-procedure TUForm.AfterConstruction;
-begin
-  inherited;
-  ThemeManager.UpdateTheme;
 end;
 
 //  CUSTOM METHODS
@@ -332,8 +380,10 @@ var
   CurrentScreen: TMonitor;
   wta: WTA_OPTIONS;
   Flag: LongInt;
+  TM: TUCustomThemeManager;
 begin
   //  New props
+  FThemeManager:=Nil;
   FIsActive := True;
 
   //  Get PPI from current screen
@@ -345,17 +395,11 @@ begin
 {$IFEND}
   FOverlayType := otNone;
   FFitDesktopSize := True;
+  FFullScreen := False;
 
   //  Common props
   Font.Name := 'Segoe UI';
   Font.Size := 10;
-
-  if GetCommonThemeManager = Nil then
-    TUThemeManager.Create(Self);
-  FThemeManager := GetCommonThemeManager;
-  FThemeManager.Connect(Self);
-
-//  UpdateTheme;
 
   FOverlay := TUFormOverlay.CreateNew(Self);
   FOverlay.AssignToForm(Self);
@@ -363,6 +407,10 @@ begin
   FBackColor := TUThemeControlColorSet.Create;
   FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(FORM_BACK);
+
+  TM := SelectThemeManager(Self);
+  TM.Connect(Self);
+  TM.CollectAndConnectControls(Self);
 
   // TIP: how to maintain DWM shadow
   // Source: https://stackoverflow.com/a/50580016/2111514
@@ -392,20 +440,22 @@ end;
 
 procedure TUForm.Resize;
 var
-  Space: Integer;
+  Space, Space2: Integer;
   CurrentScreen: TMonitor;
 begin
   inherited;
 
   if CanDrawBorder and not IsLEWin7 then begin
-    Padding.Top := 1;
-    if IsLEWin7 then begin
-      Padding.Left := 1;
-      Padding.Right := 1;
-      Padding.Bottom := 1;
+    if Padding.Top = 0 then begin
+      Padding.Top := 1;
+      if IsLEWin7 then begin
+        Padding.Left := 1;
+        Padding.Right := 1;
+        Padding.Bottom := 1;
+      end;
     end;
   end
-  else begin
+  else if (Padding.Top > 0){ and (WindowState = wsMaximized)} then begin
     Padding.Top := 0;
     if IsLEWin7 then begin
       Padding.Left := 0;
@@ -414,50 +464,87 @@ begin
     end;
   end;
 
+  CurrentScreen := Screen.MonitorFromWindow(Handle);
+  if CurrentScreen = Nil then
+    Exit;
+
+  // Full screen
+  if FullScreen and (WindowState = wsMaximized) then begin
+    Top := CurrentScreen.Top;
+    Left := CurrentScreen.Left;
+    Width := CurrentScreen.Width;
+    Height := CurrentScreen.Height;
+    Exit;
+  end;
+
   //  Fit window to desktop - for WS_POPUP window style
   //  If not, window fill full screen when maximized
   if FitDesktopSize and (WindowState = wsMaximized) and (BorderStyle in [bsDialog, bsSizeToolWin, bsToolWindow]) then begin
-    CurrentScreen := Screen.MonitorFromWindow(Handle);
-    if CurrentScreen = Nil then
-      Exit;
     Space := GetBorderSpace(bsTop);
-
-    Top := - Space;
-    Left :=  - Space;
-    Width := CurrentScreen.WorkareaRect.Width + 2 * Space;
-    Height := CurrentScreen.WorkAreaRect.Height + 2 * Space;
+    Space2 := Space * 2;
+    //
+    Top := CurrentScreen.Top - Space;
+    Left := CurrentScreen.Left - Space;
+    Width := CurrentScreen.WorkareaRect.Width + Space2;
+    Height := CurrentScreen.WorkAreaRect.Height + Space2;
   end;
 end;
 
-procedure TUForm.SetThemeManager;
+procedure TUForm.SetThemeManager(const Value: TUThemeManager);
 begin
-  // do nothing here
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
 end;
 
 procedure TUForm.UpdateTheme;
 var
+  TM: TUCustomThemeManager;
   ColorSet: TUThemeControlColorSet;
 begin
-  if ThemeManager = Nil then begin
-    //  Do nothing
-    HintWindowClass := THintWindow;
-  end
-  else begin
-    //  Select default or custom style
-    if BackColor.Enabled then
-      ColorSet := BackColor
-    else
-      ColorSet := FORM_BACK;
+  TM := SelectThemeManager(Self);
+  //  Update tooltip style
+  HintWindowClass := THintWindow;
+  if TM.Theme = ttLight then
+    HintWindowClass := TULightTooltip
+  else
+    HintWindowClass := TUDarkTooltip;
+  //  Select default or custom style
+  if BackColor.Enabled then
+    ColorSet := BackColor
+  else
+    ColorSet := FORM_BACK;
 
-    Color := ColorSet.GetColor(ThemeManager);
-    if ThemeManager.Theme = ttLight then
-      HintWindowClass := TULightTooltip
-    else
-      HintWindowClass := TUDarkTooltip;
-  end;
+  Color := ColorSet.GetColor(TM);
+  if TM.Theme = ttLight then
+    HintWindowClass := TULightTooltip
+  else
+    HintWindowClass := TUDarkTooltip;
 
   UpdateBorderColor;
   Invalidate;
+end;
+
+function TUForm.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUForm.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
 end;
 
 //  MESSAGES
@@ -476,7 +563,7 @@ begin
   if CaptionBar <> Nil then begin
     if TUThemeManager.IsThemeAvailable(CaptionBar) then
       (CaptionBar as IUThemedComponent).UpdateTheme;
-    CaptionBar.Repaint;
+    CaptionBar.Repaint; // this is important and it must be repaint and not invalidate
   end;
 end;
 
@@ -489,9 +576,11 @@ begin
 end;
 
 procedure TUForm.WMDWMColorizationColorChanged(var Msg: TMessage);
+var
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager <> Nil then
-    ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  TM.Reload;
   inherited;
 end;
 

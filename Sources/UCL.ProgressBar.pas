@@ -13,20 +13,24 @@ uses
   Controls,
   Graphics,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.Types,
+  UCL.Colors,
+  UCL.ThemeManager,
   UCL.Utils,
   UCL.IntAnimation;
 
 type
-  TUCustomProgressBar = class;
+  TUProgressBar = class;
 
-  TUWaterMarkPositionEvent = procedure (Sender: TUCustomProgressBar; var WaterMarkX, WaterMarkY: Integer; var Streatch: Boolean; var StreatchWidth, StreatchHeight: Integer) of object;
-  TUProgressBarPaintEvent = procedure (Sender: TUCustomProgressBar; const Canvas: TCanvas) of object;
+  TUWaterMarkPositionEvent = procedure (Sender: TUProgressBar; var WaterMarkX, WaterMarkY: Integer; var Streatch: Boolean; var StreatchWidth, StreatchHeight: Integer) of object;
+  TUProgressBarPaintEvent = procedure (Sender: TUProgressBar; const Canvas: TCanvas) of object;
 
-  TUCustomProgressBar = class(TCustomControl, IUThemeComponent)
+  TUProgressBar = class(TUCustomControl, IUThemedComponent)
   private var
-    FillColor: TColor;
-    BackColor: TColor;
+    FFillColor: TUThemeControlColorSet;
+    FBackColor: TUThemeControlColorSet;
+    Fill_Color: TColor;
+    Back_Color: TColor;
     FillRect: TRect;
     BackRect: TRect;
 
@@ -47,87 +51,48 @@ type
     procedure UpdateRects;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetWaterMark(const Value: TPicture);
     procedure SetValue(const Value: Integer);
     procedure SetOrientation(const Value: TUOrientation);
 
+    //  Child events
+    procedure FillColor_OnChange(Sender: TObject);
+    procedure BackColor_OnChange(Sender: TObject);
+
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
   public
-    constructor Create(AOnwer: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
     procedure GoToValue(Value: Integer);
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property AniSet: TIntAniSet read FAniSet write FAniSet;
 
+    property FillColor: TUThemeControlColorSet read FFillColor; // read only subcomponent declaration, but its internal properties can be modified
+    property BackColor: TUThemeControlColorSet read FBackColor; // read only subcomponent declaration, but its internal properties can be modified
     property Value: Integer read FValue write SetValue;
     property Orientation: TUOrientation read FOrientation write SetOrientation;
-    property CustomFillColor: TColor read FCustomFillColor write FCustomFillColor;
-    property CustomBackColor: TColor read FCustomBackColor write FCustomBackColor;
 
     property WaterMark: TPicture read FWaterMark write SetWaterMark;
     property OnGetWaterMarkPosition: TUWaterMarkPositionEvent read FOnWaterMarkPosition write FOnWaterMarkPosition;
     property OnPaint: TUProgressBarPaintEvent read FOnPaint write FOnPaint;
 
+    property Caption;
     property Height default 5;
     property Width default 100;
-  end;
-
-  TUProgressBar = class(TUCustomProgressBar)
-    published
-      property Align;
-      property Anchors;
-      property AutoSize;
-      property BiDiMode;
-      //property Caption;
-      property Color;
-      property Constraints;
-      property DragCursor;
-      property DragKind;
-      property DragMode;
-      property Enabled;
-      property Font;
-      property ParentBiDiMode;
-      property ParentColor;
-      property ParentFont;
-      property ParentShowHint;
-      property PopupMenu;
-      property ShowHint;
-      property Touch;
-      property Visible;
-    {$IF CompilerVersion > 29}
-      property StyleElements;
-    {$IFEND}
-
-      property OnCanResize;
-      property OnClick;
-      property OnConstrainedResize;
-      property OnContextPopup;
-      property OnDblClick;
-      property OnDragDrop;
-      property OnDragOver;
-      property OnEndDock;
-      property OnEndDrag;
-      property OnGesture;
-      property OnMouseActivate;
-      property OnMouseDown;
-      property OnMouseEnter;
-      property OnMouseLeave;
-      property OnMouseMove;
-      property OnMouseUp;
-      property OnResize;
-      property OnStartDock;
-      property OnStartDrag;
   end;
 
 implementation
@@ -135,50 +100,126 @@ implementation
 type
   TGraphicAccess = class(TGraphic);
 
-{ TUCustomProgressBar }
+{ TUProgressBar }
+
+//  MAIN CLASS
+
+constructor TUProgressBar.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+  FWaterMark := TPicture.Create;
+
+  //  Parent properties
+  Height := 5;
+  Width := 100;
+
+  //  Fields
+  FValue := 0;
+  FFillColor := TUThemeControlColorSet.Create;
+  FFillColor.Assign(PROGRESSBAR_BACK);
+  FFillColor.OnChange := FillColor_OnChange;
+  FBackColor := TUThemeControlColorSet.Create;
+  FBackColor.Assign(PROGRESSBAR_BACK);
+  FBackColor.OnChange := BackColor_OnChange;
+
+  //  Custom AniSet
+  FAniSet := TIntAniSet.Create;
+  FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateColors;
+  UpdateRects;
+end;
+
+destructor TUProgressBar.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  FAniSet.Free;
+  FWaterMark.Free;
+  FFillColor.Free;
+  FBackColor.Free;
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
 
 //  THEME
 
-procedure TUCustomProgressBar.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUProgressBar.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
-procedure TUCustomProgressBar.UpdateTheme;
+procedure TUProgressBar.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
 end;
-{
-procedure TUCustomProgressBar.Notification(AComponent: TComponent; Operation: TOperation);
+
+function TUProgressBar.IsCustomThemed: Boolean;
 begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
+  Result:=(FThemeManager <> Nil);
 end;
-}
+
+function TUProgressBar.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+procedure TUProgressBar.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
+  inherited Notification(AComponent, Operation);
+end;
+
 //  INTERNAL
 
-procedure TUCustomProgressBar.UpdateColors;
+procedure TUProgressBar.UpdateColors;
+var
+  TM: TUCustomThemeManager;
+  ColorSet: TUThemeControlColorSet;
 begin
-  //  Background & fill color
-  if ThemeManager = Nil then begin
-    BackColor := FCustomBackColor;
-    FillColor := FCustomFillColor;
-  end
-  else if ThemeManager.Theme = utLight then begin
-    BackColor := $CCCCCC;
-    FillColor := ThemeManager.AccentColor;
-  end
-  else begin
-    BackColor := $333333;
-    FillColor := ThemeManager.AccentColor;
-  end;
+  TM:=SelectThemeManager(Self);
+  // Background & fill color
+  ColorSet := BackColor;
+  if BackColor.Enabled then
+    Back_Color := BackColor.Color
+  else
+    Back_Color := ColorSet.GetColor(TM);
+  //
+  ColorSet := FillColor;
+  if FillColor.Enabled then
+    Fill_Color := FillColor.Color
+  else
+    Fill_Color := ColorSet.GetColor(TM);
+  //
+  if TM.UseSystemAccentColor then
+    Fill_Color := TM.AccentColor;
 end;
 
-procedure TUCustomProgressBar.UpdateRects;
+procedure TUProgressBar.UpdateRects;
 begin
   //  Background & fill area
   if Orientation = oHorizontal then begin
@@ -193,14 +234,14 @@ end;
 
 //  SETTERS
 
-procedure TUCustomProgressBar.SetWaterMark(const Value: TPicture);
+procedure TUProgressBar.SetWaterMark(const Value: TPicture);
 begin
   FWaterMark.Assign(Value);
   UpdateRects;
   Repaint;
 end;
 
-procedure TUCustomProgressBar.SetValue(const Value: Integer);
+procedure TUProgressBar.SetValue(const Value: Integer);
 begin
   if FValue <> Value then begin
     FValue := Value;
@@ -209,7 +250,7 @@ begin
   end;
 end;
 
-procedure TUCustomProgressBar.SetOrientation(const Value: TUOrientation);
+procedure TUProgressBar.SetOrientation(const Value: TUOrientation);
 begin
   if FOrientation <> Value then begin
     FOrientation := Value;
@@ -218,44 +259,17 @@ begin
   end;
 end;
 
-//  MAIN CLASS
-
-constructor TUCustomProgressBar.Create(AOnwer: TComponent);
+procedure TUProgressBar.FillColor_OnChange(Sender: TObject);
 begin
-  inherited Create(AOnwer);
-  FThemeManager := Nil;
-  FWaterMark := TPicture.Create;
-
-  //  Parent properties
-  Height := 5;
-  Width := 100;
-
-  //  Fields
-  FValue := 0;
-  FCustomFillColor := $25B006;
-  FCustomBackColor := $E6E6E6;
-
-  //  Custom AniSet
-  FAniSet := TIntAniSet.Create;
-  FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateColors;
-  UpdateRects;
+  UpdateTheme;
 end;
 
-destructor TUCustomProgressBar.Destroy;
+procedure TUProgressBar.BackColor_OnChange(Sender: TObject);
 begin
-  FAniSet.Free;
-  FWaterMark.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
+  UpdateTheme;
 end;
 
-procedure TUCustomProgressBar.GoToValue(Value: Integer);
+procedure TUProgressBar.GoToValue(Value: Integer);
 var
   Ani: TIntAni;
 begin
@@ -273,7 +287,7 @@ end;
 
 //  CUSTOM METHODS
 
-procedure TUCustomProgressBar.Paint;
+procedure TUProgressBar.Paint;
 var
   WaterMarkX, WaterMarkY: Integer;
   Streach: Boolean;
@@ -283,11 +297,11 @@ begin
 //  inherited;
 
   //  Paint background
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Back_Color, 255);
   Canvas.FillRect(BackRect);
 
   //  Paint Fillround
-  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(FillColor, 255);
+  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Fill_Color, 255);
   Canvas.FillRect(FillRect);
 
   if FWaterMark.Graphic <> Nil then begin
@@ -320,14 +334,14 @@ begin
     FOnPaint(Self, Canvas);
 end;
 
-procedure TUCustomProgressBar.Resize;
+procedure TUProgressBar.Resize;
 begin
   inherited;
   UpdateRects;
   Invalidate;
 end;
 
-procedure TUCustomProgressBar.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUProgressBar.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   UpdateRects;

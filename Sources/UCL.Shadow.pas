@@ -13,13 +13,14 @@ uses
   Controls, 
   Graphics, 
   ExtCtrls,
-  UCL.Classes, 
+  UCL.Classes,
+  UCL.Types,
   UCL.Utils, 
-  UCL.Graphics, 
-  UCL.TUThemeManager;
+  UCL.Graphics,
+  UCL.ThemeManager;
 
 type
-  TUCustomShadow = class(TGraphicControl, IUThemeComponent)
+  TUShadow = class(TUGraphicControl, IUThemedComponent)
   private
     var Color: TColor;
     var BlendFunc: BLENDFUNCTION;
@@ -34,7 +35,7 @@ type
     FDirection: TUDirection;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetAlpha(Index: Integer; const Value: Byte);      
     procedure SetColor(Index: Integer; const Value: TColor);
     procedure SetDirection(const Value: TUDirection);
@@ -47,10 +48,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
 
     property AlphaA: Byte index 0 read FAlphaA write SetAlpha default 255;
     property AlphaB: Byte index 1 read FAlphaB write SetAlpha default 255;
@@ -59,130 +63,13 @@ type
     property Direction: TUDirection read FDirection write SetDirection default dLeft;
   end;
 
-  TUShadow = class(TUCustomShadow)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    //property Caption;
-    //property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
 implementation
 
-{ TUCustomShadow }
-
-//  THEME
-
-procedure TUCustomShadow.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
-end;
-
-procedure TUCustomShadow.UpdateTheme;
-var
-  IsLightTheme: Boolean;
-begin
-  if ThemeManager = Nil then
-    IsLightTheme := True
-  else
-    IsLightTheme := ThemeManager.Theme = utLight;
-
-  if IsLightTheme then
-    Color := LightColor
-  else
-    Color := DarkColor;
-
-  Repaint;
-end;
-{
-procedure TUCustomShadow.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
-//  SETTERS
-
-procedure TUCustomShadow.SetAlpha(Index: Integer; const Value: Byte);
-begin
-  case Index of
-    0: if Value <> FAlphaA then begin
-      FAlphaA := Value;
-    end;  
-
-    1: if Value <> FAlphaB then begin
-      FAlphaB := Value;
-    end;
-  end;
-  Repaint;
-end;
-
-procedure TUCustomShadow.SetColor(Index: Integer; const Value: TColor);
-begin
-  case Index of
-    0: if Value <> FLightColor then begin
-      FLightColor := Value;
-    end;
-
-    1: if Value <> FDarkColor then begin
-      FDarkColor := Value;
-    end;
-  end;
-  UpdateTheme;
-end;
-
-procedure TUCustomShadow.SetDirection(const Value: TUDirection);
-begin
-  if Value <> FDirection then begin
-    FDirection := Value;
-    Repaint;
-  end;
-end;
+{ TUShadow }
 
 //  MAIN CLASS
 
-constructor TUCustomShadow.Create(AOwner: TComponent);
+constructor TUShadow.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FThemeManager := Nil;
@@ -201,7 +88,7 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
-destructor TUCustomShadow.Destroy;
+destructor TUShadow.Destroy;
 begin
   BlendBmp.Free;
   if FThemeManager <> Nil then
@@ -209,7 +96,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomShadow.Paint;
+procedure TUShadow.Paint;
 begin
   inherited;
 
@@ -218,6 +105,100 @@ begin
 
   AssignGradientBlendBitmap(BlendBmp, Color, AlphaA, AlphaB, Direction);
   PaintBlendBitmap(Canvas, Rect(0, 0, Width, Height), BlendBmp, BlendFunc);
+end;
+
+//  THEME
+
+procedure TUShadow.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUShadow.UpdateTheme;
+var
+  IsLightTheme: Boolean;
+begin
+  if ThemeManager = Nil then
+    IsLightTheme := True
+  else
+    IsLightTheme := ThemeManager.Theme = ttLight;
+
+  if IsLightTheme then
+    Color := LightColor
+  else
+    Color := DarkColor;
+
+  Repaint;
+end;
+
+function TUShadow.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUShadow.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+{
+procedure TUShadow.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FThemeManager) then
+    FThemeManager := nil;
+end;
+}
+//  SETTERS
+
+procedure TUShadow.SetAlpha(Index: Integer; const Value: Byte);
+begin
+  case Index of
+    0: if Value <> FAlphaA then begin
+      FAlphaA := Value;
+    end;  
+
+    1: if Value <> FAlphaB then begin
+      FAlphaB := Value;
+    end;
+  end;
+  Repaint;
+end;
+
+procedure TUShadow.SetColor(Index: Integer; const Value: TColor);
+begin
+  case Index of
+    0: if Value <> FLightColor then begin
+      FLightColor := Value;
+    end;
+
+    1: if Value <> FDarkColor then begin
+      FDarkColor := Value;
+    end;
+  end;
+  UpdateTheme;
+end;
+
+procedure TUShadow.SetDirection(const Value: TUDirection);
+begin
+  if Value <> FDirection then begin
+    FDirection := Value;
+    Repaint;
+  end;
 end;
 
 end.

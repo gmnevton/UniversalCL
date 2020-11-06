@@ -15,15 +15,16 @@ uses
   Graphics,
   ImgList,
   UCL.Classes,
+  UCL.Types,
   UCL.SystemSettings,
   UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
-  TUCustomSymbolButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
+  TUSymbolButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
 
-  TUCustomSymbolButton = class(TCustomControl, IUThemedComponent)
+  TUSymbolButton = class(TUCustomControl, IUThemedComponent)
 //  private const
 //    DefBackColor: TDefColor = (
 //      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
@@ -38,7 +39,7 @@ type
     BackColor, TextColor, DetailColor: TColor;
     IconRect, TextRect, DetailRect: TRect;
   
-  private  
+  private
     FThemeManager: TUThemeManager;
 
     FSymbolFont: TFont;
@@ -63,7 +64,7 @@ type
     FIsToggled: Boolean;
     FMouseInClient: Boolean;
     FKeepOrginalColor: Boolean;
-    FToggleEvent: TUCustomSymbolButtonToggleEvent;
+    FToggleEvent: TUSymbolButtonToggleEvent;
 
     //  Internal
     procedure UpdateColors;
@@ -71,7 +72,7 @@ type
     procedure DoToggle;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetSymbolChar(const Value: string);
@@ -107,7 +108,7 @@ type
     function GetDesignDpi: Integer; virtual;
     function GetParentCurrentDpi: Integer; virtual;
   {$IFEND}
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
@@ -116,14 +117,17 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    procedure UpdateTheme;
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
 
+    // IUThemedComponent
+    procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
+
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
 
     property SymbolFont: TFont read FSymbolFont write FSymbolFont;
     property DetailFont: TFont read FDetailFont write FDetailFont;
@@ -146,374 +150,31 @@ type
     property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
     property KeepOrginalColor: Boolean read FKeepOrginalColor write SetKeepOrginalColor;
 
+    property Caption;
+//    property Color;
     property TabOrder;
     property TabStop default true;
     property Height default 40;
     property Width default 250;
 
-    property OnToggle: TUCustomSymbolButtonToggleEvent read FToggleEvent write FToggleEvent;
-  end;
-
-  TUSymbolButton = class(TUCustomSymbolButton)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    //property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
+    property OnToggle: TUSymbolButtonToggleEvent read FToggleEvent write FToggleEvent;
   end;
 
 implementation
 
 uses
   Forms,
-  UCL.Types,
   UCL.Colors,
   UCL.CaptionBar;
 
-{ TUCustomSymbolButton }
-
-//  THEME
-
-procedure TUCustomSymbolButton.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
-end;
-
-procedure TUCustomSymbolButton.UpdateTheme;
-begin
-  UpdateColors;
-  UpdateRects;
-  Repaint;
-end;
-
-{$REGION 'Compatibility with older Delphi'}
-{$IF CompilerVersion < 30}
-function TUCustomSymbolButton.GetDesignDpi: Integer;
-var
-  LForm: TCustomForm;
-begin
-  LForm := GetParentForm(Self);
-
-  if (LForm <> Nil) and (LForm is TForm) then
-    Result := TForm(LForm).PixelsPerInch
-  else
-    Result := Windows.USER_DEFAULT_SCREEN_DPI;
-end;
-
-function TUCustomSymbolButton.GetParentCurrentDpi: Integer;
-begin
-//  if Parent <> nil then
-//    Result := Parent.GetParentCurrentDpi
-//  else
-    Result := FCurrentPPI;
-end;
-
-procedure TUCustomSymbolButton.ScaleForPPI(NewPPI: Integer);
-begin
-  if not FIsScaling and (NewPPI > 0) then begin
-    FIsScaling := True;
-    try
-      if FCurrentPPI = 0 then
-        FCurrentPPI := GetDesignDpi;
-
-      if NewPPI <> FCurrentPPI then begin
-        ChangeScale(NewPPI, FCurrentPPI);
-        FCurrentPPI := NewPPI;
-      end
-    finally
-      FIsScaling := False;
-    end;
-  end;
-end;
-{$IFEND}
-{$ENDREGION}
-
-{
-procedure TUCustomSymbolButton.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
-//  INTERNAL
-
-procedure TUCustomSymbolButton.UpdateColors;
-var
-  TempTheme: TUThemeType;
-  ParentControl: TWinControl;
-begin
-  if ThemeManager = Nil then
-    TempTheme := ttLight
-  else
-    TempTheme := ThemeManager.Theme;
-
-  ParentControl:=Self.Parent;
-
-  if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
-    BackColor := Color;
-    TextColor := GetTextColorFromBackground(Color);
-    DetailColor := $808080;
-    if ButtonState in [csNone, csHover, csFocused] then begin
-      if (ThemeManager = Nil) or ((ThemeManager <> Nil) and (ThemeManager.Theme = ttLight)) then
-        BackColor := BrightenColor(BackColor, 25)
-      else
-        BackColor := BrightenColor(BackColor, -25);
-    end;
-  end
-  else begin
-    //  Transparent enabled
-    if (ButtonState = csNone) and Transparent then begin
-      ParentColor := True;
-      BackColor := Color;
-      TextColor := GetTextColorFromBackground(Color);
-      DetailColor := $808080;
-    end
-    //  Highlight enabled
-    else if (ThemeManager <> Nil) and (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
-      BackColor := ThemeManager.AccentColor;
-      TextColor := GetTextColorFromBackground(BackColor);
-      DetailColor := clSilver;
-    end
-    //  Default colors
-    else begin
-      if (ParentControl <> Nil) and (ParentControl is TUCaptionBar) then begin
-        BackColor := TUCaptionBar(ParentControl).Color;
-        TextColor := GetTextColorFromBackground(BackColor);
-        DetailColor := $808080;
-      end
-      else begin
-        BackColor := BUTTON_BACK.GetColor(TempTheme, ButtonState);
-        //TextColor := BUTTON_TEXT.GetColor(TempTheme, ButtonState);
-        TextColor := GetTextColorFromBackground(BackColor);
-        DetailColor := $808080;
-      end;
-    end;
-  end;
-  //
-  if (ButtonState = csPress) then begin
-    if (ThemeManager = Nil) or ((ThemeManager <> Nil) and (ThemeManager.Theme = utLight)) then
-      BackColor := BrightenColor(BackColor, 25)
-    else
-      BackColor := BrightenColor(BackColor, -25);
-    TextColor := GetTextColorFromBackground(BackColor);
-  end;
-end;
-
-procedure TUCustomSymbolButton.UpdateRects;
-var
-  TempW, TempH: Integer;
-begin
-  if not HandleAllocated then
-    Exit;
-
-  //  Calc rects
-  if ShowIcon then begin
-    if Orientation = oHorizontal then
-      IconRect := Rect(0, 0, TextOffset, Height)
-    else
-      IconRect := Rect(0, 0, Width, TextOffset);
-  end
-  else
-    IconRect := TRect.Empty;
-
-  if ShowDetail then begin
-    Canvas.Font := DetailFont;
-    TempW := Canvas.TextWidth(Detail);
-    TempH := Canvas.TextHeight(Detail);
-    if Orientation = oHorizontal then
-      DetailRect := Rect(Width - TempW - DetailRightOffset, 0, Width - DetailRightOffset, Height)
-    else
-      DetailRect := Rect(0, Height - TempH - DetailRightOffset, Width, Height - DetailRightOffset);
-  end
-  else
-    DetailRect := TRect.Empty;
-
-  if Orientation = oHorizontal then
-    TextRect := Rect(IconRect.Width, 0, Width - DetailRect.Width, Height)
-  else
-    TextRect := Rect(0, IconRect.Height, Width, Height - DetailRect.Height);
-end;
-
-procedure TUCustomSymbolButton.DoToggle;
-begin
-  if Assigned(FToggleEvent) then
-    FToggleEvent(Self, FIsToggled);
-end;
-
-
-//  SETTERS
-
-procedure TUCustomSymbolButton.SetButtonState(const Value: TUControlState);
-begin
-  if Value <> FButtonState then begin
-    FButtonState := Value;
-    UpdateColors;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetOrientation(const Value: TUOrientation);
-begin
-  if Value <> FOrientation then begin
-    FOrientation := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetSymbolChar(const Value: string);
-begin
-  if Value <> FSymbolChar then begin
-    FSymbolChar := Value;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetText(const Value: string);
-begin
-  if Value <> FText then begin
-    FText := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetTextOffset(const Value: Integer);
-begin
-  if Value <> FTextOffset then begin
-    FTextOffset := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetDetail(const Value: string);
-begin
-  if Value <> FDetail then begin
-    FDetail := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetDetailRightOffset(const Value: Integer);
-begin
-  if Value <> FDetailRightOffset then begin
-    FDetailRightOffset := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetShowIcon(const Value: Boolean);
-begin
-  if Value <> FShowIcon then begin
-    FShowIcon := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetShowDetail(const Value: Boolean);
-begin
-  if Value <> FShowDetail then begin
-    FShowDetail := Value;
-    UpdateRects;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetTransparent(const Value: Boolean);
-begin
-  if Value <> FTransparent then begin
-    FTransparent := Value;
-    UpdateColors;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetIsToggled(const Value: Boolean);
-begin
-  if Value <> FIsToggled then begin
-    FIsToggled := Value;
-    UpdateColors;
-    Repaint;
-    DoToggle;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetImageIndex(const Value: Integer);
-begin
-  if Value <> FImageIndex then begin
-    FImageIndex := Value;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetImageKind(const Value: TUImageKind);
-begin
-  if Value <> FImageKind then begin
-    FImageKind := Value;
-    Repaint;
-  end;
-end;
-
-procedure TUCustomSymbolButton.SetKeepOrginalColor(const Value: Boolean);
-begin
-  if Value <> FKeepOrginalColor then begin
-    FKeepOrginalColor := Value;
-    UpdateColors;
-    Repaint;
-  end;
-end;
+{ TUSymbolButton }
 
 //  MAIN CLASS
 
-constructor TUCustomSymbolButton.Create(AOwner: TComponent);
+constructor TUSymbolButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  ControlStyle:=ControlStyle - [csDoubleClicks];
+  ControlStyle := ControlStyle - [csDoubleClicks];
   FThemeManager := Nil;
 
   FImageIndex := -1;
@@ -551,25 +212,347 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
-destructor TUCustomSymbolButton.Destroy;
+destructor TUSymbolButton.Destroy;
+var
+  TM: TUCustomThemeManager;
 begin
   FSymbolFont.Free;
   FDetailFont.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
   inherited;
+end;
+
+//  THEME
+
+procedure TUSymbolButton.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUSymbolButton.UpdateTheme;
+begin
+  UpdateColors;
+  UpdateRects;
+  Repaint;
+end;
+
+function TUSymbolButton.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUSymbolButton.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+{$REGION 'Compatibility with older Delphi'}
+{$IF CompilerVersion < 30}
+function TUSymbolButton.GetDesignDpi: Integer;
+var
+  LForm: TCustomForm;
+begin
+  LForm := GetParentForm(Self);
+
+  if (LForm <> Nil) and (LForm is TForm) then
+    Result := TForm(LForm).PixelsPerInch
+  else
+    Result := Windows.USER_DEFAULT_SCREEN_DPI;
+end;
+
+function TUSymbolButton.GetParentCurrentDpi: Integer;
+begin
+//  if Parent <> nil then
+//    Result := Parent.GetParentCurrentDpi
+//  else
+    Result := FCurrentPPI;
+end;
+
+procedure TUSymbolButton.ScaleForPPI(NewPPI: Integer);
+begin
+  if not FIsScaling and (NewPPI > 0) then begin
+    FIsScaling := True;
+    try
+      if FCurrentPPI = 0 then
+        FCurrentPPI := GetDesignDpi;
+
+      if NewPPI <> FCurrentPPI then begin
+        ChangeScale(NewPPI, FCurrentPPI);
+        FCurrentPPI := NewPPI;
+      end
+    finally
+      FIsScaling := False;
+    end;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+procedure TUSymbolButton.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
+  inherited Notification(AComponent, Operation);
+end;
+
+//  INTERNAL
+
+procedure TUSymbolButton.UpdateColors;
+var
+  TM: TUCustomThemeManager;
+  ParentControl: TWinControl;
+begin
+  TM:=SelectThemeManager(Self);
+  ParentControl:=Self.Parent;
+
+  if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
+    BackColor := Color;
+    TextColor := GetTextColorFromBackground(Color);
+    DetailColor := $808080;
+    if ButtonState in [csNone, csHover, csFocused] then begin
+      if TM.ThemeUsed = utLight then
+        BackColor := BrightenColor(BackColor, 25)
+      else
+        BackColor := BrightenColor(BackColor, -25);
+    end;
+  end
+  else begin
+    //  Transparent enabled
+    if (ButtonState = csNone) and Transparent then begin
+      ParentColor := True;
+      BackColor := Color;
+      TextColor := GetTextColorFromBackground(Color);
+      DetailColor := $808080;
+    end
+    //  Highlight enabled
+    else if (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
+      BackColor := TM.AccentColor;
+      TextColor := GetTextColorFromBackground(BackColor);
+      DetailColor := clSilver;
+    end
+    //  Default colors
+    else begin
+      if (ParentControl <> Nil) and (ParentControl is TUCaptionBar) then begin
+        BackColor := TUCaptionBar(ParentControl).Color;
+        TextColor := GetTextColorFromBackground(BackColor);
+        DetailColor := $808080;
+      end
+      else begin
+        if IsToggled then
+          BackColor := TM.AccentColor
+        else
+          BackColor := BUTTON_BACK.GetColor(TM.ThemeUsed, ButtonState);
+        //TextColor := BUTTON_TEXT.GetColor(TempTheme, ButtonState);
+        TextColor := GetTextColorFromBackground(BackColor);
+        DetailColor := $808080;
+      end;
+    end;
+  end;
+  //
+  if (ButtonState = csPress) then begin
+    if TM.ThemeUsed = utLight then
+      BackColor := BrightenColor(BackColor, 25)
+    else
+      BackColor := BrightenColor(BackColor, -25);
+    TextColor := GetTextColorFromBackground(BackColor);
+  end;
+end;
+
+procedure TUSymbolButton.UpdateRects;
+var
+  TempW, TempH: Integer;
+begin
+  if not HandleAllocated then
+    Exit;
+
+  //  Calc rects
+  if ShowIcon then begin
+    if Orientation = oHorizontal then
+      IconRect := Rect(0, 0, TextOffset, Height)
+    else
+      IconRect := Rect(0, 0, Width, TextOffset);
+  end
+  else
+    IconRect := TRect.Empty;
+
+  if ShowDetail then begin
+    Canvas.Font := DetailFont;
+    TempW := Canvas.TextWidth(Detail);
+    TempH := Canvas.TextHeight(Detail);
+    if Orientation = oHorizontal then
+      DetailRect := Rect(Width - TempW - DetailRightOffset, 0, Width - DetailRightOffset, Height)
+    else
+      DetailRect := Rect(0, Height - TempH - DetailRightOffset, Width, Height - DetailRightOffset);
+  end
+  else
+    DetailRect := TRect.Empty;
+
+  if Orientation = oHorizontal then
+    TextRect := Rect(IconRect.Width, 0, Width - DetailRect.Width, Height)
+  else
+    TextRect := Rect(0, IconRect.Height, Width, Height - DetailRect.Height);
+end;
+
+procedure TUSymbolButton.DoToggle;
+begin
+  if Assigned(FToggleEvent) then
+    FToggleEvent(Self, FIsToggled);
+end;
+
+//  SETTERS
+
+procedure TUSymbolButton.SetButtonState(const Value: TUControlState);
+begin
+  if Value <> FButtonState then begin
+    FButtonState := Value;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetOrientation(const Value: TUOrientation);
+begin
+  if Value <> FOrientation then begin
+    FOrientation := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetSymbolChar(const Value: string);
+begin
+  if Value <> FSymbolChar then begin
+    FSymbolChar := Value;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetText(const Value: string);
+begin
+  if Value <> FText then begin
+    FText := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetTextOffset(const Value: Integer);
+begin
+  if Value <> FTextOffset then begin
+    FTextOffset := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetDetail(const Value: string);
+begin
+  if Value <> FDetail then begin
+    FDetail := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetDetailRightOffset(const Value: Integer);
+begin
+  if Value <> FDetailRightOffset then begin
+    FDetailRightOffset := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetShowIcon(const Value: Boolean);
+begin
+  if Value <> FShowIcon then begin
+    FShowIcon := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetShowDetail(const Value: Boolean);
+begin
+  if Value <> FShowDetail then begin
+    FShowDetail := Value;
+    UpdateRects;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetTransparent(const Value: Boolean);
+begin
+  if Value <> FTransparent then begin
+    FTransparent := Value;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetIsToggled(const Value: Boolean);
+begin
+  if Value <> FIsToggled then begin
+    FIsToggled := Value;
+    UpdateColors;
+    Repaint;
+    DoToggle;
+  end;
+end;
+
+procedure TUSymbolButton.SetImageIndex(const Value: Integer);
+begin
+  if Value <> FImageIndex then begin
+    FImageIndex := Value;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetImageKind(const Value: TUImageKind);
+begin
+  if Value <> FImageKind then begin
+    FImageKind := Value;
+    Repaint;
+  end;
+end;
+
+procedure TUSymbolButton.SetKeepOrginalColor(const Value: Boolean);
+begin
+  if Value <> FKeepOrginalColor then begin
+    FKeepOrginalColor := Value;
+    UpdateColors;
+    Repaint;
+  end;
 end;
 
 //  CUSTOM METHODS
 
-procedure TUCustomSymbolButton.Paint;
+procedure TUSymbolButton.Paint;
 var
+  TM: TUCustomThemeManager;
   ImgX, ImgY: Integer;
   bmp: TBitmap;
   P: TPoint;
 begin
-  inherited;
-
+//  inherited;
+  TM:=SelectThemeManager(Self);
   bmp := TBitmap.Create;
   try
     bmp.SetSize(Width, Height);
@@ -584,7 +567,7 @@ begin
     P:=ScreenToClient(P);
 
     if Enabled and FMouseInClient then
-      DrawBumpMap(bmp.Canvas, P.X, Height div 2);
+      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
 
     //  Paint icon
     if ImageKind = ikFontIcon then begin
@@ -626,20 +609,20 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.Resize;
+procedure TUSymbolButton.Resize;
 begin
   inherited;
   UpdateRects;
 end;
 
-procedure TUCustomSymbolButton.CreateWindowHandle(const Params: TCreateParams);
+procedure TUSymbolButton.CreateWindowHandle(const Params: TCreateParams);
 begin
   inherited;
   UpdateColors;
   UpdateRects;
 end;
 
-procedure TUCustomSymbolButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUSymbolButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
 
@@ -655,7 +638,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then begin
     if IsToggleButton then
@@ -667,7 +650,7 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
     ButtonState := csPress;
@@ -675,7 +658,7 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.WMLButtonUp(var Msg: TWMLButtonUp);
+procedure TUSymbolButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled then begin
     if IsToggleButton then
@@ -687,14 +670,14 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.WMMouseMove(var Msg: TWMMouseMove);
+procedure TUSymbolButton.WMMouseMove(var Msg: TWMMouseMove);
 begin
   if Enabled then
     Repaint;
   inherited;
 end;
 
-procedure TUCustomSymbolButton.WMSetFocus(var Msg: TWMSetFocus);
+procedure TUSymbolButton.WMSetFocus(var Msg: TWMSetFocus);
 begin
   if Enabled then begin
     ButtonState := csFocused;
@@ -702,7 +685,7 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.WMKillFocus(var Msg: TWMKillFocus);
+procedure TUSymbolButton.WMKillFocus(var Msg: TWMKillFocus);
 begin
   if Enabled then begin
     ButtonState := csNone;
@@ -710,13 +693,13 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.CMColorChanged(var Message: TMessage);
+procedure TUSymbolButton.CMColorChanged(var Message: TMessage);
 begin
   UpdateColors;
   inherited;
 end;
 
-procedure TUCustomSymbolButton.CMMouseEnter(var Msg: TMessage);
+procedure TUSymbolButton.CMMouseEnter(var Msg: TMessage);
 begin
   FMouseInClient := True;
   if Enabled then begin
@@ -725,7 +708,7 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.CMMouseLeave(var Msg: TMessage);
+procedure TUSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
   FMouseInClient := False;
   if Enabled then begin
@@ -735,12 +718,12 @@ begin
   end;
 end;
 
-procedure TUCustomSymbolButton.CMFontChanged(var Msg: TMessage);
+procedure TUSymbolButton.CMFontChanged(var Msg: TMessage);
 begin
   Repaint;
 end;
 
-procedure TUCustomSymbolButton.CMEnabledChanged(var Msg: TMessage);
+procedure TUSymbolButton.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then

@@ -13,21 +13,22 @@ uses
   Controls,
   Graphics,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.Types,
+  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUCustomSlider = class(TGraphicControl, IUThemeComponent)
-  private const
-    DefActiveColor: TDefColor = (
-      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
-      ($D77800, $D77800, $D77800, $333333, $D77800));
-    DefBackColor: TDefColor = (
-      ($999999, $666666, $999999, $CCCCCC, $999999),
-      ($666666, $999999, $666666, $333333, $666666));
-    DefCurColor: TDefColor = (
-      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
-      ($D77800, $F2F2F2, $767676, $333333, $D77800));
+  TUSlider = class(TUGraphicControl, IUThemedComponent)
+//  private const
+//    DefActiveColor: TDefColor = (
+//      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
+//      ($D77800, $D77800, $D77800, $333333, $D77800));
+//    DefBackColor: TDefColor = (
+//      ($999999, $666666, $999999, $CCCCCC, $999999),
+//      ($666666, $999999, $666666, $333333, $666666));
+//    DefCurColor: TDefColor = (
+//      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
+//      ($D77800, $F2F2F2, $767676, $333333, $D77800));
 
   private var
     CurWidth: Integer;
@@ -55,7 +56,7 @@ type
     procedure UpdateRects;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetControlState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetMin(const Value: Integer);
@@ -81,10 +82,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
     property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
@@ -100,76 +104,90 @@ type
     property Width default 100;
   end;
 
-  TUSlider = class(TUCustomSlider)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    //property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
 implementation
 
-uses
-  UCL.Types;
+{ TUSlider }
 
-{ TUCustomSlider }
+//  MAIN CLASS
+
+constructor TUSlider.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+
+  //  New properties
+  CurWidth := 8;
+  CurHeight := 23;
+  CurCorner := 5;
+  BarHeight := 2;
+
+  FIsSliding := false;
+
+  FControlState := csNone;
+  FOrientation := oHorizontal;
+
+  FMin := 0;
+  FMax := 100;
+  FValue := 0;
+
+  //  Common properties
+  Height := 25;
+  Width := 100;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateColors;
+  UpdateRects;
+end;
+
+destructor TUSlider.Destroy;
+begin
+  if FThemeManager <> Nil then
+    FThemeManager.Disconnect(Self);
+  inherited;
+end;
 
 //  THEME
 
-procedure TUCustomSlider.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUSlider.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
-procedure TUCustomSlider.UpdateTheme;
+procedure TUSlider.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
 end;
+
+function TUSlider.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUSlider.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
 {
-procedure TUCustomSlider.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TUSlider.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
@@ -178,27 +196,27 @@ end;
 }
 //  INTERNAL
 
-procedure TUCustomSlider.UpdateColors;
+procedure TUSlider.UpdateColors;
 begin
   if ThemeManager = Nil then begin
-    ActiveColor := DefActiveColor[utLight, ControlState];
-    BackColor := DefBackColor[utLight, ControlState];
-    CurColor := DefCurColor[utLight, ControlState];
+//    ActiveColor := DefActiveColor[utLight, ControlState];
+//    BackColor := DefBackColor[utLight, ControlState];
+//    CurColor := DefCurColor[utLight, ControlState];
   end
   else begin
-    if Enabled then
-      ActiveColor := ThemeManager.AccentColor
-    else
-      ActiveColor := DefActiveColor[ThemeManager.Theme, ControlState];
-    BackColor := DefBackColor[ThemeManager.Theme, ControlState];
-    if ControlState = csNone then
-      CurColor := ThemeManager.AccentColor
-    else
-      CurColor := DefCurColor[ThemeManager.Theme, ControlState];
+//    if Enabled then
+//      ActiveColor := ThemeManager.AccentColor
+//    else
+//      ActiveColor := DefActiveColor[ThemeManager.Theme, ControlState];
+//    BackColor := DefBackColor[ThemeManager.Theme, ControlState];
+//    if ControlState = csNone then
+//      CurColor := ThemeManager.AccentColor
+//    else
+//      CurColor := DefCurColor[ThemeManager.Theme, ControlState];
   end;
 end;
 
-procedure TUCustomSlider.UpdateRects;
+procedure TUSlider.UpdateRects;
 begin
   if Orientation = oHorizontal then begin
     ActiveRect.Left := 0;
@@ -236,7 +254,7 @@ end;
 
 //  SETTERS
 
-procedure TUCustomSlider.SetControlState(const Value: TUControlState);
+procedure TUSlider.SetControlState(const Value: TUControlState);
 begin
   if Value <> FControlState then begin
     FControlState := Value;
@@ -245,7 +263,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.SetOrientation(const Value: TUOrientation);
+procedure TUSlider.SetOrientation(const Value: TUOrientation);
 var
   TempSize: Integer;
 begin
@@ -262,7 +280,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.SetMin(const Value: Integer);
+procedure TUSlider.SetMin(const Value: Integer);
 begin
   if Value <> FMin then begin
     FMin := Value;
@@ -271,7 +289,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.SetMax(const Value: Integer);
+procedure TUSlider.SetMax(const Value: Integer);
 begin
   if Value <> FMax then begin
     FMax := Value;
@@ -280,7 +298,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.SetValue(const Value: Integer);
+procedure TUSlider.SetValue(const Value: Integer);
 begin
   if Value <> FValue then begin
     FValue := Value;
@@ -291,47 +309,7 @@ begin
   end;
 end;
 
-//  MAIN CLASS
-
-constructor TUCustomSlider.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FThemeManager := Nil;
-
-  //  New properties
-  CurWidth := 8;
-  CurHeight := 23;
-  CurCorner := 5;
-  BarHeight := 2;
-
-  FIsSliding := false;
-
-  FControlState := csNone;
-  FOrientation := oHorizontal;
-
-  FMin := 0;
-  FMax := 100;
-  FValue := 0;
-
-  //  Common properties
-  Height := 25;
-  Width := 100;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateColors;
-  UpdateRects;
-end;
-
-destructor TUCustomSlider.Destroy;
-begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
-end;
-
-procedure TUCustomSlider.Paint;
+procedure TUSlider.Paint;
 begin
   inherited;
 
@@ -350,13 +328,13 @@ begin
   Canvas.FloodFill(CurRect.Left + CurRect.Width div 2, CurRect.Top + CurRect.Height div 2, CurColor, fsSurface);
 end;
 
-procedure TUCustomSlider.Resize;
+procedure TUSlider.Resize;
 begin
   inherited;
   UpdateRects;
 end;
 
-procedure TUCustomSlider.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUSlider.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   CurWidth := MulDiv(CurWidth, M, D);
@@ -368,7 +346,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomSlider.CMEnabledChanged(var Msg: TMessage);
+procedure TUSlider.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then
@@ -377,7 +355,7 @@ begin
     ControlState := csNone;
 end;
 
-procedure TUCustomSlider.CMMouseEnter(var Msg: TMessage);
+procedure TUSlider.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled then begin
     ControlState := csHover;
@@ -385,7 +363,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.CMMouseLeave(var Msg: TMessage);
+procedure TUSlider.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled then begin
     ControlState := csNone;
@@ -393,7 +371,7 @@ begin
   end;
 end;
 
-procedure TUCustomSlider.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
 begin
@@ -426,7 +404,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomSlider.WMMouseMove(var Msg: TWMMouseMove);
+procedure TUSlider.WMMouseMove(var Msg: TWMMouseMove);
 var
   TempValue: Integer;
 begin
@@ -451,7 +429,7 @@ begin
   inherited;
 end;
 
-procedure TUCustomSlider.WMLButtonUp(var Msg: TWMLButtonUp);
+procedure TUSlider.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled then begin
     ControlState := csNone;

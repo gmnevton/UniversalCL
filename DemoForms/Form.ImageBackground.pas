@@ -12,19 +12,19 @@ uses
   jpeg,
   UCL.Classes,
   UCL.Utils,
-  UCL.TUThemeManager,
-  UCL.TUForm,
-  UCL.TUEdit,
-  UCL.TUButton,
-  UCL.TUPanel,
-  UCL.TUSymbolButton,
-  UCL.TUProgressBar,
-  UCL.TUQuickButton,
-  UCL.TUText,
-  UCL.TURadioButton,
-  UCL.TUSlider,
-  UCL.TUTitleBar,
-  UCL.TUShadow;
+  UCL.ThemeManager,
+  UCL.Form,
+  UCL.Edit,
+  UCL.Button,
+  UCL.Panel,
+  UCL.SymbolButton,
+  UCL.ProgressBar,
+  UCL.QuickButton,
+  UCL.Text,
+  UCL.RadioButton,
+  UCL.Slider,
+  UCL.TitleBar,
+  UCL.Shadow;
 
 type
   TformImageBackground = class(TUForm)
@@ -66,22 +66,24 @@ end;
 
 procedure TformImageBackground.radioSystemThemeClick(Sender: TObject);
 begin
-  ThemeManager.UseSystemTheme := True;
-  ThemeManager.Reload;
+  ThemeManager.Theme := ttSystem;
+//  ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioLightThemeClick(Sender: TObject);
 begin
-  ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := False;
-  ThemeManager.Reload;
+  ThemeManager.Theme := ttLight;
+//  ThemeManager.CustomTheme := utLight;
+//  ThemeManager.UseSystemTheme := False;
+//  ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioDarkThemeClick(Sender: TObject);
 begin
-  ThemeManager.CustomTheme := utDark;
-  ThemeManager.UseSystemTheme := False;
-  ThemeManager.Reload;
+  ThemeManager.Theme := ttDark;
+//  ThemeManager.CustomTheme := utDark;
+//  ThemeManager.UseSystemTheme := False;
+//  ThemeManager.Reload;
 end;
 
 end.

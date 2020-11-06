@@ -11,12 +11,12 @@ uses
   ExtCtrls,
   pngimage,
   UCL.Utils,
-  UCL.TUForm,
-  UCL.TUScrollBox,
-  UCL.TUItemButton,
-  UCL.TUCaptionBar,
-  UCL.TUQuickButton,
-  UCL.TUSymbolButton;
+  UCL.Form,
+  UCL.ScrollBox,
+  UCL.ItemButton,
+  UCL.CaptionBar,
+  UCL.QuickButton,
+  UCL.SymbolButton;
 
 type
   TformAppList = class(TUForm)

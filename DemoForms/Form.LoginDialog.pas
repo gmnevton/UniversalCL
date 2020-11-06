@@ -13,19 +13,19 @@ uses
   Menus, 
   ExtCtrls, 
   Controls,
-  UCL.TUThemeManager, 
-  UCL.TUForm, 
-  UCL.Classes, 
+  UCL.ThemeManager,
+  UCL.Form,
+  UCL.Classes,
   UCL.Utils,
-  UCL.TUText, 
-  UCL.TUEdit, 
-  UCL.TUQuickButton, 
-  UCL.TUPanel, 
-  UCL.TUPopupMenu,
-  UCL.TUCheckBox, 
-  UCL.TUCaptionBar, 
-  UCL.TUButton, 
-  UCL.TUScrollBox;
+  UCL.Text,
+  UCL.Edit,
+  UCL.QuickButton,
+  UCL.Panel,
+  UCL.PopupMenu,
+  UCL.CheckBox,
+  UCL.CaptionBar,
+  UCL.Button,
+  UCL.ScrollBox;
 
 type
   TformLoginDialog = class(TUForm)
@@ -72,11 +72,11 @@ implementation
 
 procedure TformLoginDialog.buttonAppThemeClick(Sender: TObject);
 begin
-  if ThemeManager.Theme = utLight then
-    ThemeManager.CustomTheme := utDark
-  else
-    ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := False;
+//  if ThemeManager.Theme = ttLight then
+//    ThemeManager.CustomTheme := utDark
+//  else
+//    ThemeManager.CustomTheme := utLight;
+//  ThemeManager.UseSystemTheme := False;
   ThemeManager.Reload;
 end;
 

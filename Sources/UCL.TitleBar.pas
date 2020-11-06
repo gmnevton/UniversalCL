@@ -14,12 +14,12 @@ uses
   Graphics,
   Forms,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
-  TUCustomTitleBar = class(TGraphicControl, IUThemeComponent)
+  TUTitleBar = class(TUGraphicControl, IUThemedComponent)
   private
     FThemeManager: TUThemeManager;
 
@@ -29,7 +29,7 @@ type
     FEnableSystemMenu: Boolean;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
 
     //  Mesages
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
@@ -45,64 +45,21 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
 
     property TextPosition: Integer read FTextPosition write FTextPosition default 12;
     property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
     property DragMovement: Boolean read FDragMovement write FDragMovement default true;
     property EnableSystemMenu: Boolean read FEnableSystemMenu write FEnableSystemMenu default true;
 
-    property Height default 32;
-  end;
-
-  TUTitleBar = class(TUCustomTitleBar)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
     property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
+    property Height default 32;
   end;
 
 implementation
@@ -110,41 +67,11 @@ implementation
 uses
   Types;
 
-{ TUCustomTitleBar }
+{ TUTitleBar }
 
-//  THEME
-
-procedure TUCustomTitleBar.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
-end;
-
-procedure TUCustomTitleBar.UpdateTheme;
-var
-  IsLightTheme: Boolean;
-begin
-  if ThemeManager = Nil then
-    IsLightTheme := True
-  else
-    IsLightTheme := ThemeManager.Theme = utLight;
-
-  if IsLightTheme then
-    Font.Color := $000000
-  else
-    Font.Color := $FFFFFF;
-end;
-{
-procedure TUCustomTitleBar.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
 //  MAIN CLASS
 
-constructor TUCustomTitleBar.Create(AOwner: TComponent);
+constructor TUTitleBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FThemeManager := Nil;
@@ -163,16 +90,71 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
-destructor TUCustomTitleBar.Destroy;
+destructor TUTitleBar.Destroy;
 begin
   if FThemeManager <> Nil then
     FThemeManager.Disconnect(Self);
   inherited;
 end;
 
+//  THEME
+
+procedure TUTitleBar.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUTitleBar.UpdateTheme;
+var
+  IsLightTheme: Boolean;
+begin
+  if ThemeManager = Nil then
+    IsLightTheme := True
+  else
+    IsLightTheme := ThemeManager.Theme = ttLight;
+
+  if IsLightTheme then
+    Font.Color := $000000
+  else
+    Font.Color := $FFFFFF;
+end;
+
+function TUTitleBar.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUTitleBar.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+{
+procedure TUTitleBar.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = FThemeManager) then
+    FThemeManager := nil;
+end;
+}
+
 //  CUSTOM METHODS
 
-procedure TUCustomTitleBar.Paint;
+procedure TUTitleBar.Paint;
 var
   TextRect: TRect;
 begin
@@ -187,7 +169,7 @@ begin
   DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, true);
 end;
 
-procedure TUCustomTitleBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUTitleBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 var
   ParentForm: TCustomForm;
 begin
@@ -204,7 +186,7 @@ begin
   end;
 end;
 
-procedure TUCustomTitleBar.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUTitleBar.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   inherited;
   if DragMovement then begin
@@ -213,7 +195,7 @@ begin
   end;
 end;
 
-procedure TUCustomTitleBar.WMRButtonUp(var Msg: TMessage);
+procedure TUTitleBar.WMRButtonUp(var Msg: TMessage);
 const
   WM_SYSMENU = 787;
 var
@@ -230,7 +212,7 @@ begin
   end;
 end;
 
-procedure TUCustomTitleBar.WMNCHitTest(var Msg: TWMNCHitTest);
+procedure TUTitleBar.WMNCHitTest(var Msg: TWMNCHitTest);
 var
   P: TPoint;
   ParentForm: TCustomForm;

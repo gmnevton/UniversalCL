@@ -24,7 +24,6 @@ object formAppList: TformAppList
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alTop
-    Color = 15132390
     ParentColor = False
     TabOrder = 0
     AniSet.AniKind = akOut
@@ -32,6 +31,7 @@ object formAppList: TformAppList
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 10
+    AniSet.Queue = True
     BackColor.Enabled = False
     BackColor.Color = clBlack
     BackColor.LightColor = 15132390
@@ -56,6 +56,8 @@ object formAppList: TformAppList
       SymbolChar = #57471
       Text = 'Help'
       Detail = 'Run wizard'
+      KeepOrginalColor = False
+      TabOrder = 1
       Align = alLeft
     end
     object USymbolButton14: TUSymbolButton
@@ -77,6 +79,8 @@ object formAppList: TformAppList
       SymbolChar = #57621
       Text = 'Settings'
       Detail = 'Configuration'
+      KeepOrginalColor = False
+      TabOrder = 2
       Align = alLeft
     end
     object USymbolButton15: TUSymbolButton
@@ -98,6 +102,8 @@ object formAppList: TformAppList
       SymbolChar = #57606
       Text = 'Delete'
       Detail = 'Delete item'
+      KeepOrginalColor = False
+      TabOrder = 3
       Align = alLeft
     end
     object USymbolButton18: TUSymbolButton
@@ -119,6 +125,8 @@ object formAppList: TformAppList
       SymbolChar = #57492
       Text = 'Search'
       Detail = 'Search app'
+      KeepOrginalColor = False
+      TabOrder = 4
       Align = alLeft
     end
     object USymbolButton2: TUSymbolButton
@@ -140,6 +148,8 @@ object formAppList: TformAppList
       SymbolChar = #57607
       Text = 'Uninstall'
       Detail = 'Detail'
+      KeepOrginalColor = False
+      TabOrder = 5
       Align = alLeft
     end
     object USymbolButton4: TUSymbolButton
@@ -163,6 +173,8 @@ object formAppList: TformAppList
       Detail = 'Home page'
       IsToggleButton = True
       IsToggled = True
+      KeepOrginalColor = False
+      TabOrder = 6
       Align = alLeft
     end
     object USymbolButton3: TUSymbolButton
@@ -184,6 +196,8 @@ object formAppList: TformAppList
       SymbolChar = #57350
       Text = 'Like'
       Detail = 'I like it'
+      KeepOrginalColor = False
+      TabOrder = 7
       Align = alLeft
     end
   end
@@ -192,7 +206,6 @@ object formAppList: TformAppList
     Top = 0
     Width = 440
     Caption = '   App list'
-    Color = 15921906
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -201,10 +214,12 @@ object formAppList: TformAppList
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
-    BackColor.Enabled = False
-    BackColor.Color = clBlack
-    BackColor.LightColor = 15921906
-    BackColor.DarkColor = 2829099
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 15921906
+    BackColors.DarkColor = 2829099
+    BackColors.FocusedLightColor = clBlack
+    BackColors.FocusedDarkColor = clBlack
     object buttonWinClose: TUQuickButton
       Left = 395
       Top = 0
@@ -254,7 +269,6 @@ object formAppList: TformAppList
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alClient
-    Color = 15132390
     ParentColor = False
     TabOrder = 2
     AniSet.AniKind = akOut
@@ -262,6 +276,7 @@ object formAppList: TformAppList
     AniSet.DelayStartTime = 0
     AniSet.Duration = 120
     AniSet.Step = 10
+    AniSet.Queue = True
     BackColor.Enabled = False
     BackColor.Color = clBlack
     BackColor.LightColor = 15132390

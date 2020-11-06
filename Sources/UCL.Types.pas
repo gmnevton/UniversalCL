@@ -2,12 +2,45 @@ unit UCL.Types;
 
 interface
 
-{$REGION 'Older Delphi version'}
+{$IF CompilerVersion > 29}
+  {$LEGACYIFEND ON}
+{$IFEND}
+
+{$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
 uses
   Types;
 
+const
+  {$EXTERNALSYM WM_DPICHANGED}
+  WM_DPICHANGED       = $02E0;
+
 type
+  TDWordFiller = Array[1..4] of Byte; // Pad DWORD to make it 8 bytes (4+4) [x64 only]
+
+  PRect = ^TRect;
+
+  TWMDpi = record
+    Msg: Cardinal;
+  {$IFDEF CPUX64}
+    MsgFiller: TDWordFiller;
+  {$ENDIF}
+    YDpi: Word;
+    XDpi: Word;
+  {$IFDEF CPUX64}
+    WParamFiller: TDWordFiller;
+  {$ENDIF}
+    ScaledRect: PRECT;
+    Result: LRESULT;
+  end;
+
+  TMonitorHelper = class helper for TMonitor
+  private
+    function GetPixelsPerInch: Integer;
+  public
+    property PixelsPerInch: Integer read GetPixelsPerInch;
+  end;
+
   TRectHelper = record helper for TRect
   private
     function GetWidth: Integer;
@@ -52,10 +85,70 @@ type
 {$IFEND}
 {$ENDREGION}
 
+type
+  TUOrientation = (oHorizontal, oVertical);
+
+  TUDirection = (dLeft, dTop, dRight, dBottom);
+
+  TUControlState = (csNone, csHover, csPress, csDisabled, csFocused{, csFocusedHover, csFocusedPress});
+
+  //TUButtonState = (ubsNone, ubsHover, ubsPress);
+  //TUButtonSelectionState = (ubssNormal, ubssSelected);
+
+  TUImageKind = (ikFontIcon, ikImage);
+
+//  TDefColor = array [TUTheme, TUControlState] of TColor;
+
+  AccentPolicy = packed record
+    AccentState: Integer;
+    AccentFlags: Integer;
+    GradientColor: Integer;
+    AnimationId: Integer;
+  end;
+
+  WindowCompositionAttributeData = packed record
+    Attribute: Cardinal;
+    Data: Pointer;
+    SizeOfData: Integer;
+  end;
+
+  TQuadColor = packed record
+    case Boolean of
+      True: (Blue, Green, Red, Alpha: Byte);
+      False: (Quad: Cardinal);
+  end;
+
+  PQuadColor = ^TQuadColor;
+  PPQuadColor = ^PQuadColor;
+
 implementation
 
-{$REGION 'Older Delphi version'}
+{$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
+uses
+  SysUtils,
+  UCL.ShellUIScaling;
+
+{ TMonitorHelper }
+
+function TMonitorHelper.GetPixelsPerInch: Integer;
+var
+  Ydpi: Cardinal;
+  Xdpi: Cardinal;
+  DC: HDC;
+begin
+  if CheckWin32Version(6, 3) then begin
+    if GetDpiForMonitor(Handle, TMonitorDpiType.MDT_EFFECTIVE_DPI, Ydpi, Xdpi) = S_OK then
+      Result := Ydpi
+    else
+      Result := 0;
+  end
+  else begin
+    DC := GetDC(0);
+    Result := GetDeviceCaps(DC, LOGPIXELSY);
+    ReleaseDC(0, DC);
+  end;
+end;
 
 { TRectHelper }
 

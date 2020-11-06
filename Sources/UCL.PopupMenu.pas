@@ -18,62 +18,104 @@ uses
   UCL.IntAnimation,
   UCL.IntAnimation.Helpers,
   UCL.Classes,
+  UCL.Types,
   UCL.Utils,
   UCL.Graphics,
-  UCL.TUThemeManager,
-  UCL.TUForm,
-  UCL.TUSymbolButton;
+  UCL.ThemeManager,
+  UCL.Form,
+  UCL.SymbolButton;
 
 type
   TIndexNotifyEvent = procedure (Sender: TObject; Index: Integer) of object;
 
-  TUPopupMenu = class(TPopupMenu, IUThemeComponent)
-    private
-      var BackColor: TColor;
+  TUPopupMenu = class(TPopupMenu, IUThemedComponent)
+  private var
+    BackColor: TColor;
 
-      FThemeManager: TUThemeManager;
-      FAniSet: TIntAniSet;
-      FOnItemClick: TIndexNotifyEvent;
+  private
+    FThemeManager: TUThemeManager;
+    FAniSet: TIntAniSet;
+    FOnItemClick: TIndexNotifyEvent;
 
-      FItemWidth: Integer;
-      FItemHeight: Integer;
-      FTopSpace: Integer;
-      FImageKind: TUImageKind;
-      FCloseAnimation: Boolean;
+    FItemWidth: Integer;
+    FItemHeight: Integer;
+    FTopSpace: Integer;
+    FImageKind: TUImageKind;
+    FCloseAnimation: Boolean;
 
-      procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
 
-      procedure PopupForm_OnDeactivate(Sender: TObject);
-      procedure PopupItem_OnClick(Sender: TObject);
+    procedure PopupForm_OnDeactivate(Sender: TObject);
+    procedure PopupItem_OnClick(Sender: TObject);
 
-    protected
-      //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    public
-      constructor Create(aOwner: TComponent); override;
-      destructor Destroy; override;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
 
-      procedure UpdateTheme;
+    // IUThemedComponent
+    procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
-      procedure Popup(X, Y: Integer); override;
-      procedure PopupAtPoint(P: TPoint); overload;
-      procedure PopupAtMouse; overload;
+    procedure Popup(X, Y: Integer); override;
+    procedure PopupAtPoint(P: TPoint); overload;
+    procedure PopupAtMouse; overload;
 
-      procedure ExtractPackedContent(Input: string; out Icon, Text, Detail: string);
+    procedure ExtractPackedContent(Input: string; out Icon, Text, Detail: string);
 
-    published
-      property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
-      property AniSet: TIntAniSet read FAniSet write FAniSet;
-      property OnItemClick: TIndexNotifyEvent read FOnItemClick write FOnItemClick;
+  published
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    property AniSet: TIntAniSet read FAniSet write FAniSet;
+    property OnItemClick: TIndexNotifyEvent read FOnItemClick write FOnItemClick;
 
-      property ItemWidth: Integer read FItemWidth write FItemWidth default 200;
-      property ItemHeight: Integer read FItemHeight write FItemHeight default 32;
-      property TopSpace: Integer read FTopSpace write FTopSpace default 5;
-      property ImageKind: TUImageKind read FImageKind write FImageKind default ikFontIcon;
-      property CloseAnimation: Boolean read FCloseAnimation write FCloseAnimation default false;
+    property ItemWidth: Integer read FItemWidth write FItemWidth default 200;
+    property ItemHeight: Integer read FItemHeight write FItemHeight default 32;
+    property TopSpace: Integer read FTopSpace write FTopSpace default 5;
+    property ImageKind: TUImageKind read FImageKind write FImageKind default ikFontIcon;
+    property CloseAnimation: Boolean read FCloseAnimation write FCloseAnimation default false;
   end;
 
 implementation
+
+uses
+  UCL.Colors;
+
+{ TUPopupMenu }
+
+//  MAIN CLASS
+
+constructor TUPopupMenu.Create(aOwner: TComponent);
+begin
+  inherited;
+  FThemeManager := Nil;
+
+  BackColor := $E6E6E6;
+
+  FItemWidth := 200;
+  FItemHeight := 32;
+  FTopSpace := 5;
+  FImageKind := ikFontIcon;
+  FCloseAnimation := false;
+
+  FAniSet := TIntAniSet.Create;
+  FAniSet.QuickAssign(akOut, afkQuartic, 0, 120, 20);
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+end;
+
+destructor TUPopupMenu.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  FAniSet.Free;
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
 
 { Other }
 
@@ -111,61 +153,55 @@ begin
     FOnItemClick(Self, (Sender as TUSymbolButton).Tag);
 end;
 
-{ TUPopupMenu }
-
 //  THEME
 
-procedure TUPopupMenu.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUPopupMenu.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
 procedure TUPopupMenu.UpdateTheme;
+var
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager = Nil then
-    BackColor := $E6E6E6
-  else if ThemeManager.Theme = utLight then
+  TM:=SelectThemeManager(Self);
+  if TM.ThemeUsed = utLight then
     BackColor := $E6E6E6
   else
     BackColor := $1F1F1F;
 end;
-{
+
+function TUPopupMenu.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUPopupMenu.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
 procedure TUPopupMenu.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := Nil;
-end;
-}
-//  MAIN CLASS
-
-constructor TUPopupMenu.Create(aOwner: TComponent);
-begin
-  inherited;
-  FThemeManager := Nil;
-
-  BackColor := $E6E6E6;
-
-  FItemWidth := 200;
-  FItemHeight := 32;
-  FTopSpace := 5;
-  FImageKind := ikFontIcon;
-  FCloseAnimation := false;
-
-  FAniSet := TIntAniSet.Create;
-  FAniSet.QuickAssign(akOut, afkQuartic, 0, 120, 20);
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-end;
-
-destructor TUPopupMenu.Destroy;
-begin
-  FAniSet.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
 end;
 
 //  UTILS

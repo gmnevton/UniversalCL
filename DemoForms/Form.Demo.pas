@@ -27,31 +27,31 @@ uses
   pngimage,
   jpeg,
   //  UCL units
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.IntAnimation,
   UCL.IntAnimation.Helpers,
   UCL.Utils,
   UCL.Classes,
   UCL.SystemSettings,
-  UCL.TUForm,
-  UCL.TUFormOverlay,
-  UCL.TUScrollBox,
-  UCL.TUCheckBox,
-  UCL.TUProgressBar,
-  UCL.TUHyperLink,
-  UCL.TUPanel,
-  UCL.TUSymbolButton,
-  UCL.TUButton,
-  UCL.TUText,
-  UCL.TUCaptionBar,
-  UCL.TUSlider,
-  UCL.TUSeparator,
-  UCL.TUEdit,
-  UCL.TUItemButton,
-  UCL.TUQuickButton,
-  UCL.TUPopupMenu,
-  UCL.TURadioButton,
-  UCL.TUShadow;
+  UCL.Form,
+  UCL.FormOverlay,
+  UCL.ScrollBox,
+  UCL.CheckBox,
+  UCL.ProgressBar,
+  UCL.HyperLink,
+  UCL.Panel,
+  UCL.SymbolButton,
+  UCL.Button,
+  UCL.Text,
+  UCL.CaptionBar,
+  UCL.Slider,
+  UCL.Separator,
+  UCL.Edit,
+  UCL.ItemButton,
+  UCL.QuickButton,
+  UCL.PopupMenu,
+  UCL.RadioButton,
+  UCL.Shadow;
 
 type
   TformDemo = class(TUForm)
@@ -191,17 +191,21 @@ implementation
 uses
   Form.LoginDialog,
   Form.ImageBackground,
-  Form.AppList;
+  Form.AppList,
+  UCL.Colors;
 
 {$R *.dfm}
 
 //  MAIN FORM
 
 procedure TformDemo.FormCreate(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
   CaptionBar := captionBarMain;
-  ThemeManager.OnBeforeUpdate := AppThemeBeforeUpdate;
-  ThemeManager.OnAfterUpdate  := AppThemeAfterUpdate;
+  TM := SelectThemeManager(Self);
+  TM.OnBeforeUpdate := AppThemeBeforeUpdate;
+  TM.OnAfterUpdate  := AppThemeAfterUpdate;
 end;
 
 procedure TformDemo.AppThemeBeforeUpdate(Sender: TObject);
@@ -215,23 +219,26 @@ begin
 end;
 
 procedure TformDemo.AppThemeAfterUpdate(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
+  TM := SelectThemeManager(Self);
   //  Handle theme changed for formDemo
   if formDemo <> Nil then begin
     //  Theme changed
-    if ThemeManager.UseSystemTheme then
+    if TM.Theme = ttSystem then
       formDemo.radioSystemTheme.IsChecked := True
-    else if ThemeManager.CustomTheme = utLight then
+    else if TM.Theme = ttLight then
       formDemo.radioLightTheme.IsChecked := True
     else
       formDemo.radioDarkTheme.IsChecked := True;
 
     //  Accent color changed
-    formDemo.panelSelectAccentColor.Color := ThemeManager.AccentColor;
-    formDemo.panelSelectAccentColor.Font.Color := GetTextColorFromBackground(ThemeManager.AccentColor);
+    formDemo.panelSelectAccentColor.Color := TM.AccentColor;
+    formDemo.panelSelectAccentColor.Font.Color := GetTextColorFromBackground(TM.AccentColor);
 
     //  Color on border changed
-    if ThemeManager.ColorOnBorder then
+    if TM.UseColorOnBorder then
       formDemo.checkColorBorder.State := cbsChecked
     else
       formDemo.checkColorBorder.State := cbsUnchecked;
@@ -240,9 +247,9 @@ begin
   //  Handle theme changed for formImageBackground
   if formImageBackground <> Nil then begin
     //  Theme changed
-    if ThemeManager.UseSystemTheme then
+    if TM.Theme = ttSystem then
       formImageBackground.radioSystemTheme.IsChecked := True
-    else if ThemeManager.CustomTheme = utLight then
+    else if TM.Theme = ttLight then
       formImageBackground.radioLightTheme.IsChecked := True
     else
       formImageBackground.radioDarkTheme.IsChecked := True;
@@ -365,8 +372,11 @@ begin
 end;
 
 procedure TformDemo.buttonHighlightClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.Disconnect(buttonNoFocus);
+  TM := SelectThemeManager(Self);
+  TM.Disconnect(buttonNoFocus);
 end;
 
 procedure TformDemo.sliderHorzChange(Sender: TObject);
@@ -419,8 +429,11 @@ end;
 //  THEME
 
 procedure TformDemo.buttonReloadSettingsClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  TM.Reload;
 end;
 
 procedure TformDemo.comboAppBorderStyleChange(Sender: TObject);
@@ -469,37 +482,50 @@ end;
 
 procedure TformDemo.panelSelectAccentColorClick(Sender: TObject);
 var
+  TM: TUCustomThemeManager;
   NewColor: TColor;
 begin
+  TM := SelectThemeManager(Self);
   //  Open dialog
   if dialogSelectColor.Execute then begin
     NewColor := dialogSelectColor.Color;
 
     //  Change accent color
-    ThemeManager.UseSystemAccentColor := false;
-    ThemeManager.CustomAccentColor := NewColor;
-    ThemeManager.Reload;
+    TM.UseSystemAccentColor := False;
+    TM.AccentColor := NewColor;
+//    ThemeManager.Reload;
   end;
 end;
 
 procedure TformDemo.radioSystemThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.UseSystemTheme := True;
-  ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttSystem;
+//  ThemeManager.Reload;
 end;
 
 procedure TformDemo.radioLightThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.CustomTheme := utLight;
-  ThemeManager.UseSystemTheme := False;
-  ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttLight;
+//  ThemeManager.CustomTheme := utLight;
+//  ThemeManager.UseSystemTheme := False;
+//  ThemeManager.Reload;
 end;
 
 procedure TformDemo.radioDarkThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.CustomTheme := utDark;
-  ThemeManager.UseSystemTheme := False;
-  ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttDark;
+//  ThemeManager.CustomTheme := utDark;
+//  ThemeManager.UseSystemTheme := False;
+//  ThemeManager.Reload;
 end;
 
 //  POPUP MENU

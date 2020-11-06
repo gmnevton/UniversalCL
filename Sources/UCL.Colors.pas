@@ -7,7 +7,8 @@ uses
   Classes,
   Controls,
   Graphics,
-  UCL.Classes,
+  Menus,
+  UCL.Types,
   UCL.ThemeManager;
   
 type
@@ -28,13 +29,12 @@ type
 
     procedure Assign(Source: TPersistent); override;
     procedure SetColors; overload; virtual; abstract; // set defaults
-    function GetColor(const TM: TUThemeManager): TColor; overload; virtual; abstract;
+    function GetColor(const TM: TUCustomThemeManager): TColor; overload; virtual; abstract;
 
   published
     property Enabled: Boolean read FEnabled write SetEnabled;   //  No default
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
-
 
   TUThemeControlColorSet = class(TUThemeColorSet)
   private
@@ -52,7 +52,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure SetColors; overload; override; // set defaults
     procedure SetColors(Color, LightColor, DarkColor: TColor); overload;
-    function GetColor(const TM: TUThemeManager): TColor; override;
+    function GetColor(const TM: TUCustomThemeManager): TColor; override;
 
   published
     property Color: TColor index 0 read FColor write SetColor;
@@ -69,7 +69,7 @@ type
     SelectedPress: TColor;
   end;
 
-  TUThemeButtonStateColorSet = class(TUThemeColorSet)
+  TUThemeControlStateColors = class(TUThemeColorSet)
   private
     FLightSet: TUStateColorsSet;
     FDarkSet : TUStateColorsSet;
@@ -79,12 +79,11 @@ type
 
   public
     constructor Create; override;
-    //constructor Create(Color, Hover, Press, SelColor, SelHover, SelPress: TColor); overload;
 
     procedure Assign(Source: TPersistent); override;
     procedure SetColors; overload; override; // set defaults
     procedure SetColors(const Theme: TUTheme; Color, Hover, Press, SelColor, SelHover, SelPress: TColor); overload;
-    function GetColor(const TM: TUThemeManager; State: TUButtonState): TColor; overload;
+    function GetColor(const Theme: TUTheme; State: TUControlState; Selected: Boolean): TColor; overload;
 
   published
     property LightColor: TColor index 0 read FLightSet.Color write SetColor;
@@ -102,6 +101,47 @@ type
     property DarkSelectedPress: TColor index 11 read FDarkSet.SelectedPress write SetColor;
   end;
 
+  TUControlStateColorSet = record
+    Color: TColor;
+    Hover: TColor;
+    Press: TColor;
+    Disabled: TColor;
+    Focused: TColor;
+  end;
+
+  TUThemeFocusableControlStateColors = class(TUThemeColorSet)
+  private
+    FLightSet: TUControlStateColorSet;
+    FDarkSet : TUControlStateColorSet;
+
+  protected
+    procedure SetColor(Index: Integer; const Value: TColor); override;
+
+  public
+    constructor Create; override;
+    //constructor Create(Color, Hover, Press, SelColor, SelHover, SelPress: TColor); overload;
+
+    procedure Assign(Source: TPersistent); override;
+    procedure SetColors; overload; override; // set defaults
+    procedure SetColors(const Theme: TUTheme; Color, Hover, Press, Disabled, Focused: TColor); overload;
+    function GetColor(const Theme: TUTheme; const State: TUControlState): TColor; overload;
+
+  published
+    property LightColor: TColor index 0 read FLightSet.Color write SetColor;
+    property LightHover: TColor index 1 read FLightSet.Hover write SetColor;
+    property LightPress: TColor index 2 read FLightSet.Press write SetColor;
+    property LightDisabled: TColor index 3 read FLightSet.Disabled write SetColor;
+    property LightFocused: TColor index 4 read FLightSet.Focused write SetColor;
+    //
+    property DarkColor: TColor index 5 read FDarkSet.Color write SetColor;
+    property DarkHover: TColor index 6 read FDarkSet.Hover write SetColor;
+    property DarkPress: TColor index 7 read FDarkSet.Press write SetColor;
+    property DarkDisabled: TColor index 8 read FDarkSet.Disabled write SetColor;
+    property DarkFocused: TColor index 9 read FDarkSet.Focused write SetColor;
+  end;
+
+  TUThemeButtonStateColorSet = class(TUThemeFocusableControlStateColors);
+
   TUThemeControlWithFocusColorSet = class(TUThemeControlColorSet)
   private
     FFocusedLightColor: TColor;
@@ -118,7 +158,7 @@ type
     procedure SetColors; overload; override; // set defaults
     procedure SetColors(Color, LightColor, DarkColor, FocusedLightColor, FocusedDarkColor: TColor); overload;
     procedure SetColors(FocusedLightColor, FocusedDarkColor: TColor); overload;
-    function GetColor(const TM: TUThemeManager; const Focused: Boolean): TColor; overload;
+    function GetColor(const TM: TUCustomThemeManager; const Focused: Boolean): TColor; overload;
 
   published
     property FocusedLightColor: TColor index 3 read FFocusedLightColor write SetColor;
@@ -128,7 +168,7 @@ type
   TUThemeCaptionBarColorSet = class(TUThemeControlWithFocusColorSet);
 
 var
-  MINI_SB_COLOR,
+//  MINI_SB_COLOR,
   MINI_SB_COLOR_LIGHT,
   MINI_SB_COLOR_DARK: TColor;
   //SCROLLBOX_BACK,
@@ -162,7 +202,7 @@ var
   
   // Caption bar
   CAPTIONBAR_BACK: TUThemeCaptionBarColorSet;
-  
+
   // Button
   BUTTON_BACK: TUThemeButtonStateColorSet;
   BUTTON_BORDER: TUThemeButtonStateColorSet;
@@ -189,7 +229,8 @@ var
   DETAIL_COLOR: TColor;
   DETAIL_COLOR_HIGHLIGHED: TColor;
 
-function SelectThemeManager(Control: TControl): TUThemeManager;
+function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload;
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload;
 
 implementation
 
@@ -197,15 +238,37 @@ uses
   Forms,
   UCL.Form;
 
-function SelectThemeManager(Control: TControl): TUThemeManager;
+//function SelectThemeManager(Control: TControl): TUThemeManager;
+//var
+//  ParentForm: TCustomForm;
+//begin
+//  ParentForm := GetParentForm(Control, True);
+//  if (ParentForm <> Nil) and (ParentForm is TUForm) then
+//    Result := (ParentForm as TUForm).ThemeManager
+//  else
+//    Result := Nil;
+//end;
+
+function SelectThemeManager(Control: TControl): TUCustomThemeManager;
 var
-  ParentForm: TCustomForm;
+  ThemedComponent: IUThemedComponent;
 begin
-  ParentForm := GetParentForm(Control, true);
-  if (ParentForm <> Nil) and (ParentForm is TUForm) then
-    Result := (ParentForm as TUForm).ThemeManager
-  else
-    Result := Nil;
+  Result:=GetCommonThemeManager;
+  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+    if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
+      Result:=ThemedComponent.CustomThemeManager;
+  end;
+end;
+
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload;
+var
+  ThemedComponent: IUThemedComponent;
+begin
+  Result:=GetCommonThemeManager;
+  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+    if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
+      Result:=ThemedComponent.CustomThemeManager;
+  end;
 end;
 
 { TUThemeColorSet }
@@ -261,11 +324,15 @@ begin
 end;
 
 procedure TUThemeControlColorSet.Assign(Source: TPersistent);
+var
+  SourceObject: TUThemeControlColorSet;
 begin
   if Source is TUThemeControlColorSet then begin
-    FColor      := (Source as TUThemeControlColorSet).Color;
-    FLightColor := (Source as TUThemeControlColorSet).LightColor;
-    FDarkColor  := (Source as TUThemeControlColorSet).DarkColor;
+    SourceObject:=TUThemeControlColorSet(Source);
+    //
+    FColor      := SourceObject.Color;
+    FLightColor := SourceObject.LightColor;
+    FDarkColor  := SourceObject.DarkColor;
   end;
   inherited Assign(Source); // must be last - changed is called here
 end;
@@ -310,18 +377,339 @@ begin
   Changed;
 end;
 
-function TUThemeControlColorSet.GetColor(const TM: TUThemeManager): TColor;
+function TUThemeControlColorSet.GetColor(const TM: TUCustomThemeManager): TColor;
 begin
   if TM = Nil then
     Result := Color
   else begin
-    if TM.Theme = ttLight then
+    if TM.ThemeUsed = utLight then
       Result := LightColor
     else
       Result := DarkColor;
   end;
 end;
 
+{ TUThemeControlStateColors }
+
+constructor TUThemeControlStateColors.Create;
+begin
+  inherited Create;
+  SetColors;
+end;
+
+procedure TUThemeControlStateColors.Assign(Source: TPersistent);
+var
+  SourceObject: TUThemeControlStateColors;
+begin
+  if Source is TUThemeControlStateColors then begin
+    SourceObject:=TUThemeControlStateColors(Source);
+    //
+    FLightSet := SourceObject.FLightSet;
+    FDarkSet  := SourceObject.FDarkSet;
+  end;
+  inherited Assign(Source); // must be last - changed is called here
+end;
+
+procedure TUThemeControlStateColors.SetColors;
+begin
+  FLightSet.Color    := $00000000;
+  FLightSet.Hover    := $00000000;
+  FLightSet.Press    := $00000000;
+  FLightSet.SelectedColor := $00000000;
+  FLightSet.SelectedHover := $00000000;
+  FLightSet.SelectedPress := $00000000;
+  //
+  FDarkSet.Color    := $00000000;
+  FDarkSet.Hover    := $00000000;
+  FDarkSet.Press    := $00000000;
+  FDarkSet.SelectedColor := $00000000;
+  FDarkSet.SelectedHover := $00000000;
+  FDarkSet.SelectedPress := $00000000;
+end;
+
+procedure TUThemeControlStateColors.SetColors(const Theme: TUTheme; Color, Hover, Press, SelColor, SelHover, SelPress: TColor);
+begin
+  if Theme = utLight then begin
+    FLightSet.Color    := Color;
+    FLightSet.Hover    := Hover;
+    FLightSet.Press    := Press;
+    FLightSet.SelectedColor := SelColor;
+    FLightSet.SelectedHover := SelHover;
+    FLightSet.SelectedPress := SelPress;
+  end
+  else begin
+    FDarkSet.Color    := Color;
+    FDarkSet.Hover    := Hover;
+    FDarkSet.Press    := Press;
+    FDarkSet.SelectedColor := SelColor;
+    FDarkSet.SelectedHover := SelHover;
+    FDarkSet.SelectedPress := SelPress;
+  end;
+end;
+
+procedure TUThemeControlStateColors.SetColor(Index: Integer; const Value: TColor);
+begin
+  case Index of
+    0: if Value <> FLightSet.Color then begin
+      FLightSet.Color := Value;
+    end
+    else
+      Exit;
+
+    1: if Value <> FLightSet.Hover then begin
+      FLightSet.Hover := Value;
+    end
+    else
+      Exit;
+
+    2: if Value <> FLightSet.Press then begin
+      FLightSet.Press := Value;
+    end
+    else
+      Exit;
+
+    3: if Value <> FLightSet.SelectedColor then begin
+      FLightSet.SelectedColor := Value;
+    end
+    else
+      Exit;
+
+    4: if Value <> FLightSet.SelectedHover then begin
+      FLightSet.SelectedHover := Value;
+    end
+    else
+      Exit;
+
+    5: if Value <> FLightSet.SelectedPress then begin
+      FLightSet.SelectedPress := Value;
+    end
+    else
+      Exit;
+
+    ///////////////////////////////////////////////////////////////
+
+    6: if Value <> FDarkSet.Color then begin
+      FDarkSet.Color := Value;
+    end
+    else
+      Exit;
+
+    7: if Value <> FDarkSet.Hover then begin
+      FDarkSet.Hover := Value;
+    end
+    else
+      Exit;
+
+    8: if Value <> FDarkSet.Press then begin
+      FDarkSet.Press := Value;
+    end
+    else
+      Exit;
+
+    9: if Value <> FDarkSet.SelectedColor then begin
+      FDarkSet.SelectedColor := Value;
+    end
+    else
+      Exit;
+
+    10: if Value <> FDarkSet.SelectedHover then begin
+      FDarkSet.SelectedHover := Value;
+    end
+    else
+      Exit;
+
+    11: if Value <> FDarkSet.SelectedPress then begin
+      FDarkSet.SelectedPress := Value;
+    end
+    else
+      Exit;
+  end;
+  Changed;
+end;
+
+function TUThemeControlStateColors.GetColor(const Theme: TUTheme; State: TUControlState; Selected: Boolean): TColor;
+begin
+  Result := clNone; // satisfy compiler
+  if Theme = utLight then begin
+    if not Selected then begin
+      case State of
+        csNone : Result := FLightSet.Color;
+        csHover: Result := FLightSet.Hover;
+        csPress: Result := FLightSet.Press;
+      end;
+    end
+    else begin
+      case State of
+        csNone : Result := FLightSet.SelectedColor;
+        csHover: Result := FLightSet.SelectedHover;
+        csPress: Result := FLightSet.SelectedPress;
+      end;
+    end;
+  end
+  else begin
+    if not Selected then begin
+      case State of
+        csNone : Result := FDarkSet.Color;
+        csHover: Result := FDarkSet.Hover;
+        csPress: Result := FDarkSet.Press;
+      end;
+    end
+    else begin
+      case State of
+        csNone : Result := FDarkSet.SelectedColor;
+        csHover: Result := FDarkSet.SelectedHover;
+        csPress: Result := FDarkSet.SelectedPress;
+      end;
+    end;
+  end
+end;
+
+{ TUThemeFocusableControlStateColors }
+
+constructor TUThemeFocusableControlStateColors.Create;
+begin
+  inherited Create;
+  SetColors;
+end;
+
+procedure TUThemeFocusableControlStateColors.Assign(Source: TPersistent);
+var
+  SourceObject: TUThemeFocusableControlStateColors;
+begin
+  if Source is TUThemeFocusableControlStateColors then begin
+    SourceObject:=TUThemeFocusableControlStateColors(Source);
+    //
+    FLightSet := SourceObject.FLightSet;
+    FDarkSet  := SourceObject.FDarkSet;
+  end;
+  inherited Assign(Source); // must be last - changed is called here
+end;
+
+procedure TUThemeFocusableControlStateColors.SetColors;
+begin
+  FLightSet.Color    := $00000000;
+  FLightSet.Hover    := $00000000;
+  FLightSet.Press    := $00000000;
+  FLightSet.Disabled := $00000000;
+  FLightSet.Focused  := $00000000;
+  //
+  FDarkSet.Color    := $00000000;
+  FDarkSet.Hover    := $00000000;
+  FDarkSet.Press    := $00000000;
+  FDarkSet.Disabled := $00000000;
+  FDarkSet.Focused  := $00000000;
+end;
+
+procedure TUThemeFocusableControlStateColors.SetColors(const Theme: TUTheme; Color, Hover, Press, Disabled, Focused: TColor);
+begin
+  if Theme = utLight then begin
+    FLightSet.Color    := Color;
+    FLightSet.Hover    := Hover;
+    FLightSet.Press    := Press;
+    FLightSet.Disabled := Disabled;
+    FLightSet.Focused  := Focused;
+  end
+  else begin
+    FDarkSet.Color    := Color;
+    FDarkSet.Hover    := Hover;
+    FDarkSet.Press    := Press;
+    FDarkSet.Disabled := Disabled;
+    FDarkSet.Focused  := Focused;
+  end;
+end;
+
+procedure TUThemeFocusableControlStateColors.SetColor(Index: Integer; const Value: TColor);
+begin
+  case Index of
+    0: if Value <> FLightSet.Color then begin
+      FLightSet.Color := Value;
+    end
+    else
+      Exit;
+
+    1: if Value <> FLightSet.Hover then begin
+      FLightSet.Hover := Value;
+    end
+    else
+      Exit;
+
+    2: if Value <> FLightSet.Press then begin
+      FLightSet.Press := Value;
+    end
+    else
+      Exit;
+
+    3: if Value <> FLightSet.Disabled then begin
+      FLightSet.Disabled := Value;
+    end
+    else
+      Exit;
+
+    4: if Value <> FLightSet.Focused then begin
+      FLightSet.Focused := Value;
+    end
+    else
+      Exit;
+
+    ///////////////////////////////////////////////////////////////
+
+    5: if Value <> FDarkSet.Color then begin
+      FDarkSet.Color := Value;
+    end
+    else
+      Exit;
+
+    6: if Value <> FDarkSet.Hover then begin
+      FDarkSet.Hover := Value;
+    end
+    else
+      Exit;
+
+    7: if Value <> FDarkSet.Press then begin
+      FDarkSet.Press := Value;
+    end
+    else
+      Exit;
+
+    8: if Value <> FDarkSet.Disabled then begin
+      FDarkSet.Disabled := Value;
+    end
+    else
+      Exit;
+
+    9: if Value <> FDarkSet.Focused then begin
+      FDarkSet.Focused := Value;
+    end
+    else
+      Exit;
+  end;
+  Changed;
+end;
+
+function TUThemeFocusableControlStateColors.GetColor(const Theme: TUTheme; const State: TUControlState): TColor;
+begin
+  Result := clNone; // satisfy compiler
+  if Theme = utLight then begin
+    case State of
+      csNone    : Result := FLightSet.Color;
+      csHover   : Result := FLightSet.Hover;
+      csPress   : Result := FLightSet.Press;
+      csDisabled: Result := FLightSet.Disabled;
+      csFocused : Result := FLightSet.Focused;
+    end;
+  end
+  else begin
+    case State of
+      csNone    : Result := FDarkSet.Color;
+      csHover   : Result := FDarkSet.Hover;
+      csPress   : Result := FDarkSet.Press;
+      csDisabled: Result := FDarkSet.Disabled;
+      csFocused : Result := FDarkSet.Focused;
+    end;
+  end
+end;
+
+(*
 { TUThemeButtonStateColorSet }
 
 constructor TUThemeButtonStateColorSet.Create;
@@ -479,31 +867,43 @@ begin
   Changed;
 end;
 
-function TUThemeButtonStateColorSet.GetColor(const TM: TUThemeManager; State: TUButtonState): TColor;
+function TUThemeButtonStateColorSet.GetColor(const Theme: TUThemeType; State: TUControlState; Selected: Boolean): TColor;
 begin
   Result := clNone; // satisfy compiler
-  if ((TM.Theme = ttSystem) and (TM.SystemTheme = utLight)) or (TM.Theme = ttLight) then begin
-    case State of
-      ubsNone : Result := FLightSet.Color;
-      ubsHover: Result := FLightSet.Hover;
-      ubsPress: Result := FLightSet.Press;
-      ubsSelectedNone : Result := FLightSet.SelectedColor;
-      ubsSelectedHover: Result := FLightSet.SelectedHover;
-      ubsSelectedPress: Result := FLightSet.SelectedPress;
+  if ((Theme = ttSystem) and (GetCommonThemeManager.SystemTheme = utLight)) or (Theme = ttLight) then begin
+    if not Selected then begin
+      case State of
+        csNone : Result := FLightSet.Color;
+        csHover: Result := FLightSet.Hover;
+        csPress: Result := FLightSet.Press;
+      end;
+    end
+    else begin
+      case State of
+        csNone : Result := FLightSet.SelectedColor;
+        csHover: Result := FLightSet.SelectedHover;
+        csPress: Result := FLightSet.SelectedPress;
+      end;
     end;
   end
-  else if ((TM.Theme = ttSystem) and (TM.SystemTheme = utDark)) or (TM.Theme = ttDark) then begin
-    case State of
-      ubsNone : Result := FDarkSet.Color;
-      ubsHover: Result := FDarkSet.Hover;
-      ubsPress: Result := FDarkSet.Press;
-      ubsSelectedNone : Result := FDarkSet.SelectedColor;
-      ubsSelectedHover: Result := FDarkSet.SelectedHover;
-      ubsSelectedPress: Result := FDarkSet.SelectedPress;
+  else if ((Theme = ttSystem) and (GetCommonThemeManager.SystemTheme = utDark)) or (Theme = ttDark) then begin
+    if not Selected then begin
+      case State of
+        csNone : Result := FDarkSet.Color;
+        csHover: Result := FDarkSet.Hover;
+        csPress: Result := FDarkSet.Press;
+      end;
+    end
+    else begin
+      case State of
+        csNone : Result := FDarkSet.SelectedColor;
+        csHover: Result := FDarkSet.SelectedHover;
+        csPress: Result := FDarkSet.SelectedPress;
+      end;
     end;
   end
 end;
-
+*)
 { TUThemeControlWithFocusColorSet }
 
 constructor TUThemeControlWithFocusColorSet.Create;
@@ -570,21 +970,25 @@ end;
 
 procedure TUThemeControlWithFocusColorSet.SetColors(Color, LightColor, DarkColor, FocusedLightColor, FocusedDarkColor: TColor);
 begin
-
+  SetColors(Color, LightColor, DarkColor);
+  SetColors(FocusedLightColor, FocusedDarkColor);
+//  FFocusedLightColor := FocusedLightColor;
+//  FFocusedDarkColor  := FocusedDarkColor;
 end;
 
-function TUThemeControlWithFocusColorSet.GetColor(const TM: TUThemeManager; const Focused: Boolean): TColor;
+function TUThemeControlWithFocusColorSet.GetColor(const TM: TUCustomThemeManager; const Focused: Boolean): TColor;
 begin
+  Result:=clNone;
   if TM = Nil then
     Result := Color
   else begin
-    if TM.Theme = ttLight then begin
+    if TM.ThemeUsed = utLight then begin
       if not Focused then
         Result := LightColor
       else
         Result := FocusedLightColor;
     end
-    else if TM.Theme = ttDark then begin
+    else begin // dark
       if not Focused then
         Result := DarkColor
       else
@@ -594,7 +998,7 @@ begin
 end;
 
 initialization
-  MINI_SB_COLOR       := $1A1A1A;
+//  MINI_SB_COLOR       := $1A1A1A;
   MINI_SB_COLOR_LIGHT := $1A1A1A;
   MINI_SB_COLOR_DARK  := $7A7A7A;
 
@@ -626,18 +1030,18 @@ initialization
   
   // Scrollbox
   SCROLLBOX_BACK := TUThemeControlColorSet.Create(0, $E6E6E6, $1F1F1F);
-  
+
   // Caption bar
   CAPTIONBAR_BACK := TUThemeCaptionBarColorSet.Create;
   CAPTIONBAR_BACK.SetColors(0, $F2F2F2, $2B2B2B, $D77800, $174800);
 
   // Button
   BUTTON_BACK := TUThemeButtonStateColorSet.Create;
-  //BUTTON_BACK.SetLightColor($CCCCCC, $CCCCCC, $999999, $CCCCCC, $CCCCCC, $999999);
-  //BUTTON_BACK.SetDarkColor($333333, $333333, $666666, $333333, $333333, $666666);
+  BUTTON_BACK.SetColors(utLight, $CCCCCC, $CCCCCC, $999999, $CCCCCC, $CCCCCC{, $999999});
+  BUTTON_BACK.SetColors(utDark,  $333333, $333333, $666666, $333333, $333333{, $666666});
   BUTTON_BORDER := TUThemeButtonStateColorSet.Create;
-  //BUTTON_BORDER.SetLightColor($CCCCCC, $7A7A7A, $999999, $7A7A7A, $7A7A7A, $999999);
-  //BUTTON_BORDER.SetDarkColor($333333, $858585, $666666, $858585, $858585, $666666);
+  BUTTON_BORDER.SetColors(utLight, $CCCCCC, $7A7A7A, $999999, $7A7A7A, $7A7A7A{, $999999});
+  BUTTON_BORDER.SetColors(utDark,  $333333, $858585, $666666, $858585, $858585{, $666666});
 
   // List button
   LISTBUTTON_BACK := TUThemeControlColorSet.Create;
@@ -665,10 +1069,8 @@ initialization
   // Edit
   EDIT_BACK := TUThemeControlWithFocusColorSet.Create($FFFFFF, $FFFFFF, $000000);
   EDIT_BORDER := TUThemeControlWithFocusColorSet.Create;
-  //EDIT_BORDER.SetLightColor($999999, $666666, $D77800, $D77800, $D77800, $D77800);
-  //EDIT_BORDER.SetDarkColor($666666, $999999, $D77800, $D77800, $D77800, $D77800);
-  
-  EDIT_BORDER := TUThemeControlWithFocusColorSet.Create;
+  //EDIT_BORDER.SetColors(utLight, $999999, $666666, $D77800, $D77800, $D77800, $D77800);
+  //EDIT_BORDER.SetColors(utDark,  $666666, $999999, $D77800, $D77800, $D77800, $D77800);
   EDIT_BORDER.SetColors(0, $999999, $666666, $D77800, $D77800);
 
   DETAIL_COLOR := $808080;  //  Both light & dark

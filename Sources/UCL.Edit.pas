@@ -17,8 +17,9 @@ uses
   Graphics,
   Forms,
   UCL.Classes,
+  UCL.Types,
   UCL.Colors,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.Utils;
 
 const
@@ -61,11 +62,11 @@ type
     property OnKeyUp;
   end;
 
-  TUEdit = class(TPanel, IUThemeComponent)
-  private const
-    DefBorderColor: TDefColor = (
-      ($999999, $666666, $D77800, $CCCCCC, $D77800),
-      ($666666, $999999, $D77800, $CCCCCC, $D77800));
+  TUEdit = class(TPanel, IUThemedComponent)
+//  private const
+//    DefBorderColor: TDefColor = (
+//      ($999999, $666666, $D77800, $CCCCCC, $D77800),
+//      ($666666, $999999, $D77800, $CCCCCC, $D77800));
 
   private var
     BorderThickness: Integer;
@@ -86,7 +87,7 @@ type
     procedure UpdateColors;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetControlState(const Value: TUControlState);
     procedure SetTransparent(const Value: Boolean);
 
@@ -107,7 +108,7 @@ type
     procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
@@ -116,10 +117,13 @@ type
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor write FBorderColor;
     property Edit: TUSubEdit read FEdit write FEdit;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
@@ -151,13 +155,84 @@ begin
   inherited;
 end;
 
-{ TUCustomEdit }
+{ TUEdit }
+
+//  MAIN CLASS
+
+constructor TUEdit.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FThemeManager := Nil;
+
+  BorderThickness := 2;
+
+  FControlState := csNone;
+  FTransparent := False;
+
+  Alignment := taLeftJustify;
+  ShowCaption := False;
+  Height := 29;
+  BevelOuter := bvNone;
+  Caption := '';
+  Padding.SetBounds(5, 5, 4, 4);
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
+
+  FEdit := TUSubEdit.Create(Self);
+  FEdit.Parent := Self;
+  FEdit.ParentFont := True;
+  FEdit.Name := 'SubEdit';
+  FEdit.Text := '';
+  FEdit.BorderStyle := bsNone;
+  FEdit.AutoSize := True;
+  FEdit.ParentColor := True;
+  FEdit.Height := 20;
+
+  FEdit.Align := alClient;
+  FEdit.SetSubComponent(True);
+
+  FBorderColor := TUThemeControlWithFocusColorSet.Create;
+  FBorderColor.Assign(EDIT_BORDER);
+  FBorderColor.OnChange := BorderColor_OnChange;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+end;
+
+procedure TUEdit.CreateWindowHandle(const Params: TCreateParams);
+begin
+  inherited;
+  UpdateColors;
+end;
+
+destructor TUEdit.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  FBorderColor.Free;
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
 
 //  THEME
 
 procedure TUEdit.SetThemeManager; // (const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
@@ -166,44 +241,50 @@ begin
   UpdateColors;
   Repaint;
 end;
-{
+
+function TUEdit.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUEdit.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
 procedure TUEdit.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  INTERNAL
 
 procedure TUEdit.UpdateColors;
 var
+  TM: TUCustomThemeManager;
   ColorSet: TUThemeControlWithFocusColorSet;
 begin
-  //  Border & background color
-  if ThemeManager = Nil then begin
-//    Border_Color := DefBorderColor[utLight, ControlState];
-    Border_Color := BorderColor.Color;
-    BackColor := $FFFFFF;
-  end
-  else begin
-    case ControlState of
-      csPress, csFocused: begin
-        ColorSet := BorderColor;
-        if BorderColor.Enabled then
-          Border_Color := BorderColor.Color
-        else
-          Border_Color := ColorSet.GetColor(ThemeManager, Focused);
-      end
-    else
-      Border_Color := DefBorderColor[ThemeManager.Theme, ControlState];
-    end;
-
-    if (ThemeManager.Theme = utLight) or (ControlState in [csPress, csFocused]) then
-      BackColor := $FFFFFF
-    else
-      BackColor := $000000;
+  TM:=SelectThemeManager(Self);
+  case ControlState of
+    csPress, csFocused: begin
+      ColorSet := BorderColor;
+      if BorderColor.Enabled then
+        Border_Color := BorderColor.Color
+      else
+        Border_Color := ColorSet.GetColor(TM, Focused);
+    end
+  else
+    Border_Color := EDIT_BORDER.GetColor(TM, Focused);
   end;
+
+  if (TM.ThemeUsed = utLight) or (ControlState in [csPress, csFocused]) then
+    BackColor := $FFFFFF
+  else
+    BackColor := $000000;
 
   //  Transparent edit
   if Transparent and (ControlState = csNone) then begin
@@ -247,48 +328,6 @@ begin
   UpdateTheme;
 end;
 
-//  MAIN CLASS
-
-constructor TUEdit.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  FThemeManager := Nil;
-
-  BorderThickness := 2;
-
-  FControlState := csNone;
-  FTransparent := False;
-
-  Alignment := taLeftJustify;
-  ShowCaption := False;
-  Height := 29;
-  BevelOuter := bvNone;
-  Caption := '';
-  Padding.SetBounds(5, 5, 4, 4);
-//  Font.Name := 'Segoe UI';
-//  Font.Size := 10;
-
-  FEdit := TUSubEdit.Create(Self);
-  FEdit.Parent := Self;
-  FEdit.ParentFont := True;
-  FEdit.Name := 'SubEdit';
-  FEdit.Text := '';
-  FEdit.BorderStyle := bsNone;
-  FEdit.AutoSize := True;
-  FEdit.ParentColor := True;
-  FEdit.Height := 20;
-
-  FEdit.Align := alClient;
-  FEdit.SetSubComponent(True);
-
-  FBorderColor := TUThemeControlWithFocusColorSet.Create;
-  FBorderColor.OnChange := BorderColor_OnChange;
-  FBorderColor.Assign(EDIT_BORDER);
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-end;
-
 //  CUSTOM METHODS
 
 procedure TUEdit.Paint;
@@ -315,19 +354,6 @@ begin
   //  Subedit color
   FEdit.Color := BackColor;
   FEdit.Font.Color := TextColor;
-end;
-
-procedure TUEdit.CreateWindowHandle(const Params: TCreateParams);
-begin
-  inherited;
-  UpdateColors;
-end;
-
-destructor TUEdit.Destroy;
-begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
 end;
 
 procedure TUEdit.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});

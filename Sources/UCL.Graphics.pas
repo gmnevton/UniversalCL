@@ -38,7 +38,7 @@ procedure GetCenterPos(Width, Height: Integer; Rect: TRect; out X, Y: Integer);
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Byte);
 procedure InitBumpMap;
-procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer);
+procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer; Add: Boolean);
 
 var
   DEFAULT_GLASSTEXT_GLOWSIZE: Byte;
@@ -266,21 +266,29 @@ begin
   end;
 end;
 
-function Mix(A, B: Byte): Byte; inline;
+function Mix(A, B: Byte; Sign: Boolean): Byte; inline;
 var
   C: Integer;
 begin
-  C:=A + B;
-  if C > 255 then
-    C:=255;
+  if Sign then begin
+    C:=A + B;
+    if C > 255 then
+      C:=255;
+  end
+  else begin
+    C:=A - B;
+    if C < 0 then
+      C:=0;
+  end;
+  //
   Result:=C;
 end;
 
-procedure MulColor(var AColor: PQuadColor; Base: Byte); inline;
+procedure MulColor(var AColor: PQuadColor; Base: Byte; Sign: Boolean); inline;
 begin
-  AColor.Blue  := Mix(AColor.Blue,  Base);
-  AColor.Green := Mix(AColor.Green, Base);
-  AColor.Red   := Mix(AColor.Red,   Base);
+  AColor.Blue  := Mix(AColor.Blue,  Base, Sign);
+  AColor.Green := Mix(AColor.Green, Base, Sign);
+  AColor.Red   := Mix(AColor.Red,   Base, Sign);
   //AColor.Alpha := AColor.Alpha;
 end;
 
@@ -311,7 +319,7 @@ begin
   BumpMapInited := True;
 end;
 
-procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer);
+procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer; Add: Boolean);
 var
   bmp: TBitmap;
   ax, ay, half_size: Integer;
@@ -328,7 +336,7 @@ begin
     for ay:=0 to BumpMapSize - 1 do begin
       Pixel := bmp.ScanLine[ay];
       for ax:=0 to BumpMapSize - 1 do begin
-        MulColor(Pixel, BumpMap[ay, ax]);
+        MulColor(Pixel, BumpMap[ay, ax], Add);
         Inc(Pixel);
       end;
     end;

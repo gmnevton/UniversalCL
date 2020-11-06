@@ -26,7 +26,6 @@ object formLoginDialog: TformLoginDialog
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alClient
-    Color = 15132390
     Padding.Left = 40
     Padding.Right = 40
     Padding.Bottom = 50
@@ -37,6 +36,7 @@ object formLoginDialog: TformLoginDialog
     AniSet.DelayStartTime = 0
     AniSet.Duration = 250
     AniSet.Step = 25
+    AniSet.Queue = True
     BackColor.Enabled = False
     BackColor.Color = clBlack
     BackColor.LightColor = 15132390
@@ -46,7 +46,7 @@ object formLoginDialog: TformLoginDialog
       AlignWithMargins = True
       Left = 40
       Top = 50
-      Width = 330
+      Width = 137
       Height = 38
       Margins.Left = 0
       Margins.Top = 50
@@ -63,13 +63,12 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       TextKind = tkTitle
       UseAccentColor = True
-      ExplicitWidth = 137
     end
     object headingSignin: TUText
       AlignWithMargins = True
       Left = 40
       Top = 88
-      Width = 330
+      Width = 197
       Height = 28
       Margins.Left = 0
       Margins.Top = 0
@@ -85,12 +84,11 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
-      ExplicitWidth = 197
     end
     object entryPassword: TUText
       Left = 40
       Top = 207
-      Width = 330
+      Width = 58
       Height = 17
       Align = alTop
       Caption = 'Password'
@@ -101,12 +99,11 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 58
     end
     object entryEmail: TUText
       Left = 40
       Top = 136
-      Width = 330
+      Width = 32
       Height = 17
       Align = alTop
       Caption = 'Email'
@@ -117,13 +114,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 32
     end
     object textShowMoreOptions: TUText
       AlignWithMargins = True
       Left = 40
       Top = 349
-      Width = 330
+      Width = 103
       Height = 15
       Cursor = crHandPoint
       Margins.Left = 0
@@ -140,12 +136,11 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       OnClick = textShowMoreOptionsClick
       TextKind = tkDescription
-      ExplicitWidth = 103
     end
     object entryDescription: TUText
       Left = 40
       Top = 278
-      Width = 330
+      Width = 130
       Height = 17
       Align = alTop
       Caption = 'Description (optional)'
@@ -156,7 +151,6 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 130
     end
     object panelMoreOptions: TUPanel
       Left = 40
@@ -164,7 +158,6 @@ object formLoginDialog: TformLoginDialog
       Width = 330
       Height = 80
       Align = alTop
-      Color = 15132390
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
@@ -216,6 +209,12 @@ object formLoginDialog: TformLoginDialog
       Align = alTop
       UseDockManager = False
       TabOrder = 1
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = clBlack
+      BorderColor.DarkColor = clBlack
+      BorderColor.FocusedLightColor = clBlack
+      BorderColor.FocusedDarkColor = clBlack
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -236,6 +235,12 @@ object formLoginDialog: TformLoginDialog
       Align = alTop
       UseDockManager = False
       TabOrder = 2
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = clBlack
+      BorderColor.DarkColor = clBlack
+      BorderColor.FocusedLightColor = clBlack
+      BorderColor.FocusedDarkColor = clBlack
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -258,6 +263,12 @@ object formLoginDialog: TformLoginDialog
       UseDockManager = False
       ParentColor = True
       TabOrder = 3
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = clBlack
+      BorderColor.DarkColor = clBlack
+      BorderColor.FocusedLightColor = clBlack
+      BorderColor.FocusedDarkColor = clBlack
       Edit.Left = 5
       Edit.Top = 5
       Edit.Width = 321
@@ -272,7 +283,6 @@ object formLoginDialog: TformLoginDialog
     Top = 0
     Width = 410
     Caption = '   Login'
-    Color = 15921906
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -281,10 +291,12 @@ object formLoginDialog: TformLoginDialog
     ParentBackground = False
     ParentFont = False
     TabOrder = 1
-    BackColor.Enabled = False
-    BackColor.Color = clBlack
-    BackColor.LightColor = 15921906
-    BackColor.DarkColor = 2829099
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 15921906
+    BackColors.DarkColor = 2829099
+    BackColors.FocusedLightColor = clBlack
+    BackColors.FocusedDarkColor = clBlack
     object buttonAppQuit: TUQuickButton
       Left = 365
       Top = 0
@@ -350,7 +362,6 @@ object formLoginDialog: TformLoginDialog
     Width = 410
     Height = 52
     Align = alBottom
-    Color = 15132390
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -372,21 +383,10 @@ object formLoginDialog: TformLoginDialog
       Top = 10
       Width = 130
       Height = 32
-      CustomBorderColors.None = 15921906
-      CustomBorderColors.Hover = 15132390
-      CustomBorderColors.Press = 13421772
-      CustomBorderColors.Disabled = 15921906
-      CustomBorderColors.Focused = 15921906
-      CustomBackColors.None = 15921906
-      CustomBackColors.Hover = 15132390
-      CustomBackColors.Press = 13421772
-      CustomBackColors.Disabled = 15921906
-      CustomBackColors.Focused = 15921906
-      CustomTextColors.Disabled = clGray
-      Highlight = True
       Align = alRight
       Caption = 'Ok'
       OnClick = buttonOkClick
+      Highlight = True
     end
     object buttonCancel: TUButton
       AlignWithMargins = True
@@ -398,17 +398,6 @@ object formLoginDialog: TformLoginDialog
       Margins.Top = 0
       Margins.Right = 10
       Margins.Bottom = 0
-      CustomBorderColors.None = 15921906
-      CustomBorderColors.Hover = 15132390
-      CustomBorderColors.Press = 13421772
-      CustomBorderColors.Disabled = 15921906
-      CustomBorderColors.Focused = 15921906
-      CustomBackColors.None = 15921906
-      CustomBackColors.Hover = 15132390
-      CustomBackColors.Press = 13421772
-      CustomBackColors.Disabled = 15921906
-      CustomBackColors.Focused = 15921906
-      CustomTextColors.Disabled = clGray
       Align = alRight
       Caption = 'Cancel'
       OnClick = buttonCancelClick

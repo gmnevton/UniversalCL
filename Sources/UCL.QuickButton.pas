@@ -14,14 +14,15 @@ uses
   Graphics,
   Forms,
   UCL.Classes,
-  UCL.TUThemeManager,
+  UCL.Types,
+  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
   TUQuickButtonStyle = (sbsNone, sbsQuit, sbsMax, sbsMin, sbsSysButton, sbsHighlight);
 
-  TUCustomQuickButton = class(TGraphicControl, IUThemeComponent)
+  TUQuickButton = class(TUGraphicControl, IUThemedComponent)
   private var
     BackColor: TColor;
     TextColor: TColor;
@@ -40,7 +41,7 @@ type
     procedure UpdateColors;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetButtonStyle(const Value: TUQuickButtonStyle);
     procedure SetTransparent(const Value: Boolean);
@@ -60,10 +61,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // IUThemedComponent
     procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
 
@@ -73,76 +77,94 @@ type
     property PressBrightnessDelta: Integer read FPressBrightnessDelta write FPressBrightnessDelta default 25;
     property Transparent: Boolean read FTransparent write SetTransparent default false;
 
+    property Caption;
     property Height default 32;
     property Width default 45;
   end;
 
-  TUQuickButton = class(TUCustomQuickButton)
-  published
-    property Align;
-    property Anchors;
-    property AutoSize;
-    property BiDiMode;
-    property Caption;
-    property Color;
-    property Constraints;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowHint;
-    property Touch;
-    property Visible;
-  {$IF CompilerVersion > 29}
-    property StyleElements;
-  {$IFEND}
-
-    property OnCanResize;
-    property OnClick;
-    property OnConstrainedResize;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
 implementation
 
-{ TUCustomQuickButton }
+uses
+  UCL.Colors;
+
+{ TUQuickButton }
+
+//  MAIN CLASS
+
+constructor TUQuickButton.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+
+  //  New props
+  FButtonState := csNone;
+  FLightColor := $E6E6E6;
+  FDarkColor := $191919;
+  FCustomAccentColor := $D77800;
+  FPressBrightnessDelta := 25;
+  FTransparent := False;
+
+  //  Old props
+  Caption := ''; //  Back icon
+  Font.Name := 'Segoe MDL2 Assets';
+  Font.Size := 10;
+  Height := 32;
+  Width := 45;
+
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateColors;
+end;
+
+destructor TUQuickButton.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
 
 //  THEME
 
-procedure TUCustomQuickButton.SetThemeManager; // (const Value: TUThemeManager);
+procedure TUQuickButton.SetThemeManager(const Value: TUThemeManager);
 begin
-  FThemeManager := GetCommonThemeManager;
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
   UpdateTheme;
 end;
 
-procedure TUCustomQuickButton.UpdateTheme;
+procedure TUQuickButton.UpdateTheme;
 begin
   UpdateColors;
   Repaint;
 end;
+
+function TUQuickButton.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUQuickButton.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
 {
-procedure TUCustomQuickButton.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TUQuickButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = FThemeManager) then
@@ -151,8 +173,11 @@ end;
 }
 //  INTERNAL
 
-procedure TUCustomQuickButton.UpdateColors;
+procedure TUQuickButton.UpdateColors;
+var
+  TM: TUCustomThemeManager;
 begin
+  TM := SelectThemeManager(Self);
   case ButtonState of
     csNone:  begin
       if not Transparent then begin
@@ -166,18 +191,18 @@ begin
     end;
 
     csHover: begin
-      if ThemeManager = Nil then
+      if not TM.UseSystemAccentColor then
         BackColor := CustomAccentColor
-      else if ThemeManager.Theme = utLight then
+      else if TM.ThemeUsed = utLight then
         BackColor := LightColor
       else
         BackColor := DarkColor;
     end;
 
     csPress: begin
-      if ThemeManager = Nil then
+      if not TM.UseSystemAccentColor then
         BackColor := BrightenColor(LightColor, PressBrightnessDelta)
-      else if ThemeManager.Theme = utLight then
+      else if TM.ThemeUsed = utLight then
         BackColor := BrightenColor(LightColor, PressBrightnessDelta)
       else
         BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
@@ -188,9 +213,9 @@ begin
     end;
 
     csFocused: begin
-      if ThemeManager = Nil then
+      if not TM.UseSystemAccentColor then
         BackColor := LightColor
-      else if ThemeManager.Theme = utLight then
+      else if TM.ThemeUsed = utLight then
         BackColor := LightColor
       else
         BackColor := DarkColor;
@@ -201,7 +226,7 @@ end;
 
 //  SETTERS
 
-procedure TUCustomQuickButton.SetButtonState(const Value: TUControlState);
+procedure TUQuickButton.SetButtonState(const Value: TUControlState);
 begin
   if Value <> FButtonState then begin
     FButtonState := Value;
@@ -210,8 +235,11 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.SetButtonStyle(const Value: TUQuickButtonStyle);
+procedure TUQuickButton.SetButtonStyle(const Value: TUQuickButtonStyle);
+var
+  TM: TUCustomThemeManager;
 begin
+  TM := SelectThemeManager(Self);
   if Value <> FButtonStyle then begin
     FButtonStyle := Value;
 
@@ -239,10 +267,10 @@ begin
         end;
       end;
       sbsHighlight: begin
-        if ThemeManager = Nil then
+        if not TM.UseSystemAccentColor then
           FLightColor := FCustomAccentColor
         else
-          FLightColor := ThemeManager.AccentColor;
+          FLightColor := TM.AccentColor;
         FDarkColor := FLightColor;
         FPressBrightnessDelta := 25;
         Caption := '';
@@ -253,7 +281,7 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.SetTransparent(const Value: Boolean);
+procedure TUQuickButton.SetTransparent(const Value: Boolean);
 begin
   if Value <> FTransparent then begin
     FTransparent := Value;
@@ -262,48 +290,13 @@ begin
   end;
 end;
 
-//  MAIN CLASS
-
-constructor TUCustomQuickButton.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FThemeManager := Nil;
-
-  //  New props
-  FButtonState := csNone;
-  FLightColor := $E6E6E6;
-  FDarkColor := $191919;
-  FCustomAccentColor := $D77800;
-  FPressBrightnessDelta := 25;
-  FTransparent := false;
-
-  //  Old props
-  Caption := ''; //  Back icon
-  Font.Name := 'Segoe MDL2 Assets';
-  Font.Size := 10;
-  Height := 32;
-  Width := 45;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateColors;
-end;
-
-destructor TUCustomQuickButton.Destroy;
-begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
-  inherited;
-end;
-
 //  CUSTOM METHODS
 
-procedure TUCustomQuickButton.Paint;
+procedure TUQuickButton.Paint;
 var
   TextRect: TRect;
 begin
-  inherited;
+//  inherited Paint; // no need to call TGraphicControl.Paint, because it is empty procedure
 
   if not Transparent or (ButtonState <> csNone) then begin //  Paint background
     Canvas.Brush.Style := bsSolid;
@@ -322,7 +315,7 @@ end;
 
 //  MESSAGES
 
-procedure TUCustomQuickButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+procedure TUQuickButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then begin
     ButtonState := csPress;
@@ -330,7 +323,7 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
     ButtonState := csPress;
@@ -338,7 +331,7 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.WMLButtonUp(var Msg: TWMLButtonUp);
+procedure TUQuickButton.WMLButtonUp(var Msg: TWMLButtonUp);
 var
   ParentForm: TCustomForm;
 begin
@@ -374,7 +367,7 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.CMMouseEnter(var Msg: TMessage);
+procedure TUQuickButton.CMMouseEnter(var Msg: TMessage);
 begin
   if Enabled then begin
     ButtonState := csHover;
@@ -382,7 +375,7 @@ begin
   end;
 end;
 
-procedure TUCustomQuickButton.CMMouseLeave(var Msg: TMessage);
+procedure TUQuickButton.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled then begin
     ButtonState := csNone;

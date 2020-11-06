@@ -14,8 +14,9 @@ uses
   ExtCtrls,
   Graphics,
   UCL.Classes,
+  UCL.Types,
   UCL.Colors,
-  UCL.TUThemeManager,
+  UCL.ThemeManager,
   UCL.IntAnimation,
   UCL.Utils;
 
@@ -33,7 +34,7 @@ type
     property Visible default False;
   end;
 
-  TUScrollBox = class(TScrollBox, IUThemeComponent)
+  TUScrollBox = class(TScrollBox, IUThemedComponent)
   private var
     MiniSB: TUMiniScrollBar;
     MINI_SB_THICKNESS: Byte;
@@ -54,7 +55,7 @@ type
     FScrollBarTimer: TTimer;
 
     //  Setters
-    procedure SetThemeManager; // (const Value: TUThemeManager);
+    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetScrollBarStyle(const Value: TUScrollBarStyle); // suppress default scrollbar blinking
 
     //  Child events
@@ -73,22 +74,24 @@ type
     procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL; // suppress default scrollbar blinking
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
     procedure CreateParams(var Params: TCreateParams); override; // suppress default scrollbar blinking
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-
-    procedure UpdateTheme;
-
     procedure SetOldSBVisible(IsVisible: Boolean);
     procedure UpdateMiniSB;
     procedure SetMiniSBVisible(IsVisible: Boolean);
 
+    // IUThemedComponent
+    procedure UpdateTheme;
+    function IsCustomThemed: Boolean;
+    function CustomThemeManager: TUCustomThemeManager;
+
   published
-    property ThemeManager: TUThemeManager read FThemeManager; // write SetThemeManager;
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property AniSet: TIntAniSet read FAniSet write FAniSet;
     property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
 
@@ -105,60 +108,13 @@ implementation
 
 uses
   SysUtils,
-  UCL.TUForm;
+  UCL.Form;
 
 type
   TUFormAccess = class(TUForm);
 
 { TUScrollBox }
 
-//  THEME
-
-procedure TUScrollBox.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  FThemeManager := GetCommonThemeManager;
-  UpdateTheme;
-end;
-
-procedure TUScrollBox.SetScrollBarStyle(const Value: TUScrollBarStyle);
-begin
-  if FScrollBarStyle <> Value then begin
-    FScrollBarStyle := Value;
-    RecreateWnd;
-  end;
-end;
-
-procedure TUScrollBox.UpdateTheme;
-var
-  ColorSet: TUThemeControlColorSet;
-begin
-  //  Background color
-  if ThemeManager = Nil then begin
-    // Color := $E6E6E6 // do nothing
-    MiniSB.Color := MINI_SB_COLOR_NIL;
-  end
-  else begin
-    //  Select default or custom style
-    if BackColor.Enabled then
-      ColorSet := BackColor
-    else
-      ColorSet := SCROLLBOX_BACK;
-
-    Color := ColorSet.GetColor(ThemeManager);
-    if ThemeManager.Theme = utLight then
-      MiniSB.Color := MINI_SB_COLOR_LIGHT
-    else
-      MiniSB.Color := MINI_SB_COLOR_DARK;
-  end;
-end;
-{
-procedure TUScrollBox.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
-end;
-}
 //  MAIN CLASS
 
 constructor TUScrollBox.Create(AOwner: TComponent);
@@ -197,8 +153,8 @@ begin
   FAniSet.QuickAssign(akOut, afkCubic, 0, 120, 10, True);
 
   FBackColor := TUThemeControlColorSet.Create;
-  FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(SCROLLBOX_BACK);
+  FBackColor.OnChange := BackColor_OnChange;
 
   FScrollBarTimer := TTimer.Create(Nil);
   FScrollBarTimer.Enabled := False;
@@ -222,15 +178,84 @@ begin
 end;
 
 destructor TUScrollBox.Destroy;
+var
+  TM: TUCustomThemeManager;
 begin
   FScrollBarTimer.Enabled := False;
   MiniSB.Free;
   FAniSet.Free;
   FBackColor.Free;
   FScrollBarTimer.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
   inherited;
+end;
+
+//  THEME
+
+procedure TUScrollBox.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self);
+
+  if FThemeManager = Nil then
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUScrollBox.SetScrollBarStyle(const Value: TUScrollBarStyle);
+begin
+  if FScrollBarStyle <> Value then begin
+    FScrollBarStyle := Value;
+    RecreateWnd;
+  end;
+end;
+
+procedure TUScrollBox.UpdateTheme;
+var
+  TM: TUCustomThemeManager;
+  ColorSet: TUThemeControlColorSet;
+begin
+  TM:=SelectThemeManager(Self);
+  // Select default or custom style
+  if BackColor.Enabled then
+    ColorSet := BackColor
+  else
+    ColorSet := SCROLLBOX_BACK;
+
+  Color := ColorSet.GetColor(TM);
+  if TM.ThemeUsed = utLight then
+    MiniSB.Color := MINI_SB_COLOR_LIGHT
+  else
+    MiniSB.Color := MINI_SB_COLOR_DARK;
+end;
+
+function TUScrollBox.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUScrollBox.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
+
+procedure TUScrollBox.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
+  inherited Notification(AComponent, Operation);
 end;
 
 //  CUSTOM METHODS
