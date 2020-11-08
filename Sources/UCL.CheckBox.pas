@@ -204,6 +204,16 @@ begin
     else
       TextColor := $FFFFFF;
   end
+  else if CustomActiveColor = clDefault then begin
+    if TM.UseSystemAccentColor then
+      ActiveColor := TM.SystemAccentColor
+    else
+      ActiveColor := TM.AccentColor;
+    if TM.ThemeUsed = utLight then
+      TextColor := $000000
+    else
+      TextColor := $FFFFFF;
+  end
   else if TM.ThemeUsed = utLight then begin
     ActiveColor := TM.AccentColor;
     TextColor := $000000;
@@ -212,6 +222,9 @@ begin
     ActiveColor := TM.AccentColor;
     TextColor := $FFFFFF;
   end;
+  //
+  if csDesigning in Self.ComponentState then
+    TextColor := GetTextColorFromBackground(Color);
 end;
 
 procedure TUCheckBox.UpdateRects;
