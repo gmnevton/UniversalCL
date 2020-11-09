@@ -14704,23 +14704,13 @@ object formImageBackground: TformImageBackground
       Left = 14
       Top = 14
       Width = 292
-      Height = 30
       Align = alClient
-      Caption = 'editEmail'
+      ParentColor = False
+      ParentFont = False
+      BevelOuter = bvNone
+      Color = clBlack
       TabOrder = 2
-      BorderColor.Enabled = False
-      BorderColor.Color = clBlack
-      BorderColor.LightColor = clBlack
-      BorderColor.DarkColor = clBlack
-      BorderColor.FocusedLightColor = clBlack
-      BorderColor.FocusedDarkColor = clBlack
-      Edit.Left = 5
-      Edit.Top = 5
-      Edit.Width = 283
-      Edit.Height = 21
-      Edit.ParentColor = False
-      Edit.ParentFont = False
-      Edit.TextHint = 'Enter your email'
+      BorderThickness = 2
     end
   end
 end

@@ -22,79 +22,42 @@ uses
   UCL.ThemeManager,
   UCL.Utils;
 
-const
-  UM_SUBEDIT_SETFOCUS = WM_USER + 1;
-  UM_SUBEDIT_KILLFOCUS = WM_USER + 2;
-
 type
-  TUSubEdit = class(TCustomEdit)
-  private
-    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
-
-  published
-    property Align default alClient;
-    property BorderStyle default bsNone;
-    property AutoSize default true;
-    property ParentColor default true;
-    property ParentFont default true;
-    property Height default 20;
-
-    property Alignment;
-    property CharCase;
-    property Enabled;
-    property Font stored false;
-    property MaxLength;
-    property NumbersOnly;
-    property PasswordChar;
-    property PopupMenu;
-    property ReadOnly;
-    property Text;
-    property TextHint;
-    property OnChange;
-    property OnClick;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnEnter;
-    property OnExit;
-    property OnKeyDown;
-    property OnKeyPress;
-    property OnKeyUp;
-  end;
-
-  TUEdit = class(TPanel, IUThemedComponent)
+  TUEdit = class(TUCustomEdit, IUThemedComponent)
 //  private const
 //    DefBorderColor: TDefColor = (
 //      ($999999, $666666, $D77800, $CCCCCC, $D77800),
 //      ($666666, $999999, $D77800, $CCCCCC, $D77800));
 
-  private var
-    BorderThickness: Integer;
-    Border_Color: TColor;
-    BackColor: TColor;
-    TextColor: TColor;
+  private
+    LBorderColor: TColor;
+    LBackColor: TColor;
+    LTextColor: TColor;
 
   private
     FThemeManager: TUThemeManager;
+    FBorderThickness: Byte;
     FBorderColor: TUThemeControlWithFocusColorSet;
-    //FEditColor: TUThemeControlWithFocusColorSet;
+    FBackColor: TUThemeControlWithFocusColorSet;
     FControlState: TUControlState;
-    FEdit: TUSubEdit;
-
+    //
     FTransparent: Boolean;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
 
-    //  Setters
+    // Setters
     procedure SetThemeManager(const Value: TUThemeManager);
+    procedure SetBorderThickness(const Value: Byte);
     procedure SetControlState(const Value: TUControlState);
     procedure SetTransparent(const Value: Boolean);
 
-    //  Child events
+    // Child events
     procedure BorderColor_OnChange(Sender: TObject);
+    procedure BackColor_OnChange(Sender: TObject);
 
-    //  Messages
+    // Messages
+    procedure WMNCPaint(var Msg: TWMNCPaint); message WM_NCPAINT;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
@@ -103,13 +66,14 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    //procedure Paint;
 
-    procedure UMSubEditSetFocus(var Msg: TMessage); message UM_SUBEDIT_SETFOCUS;
-    procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
+    //procedure UMSubEditSetFocus(var Msg: TMessage); message UM_SUBEDIT_SETFOCUS;
+    //procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure Paint; override;
+    //procedure Paint; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
 
@@ -124,36 +88,19 @@ type
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-    property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor write FBorderColor;
-    property Edit: TUSubEdit read FEdit write FEdit;
+    property BorderThickness: Byte read FBorderThickness write SetBorderThickness;
+    property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor;
+    property BackColor: TUThemeControlWithFocusColorSet read FBackColor;
+    //property Edit: TUSubEdit read FEdit write FEdit;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
     property Transparent: Boolean read FTransparent write SetTransparent default false;
-
-    property Padding stored false;
-    property Alignment default taLeftJustify;
-    property ShowCaption default false;
-    property BevelOuter default bvNone;
-    property Height default 29;
   end;
 
 implementation
 
-{ TUSubEdit }
-
-//  MESSAGES
-
-procedure TUSubEdit.WMSetFocus(var Msg: TWMSetFocus);
-begin
-  PostMessage(Parent.Handle, UM_SUBEDIT_SETFOCUS, 0, 0);
-  inherited;
-end;
-
-procedure TUSubEdit.WMKillFocus(var Msg: TWMKillFocus);
-begin
-  PostMessage(Parent.Handle, UM_SUBEDIT_KILLFOCUS, 0, 0);
-  inherited;
-end;
+uses
+  UCL.Graphics;
 
 { TUEdit }
 
@@ -164,32 +111,25 @@ begin
   inherited Create(aOwner);
   FThemeManager := Nil;
 
-  BorderThickness := 2;
-
+  FBorderThickness := 2;
   FControlState := csNone;
   FTransparent := False;
 
   Alignment := taLeftJustify;
-  ShowCaption := False;
-  Height := 29;
   BevelOuter := bvNone;
-  Caption := '';
-  Padding.SetBounds(5, 5, 4, 4);
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 10;
+  //  Modify default props
+  AutoSize := False;
+  BorderStyle := bsNone;
+  BevelKind := bkFlat;
+  BorderWidth := 4;
+  Ctl3D := False;
+  Height := 30;
 
-  FEdit := TUSubEdit.Create(Self);
-  FEdit.Parent := Self;
-  FEdit.ParentFont := True;
-  FEdit.Name := 'SubEdit';
-  FEdit.Text := '';
-  FEdit.BorderStyle := bsNone;
-  FEdit.AutoSize := True;
-  FEdit.ParentColor := True;
-  FEdit.Height := 20;
-
-  FEdit.Align := alClient;
-  FEdit.SetSubComponent(True);
+  FBackColor := TUThemeControlWithFocusColorSet.Create;
+  FBackColor.Assign(EDIT_BACK);
+  FBackColor.OnChange := BackColor_OnChange;
 
   FBorderColor := TUThemeControlWithFocusColorSet.Create;
   FBorderColor.Assign(EDIT_BORDER);
@@ -197,6 +137,8 @@ begin
 
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
+
+  UpdateColors;
 end;
 
 procedure TUEdit.CreateWindowHandle(const Params: TCreateParams);
@@ -209,6 +151,7 @@ destructor TUEdit.Destroy;
 var
   TM: TUCustomThemeManager;
 begin
+  FBackColor.Free;
   FBorderColor.Free;
   TM:=SelectThemeManager(Self);
   TM.Disconnect(Self);
@@ -239,6 +182,14 @@ end;
 procedure TUEdit.UpdateTheme;
 begin
   UpdateColors;
+
+  if Color <> LBackColor then
+    Color := LBackColor;
+
+  ParentFont := True;
+  if Font.Color <> LTextColor then
+    Font.Color := LTextColor;
+
   Repaint;
 end;
 
@@ -266,51 +217,71 @@ end;
 procedure TUEdit.UpdateColors;
 var
   TM: TUCustomThemeManager;
-  ColorSet: TUThemeControlWithFocusColorSet;
+  AccentColor: TColor;
+  BackColorSet: TUThemeControlWithFocusColorSet;
+  BorderColorSet: TUThemeControlWithFocusColorSet;
 begin
   TM:=SelectThemeManager(Self);
-  case ControlState of
-    csPress, csFocused: begin
-      ColorSet := BorderColor;
-      if BorderColor.Enabled then
-        Border_Color := BorderColor.Color
-      else
-        Border_Color := ColorSet.GetColor(TM, Focused);
-    end
-  else
-    Border_Color := EDIT_BORDER.GetColor(TM, Focused);
-  end;
-
-  if (TM.ThemeUsed = utLight) or (ControlState in [csPress, csFocused]) then
-    BackColor := $FFFFFF
-  else
-    BackColor := $000000;
-
-  //  Transparent edit
-  if Transparent and (ControlState = csNone) then begin
-    ParentColor := True;
-    BackColor := Color;
-  end;
-
-  //  Text color
-  TextColor := GetTextColorFromBackground(BackColor);
-
+  AccentColor := SelectAccentColor(TM, $D77800);
+  //
   //  Disabled edit
   if ControlState = csDisabled then begin
-    BackColor := $CCCCCC;
-    Border_Color := $CCCCCC;
-    TextColor := clGray;
+    LBorderColor := $CCCCCC;
+    LBackColor := $D8D8D8;
+    LTextColor := clGray;
+    Exit;
   end;
+  //
+  // Transparent edit
+  if Transparent and (ControlState = csNone) then begin
+    ParentColor := True;
+    LBackColor := Color;
+  end
+  else begin
+    BackColorSet := BackColor;
+    case ControlState of
+      csPress, csFocused: begin
+        if BackColor.Enabled then
+          LBackColor := BackColor.Color
+        else
+          LBackColor := BackColorSet.GetColor(TM, Focused);
+      end
+    else
+      LBorderColor := BackColorSet.GetColor(TM, Focused);
+    end;
+  end;
+  //
+  BorderColorSet := BorderColor;
+  case ControlState of
+    csPress, csFocused: begin
+      if BorderColor.Enabled then
+        LBorderColor := BorderColor.Color
+      else
+        LBorderColor := AccentColor;
+    end
+  else
+    LBorderColor := BorderColorSet.GetColor(TM, Focused);
+  end;
+  //
+  // Text color
+  LTextColor := GetTextColorFromBackground(LBackColor);
 end;
 
 //  SETTERS
+
+procedure TUEdit.SetBorderThickness(const Value: Byte);
+begin
+  if FBorderThickness <> Value then begin
+    FBorderThickness := Value;
+    UpdateTheme;
+  end;
+end;
 
 procedure TUEdit.SetControlState(const Value: TUControlState);
 begin
   if Value <> FControlState then begin
     FControlState := Value;
-    UpdateColors;
-    Repaint;
+    UpdateTheme;
   end;
 end;
 
@@ -318,8 +289,7 @@ procedure TUEdit.SetTransparent(const Value: Boolean);
 begin
   if Value <> FTransparent then begin
     FTransparent := Value;
-    UpdateColors;
-    Repaint;
+    UpdateTheme;
   end;
 end;
 
@@ -328,8 +298,13 @@ begin
   UpdateTheme;
 end;
 
-//  CUSTOM METHODS
+procedure TUEdit.BackColor_OnChange(Sender: TObject);
+begin
+  UpdateTheme;
+end;
 
+//  CUSTOM METHODS
+{
 procedure TUEdit.Paint;
 var
   Space: Integer;
@@ -355,94 +330,109 @@ begin
   FEdit.Color := BackColor;
   FEdit.Font.Color := TextColor;
 end;
-
+}
 procedure TUEdit.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
 begin
   inherited;
   BorderThickness := MulDiv(BorderThickness, M, D);
+  BorderWidth := MulDiv(BorderWidth, M, D);
+  Font.Height := MulDiv(Font.Height, M, D);
 end;
 
 //  MESSAGES
 
-procedure TUEdit.WMLButtonDown(var Msg: TWMLButtonDown);
+procedure TUEdit.WMNCPaint(var Msg: TWMNCPaint);
+var
+  Canvas: TCanvas;
+  DC: HDC;
 begin
-  if Enabled then begin
-    FEdit.SetFocus;
-    ControlState := csPress;
-    inherited;
+  inherited;
+
+  DC:= GetWindowDC(Handle);
+  SaveDC(DC);
+  try
+    Canvas:= TCanvas.Create;
+    try
+      Canvas.Handle := DC;
+      Canvas.Brush.Style := bsClear;
+
+      DrawBorder(Canvas, Rect(0, 0, Width, Height), LBorderColor, BorderThickness);
+    finally
+      Canvas.free;
+    end;
+  finally
+    RestoreDC(DC, -1);
+    ReleaseDC(Handle, DC);
   end;
 end;
 
-procedure TUEdit.WMLButtonUp(var Msg: TWMLButtonUp);
+procedure TUEdit.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
-  if Enabled then begin
-    if Focused or FEdit.Focused then
-      ControlState := csFocused
-    else
-      ControlState := csNone;
-    inherited;
-  end;
+  if not Enabled then
+    Exit;
+  //
+  ControlState := csPress;
+  inherited;
+end;
+
+procedure TUEdit.WMLButtonUp(var Msg: TWMLButtonUp);
+var
+  MousePoint: TPoint;
+begin
+  if not Enabled then
+    Exit;
+  //
+  MousePoint := ScreenToClient(Mouse.CursorPos);
+  if PtInRect(GetClientRect, MousePoint) then
+    ControlState := csFocused
+  else
+    ControlState := csNone;
+  inherited;
 end;
 
 procedure TUEdit.WMSetFocus(var Msg: TWMSetFocus);
 begin
-  if Enabled then begin
-    ControlState := csFocused;
-    inherited;
-    FEdit.SetFocus;
-  end;
+  if not Enabled then
+    Exit;
+  //
+  ControlState := csFocused;
+  inherited;
 end;
 
 procedure TUEdit.WMKillFocus(var Msg: TWMKillFocus);
 begin
-  if Enabled then begin
-    ControlState := csNone;
-    inherited;
-  end;
-end;
-
-procedure TUEdit.UMSubEditSetFocus(var Msg: TMessage);
-begin
-  if Enabled then
-    ControlState := csFocused;
-end;
-
-procedure TUEdit.UMSubEditKillFocus(var Msg: TMessage);
-begin
-  if Enabled then
-    ControlState := csNone;
+  if not Enabled then
+    Exit;
+  //
+  ControlState := csNone;
+  inherited;
 end;
 
 procedure TUEdit.CMMouseEnter(var Msg: TMessage);
 begin
-  if Enabled then begin
-    if Focused or FEdit.Focused then
-      ControlState := csFocused
-    else
-      ControlState := csHover;
-    inherited;
-  end;
+  if not Enabled then
+    Exit;
+  //
+  ControlState := csFocused;
+  inherited;
 end;
 
 procedure TUEdit.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled then begin
-    if (Focused) or (FEdit.Focused) then
-      ControlState := csFocused
-    else
-      ControlState := csNone;
-    inherited;
-  end;
+  if not Enabled then
+    Exit;
+  //
+  ControlState := csNone;
+  inherited;
 end;
 
 procedure TUEdit.CMEnabledChanged(var Msg: TMessage);
 begin
   inherited;
   if not Enabled then
-    FControlState := csDisabled
+    ControlState := csDisabled
   else
-    FControlState := csNone;
-  FEdit.Enabled := Enabled;
+    ControlState := csNone;
   UpdateTheme;
 end;
 

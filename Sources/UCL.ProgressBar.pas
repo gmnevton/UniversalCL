@@ -40,8 +40,8 @@ type
 
     FValue: Integer;
     FOrientation: TUOrientation;
-    FCustomFillColor: TColor;
-    FCustomBackColor: TColor;
+    //FCustomFillColor: TColor;
+    //FCustomBackColor: TColor;
     FWaterMark: TPicture;
     FOnWaterMarkPosition: TUWaterMarkPositionEvent;
     FOnPaint: TUProgressBarPaintEvent;

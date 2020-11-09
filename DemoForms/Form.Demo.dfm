@@ -50,14 +50,12 @@ object formDemo: TformDemo
     Height = 17
     Cursor = crDefault
     Caption = 'TUHyperLink (disabled)'
-    Color = clWhite
     Enabled = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clMedGray
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ParentColor = False
     ParentFont = False
     ButtonState = csDisabled
     URL = 'https://embarcadero.com/'
@@ -69,7 +67,7 @@ object formDemo: TformDemo
     Height = 15
     Caption = 'This is description'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 6710886
+    Font.Color = clBlack
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -96,7 +94,7 @@ object formDemo: TformDemo
     Height = 17
     Caption = 'This is entry'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
+    Font.Color = clBlack
     Font.Height = -13
     Font.Name = 'Segoe UI Semibold'
     Font.Style = []
@@ -110,7 +108,7 @@ object formDemo: TformDemo
     Height = 28
     Caption = 'This is heading'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
+    Font.Color = clBlack
     Font.Height = -20
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -125,7 +123,7 @@ object formDemo: TformDemo
     Caption = 'This is title'
     Color = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
+    Font.Color = clBlack
     Font.Height = -28
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -1181,7 +1179,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Settings'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -20
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1203,7 +1201,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'App theme'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
@@ -1225,7 +1223,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'User profile'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
@@ -1324,7 +1322,7 @@ object formDemo: TformDemo
     object entryAccountType: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 473
+      Top = 474
       Width = 203
       Height = 17
       Margins.Left = 0
@@ -1334,7 +1332,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Account'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
@@ -1345,7 +1343,7 @@ object formDemo: TformDemo
     object desAccountHint: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 672
+      Top = 673
       Width = 203
       Height = 30
       Margins.Left = 0
@@ -1355,7 +1353,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Upgrade to Developer account to get more features'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clBlack
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1367,7 +1365,7 @@ object formDemo: TformDemo
     object entryStorage: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 645
+      Top = 646
       Width = 203
       Height = 17
       Margins.Left = 0
@@ -1377,7 +1375,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Free storage'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -13
       Font.Name = 'Segoe UI Semibold'
       Font.Style = []
@@ -1388,7 +1386,7 @@ object formDemo: TformDemo
     object desStorageHint: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 767
+      Top = 768
       Width = 203
       Height = 30
       Margins.Left = 0
@@ -1398,7 +1396,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Your are using 3/5 GB of free cloud storage'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clBlack
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1410,7 +1408,7 @@ object formDemo: TformDemo
     object headingAbout: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 827
+      Top = 828
       Width = 203
       Height = 28
       Margins.Left = 0
@@ -1420,7 +1418,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'About'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBlack
       Font.Height = -20
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1431,7 +1429,7 @@ object formDemo: TformDemo
     object desAppVersion: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 905
+      Top = 906
       Width = 203
       Height = 15
       Margins.Left = 0
@@ -1441,7 +1439,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'App version: 1.1'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clBlack
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1453,7 +1451,7 @@ object formDemo: TformDemo
     object desFlashVersion: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 925
+      Top = 926
       Width = 203
       Height = 15
       Margins.Left = 0
@@ -1463,7 +1461,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Flash version: 31.0.0.14'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clBlack
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1475,7 +1473,7 @@ object formDemo: TformDemo
     object desChromiumVersion: TUText
       AlignWithMargins = True
       Left = 15
-      Top = 945
+      Top = 946
       Width = 203
       Height = 15
       Margins.Left = 0
@@ -1485,7 +1483,7 @@ object formDemo: TformDemo
       Align = alTop
       Caption = 'Chromium version: 71.0'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clBlack
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -1497,7 +1495,7 @@ object formDemo: TformDemo
     object linkEmbarcadero: TUHyperLink
       AlignWithMargins = True
       Left = 15
-      Top = 965
+      Top = 966
       Width = 203
       Height = 13
       Margins.Left = 0
@@ -1532,7 +1530,7 @@ object formDemo: TformDemo
     object checkAutoSync: TUCheckBox
       AlignWithMargins = True
       Left = 15
-      Top = 373
+      Top = 374
       Width = 203
       Margins.Left = 0
       Margins.Top = 5
@@ -1549,7 +1547,7 @@ object formDemo: TformDemo
     end
     object checkKeepEmailPrivate: TUCheckBox
       Left = 15
-      Top = 433
+      Top = 434
       Width = 203
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -1562,7 +1560,7 @@ object formDemo: TformDemo
     end
     object checkSendEmail: TUCheckBox
       Left = 15
-      Top = 403
+      Top = 404
       Width = 203
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -1621,7 +1619,7 @@ object formDemo: TformDemo
     end
     object radioFreeAccount: TURadioButton
       Left = 15
-      Top = 500
+      Top = 501
       Width = 203
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -1637,7 +1635,7 @@ object formDemo: TformDemo
     end
     object radioProAccount: TURadioButton
       Left = 15
-      Top = 530
+      Top = 531
       Width = 203
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -1652,7 +1650,7 @@ object formDemo: TformDemo
     end
     object radioDevAccount: TURadioButton
       Left = 15
-      Top = 560
+      Top = 561
       Width = 203
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -1667,7 +1665,7 @@ object formDemo: TformDemo
     end
     object separatorLastBox: TUSeparator
       Left = 15
-      Top = 988
+      Top = 989
       Width = 203
       Height = 10
       Align = alTop
@@ -1707,7 +1705,7 @@ object formDemo: TformDemo
       Tag = 2
       AlignWithMargins = True
       Left = 15
-      Top = 595
+      Top = 596
       Width = 203
       Margins.Left = 0
       Margins.Top = 5
@@ -1720,7 +1718,7 @@ object formDemo: TformDemo
       Tag = 2
       AlignWithMargins = True
       Left = 15
-      Top = 712
+      Top = 713
       Width = 203
       Margins.Left = 0
       Margins.Top = 0
@@ -1732,7 +1730,7 @@ object formDemo: TformDemo
     object progressStorageUsed: TUProgressBar
       AlignWithMargins = True
       Left = 15
-      Top = 752
+      Top = 753
       Width = 203
       Margins.Left = 0
       Margins.Top = 0
@@ -1751,7 +1749,7 @@ object formDemo: TformDemo
       Tag = 2
       AlignWithMargins = True
       Left = 15
-      Top = 865
+      Top = 866
       Width = 203
       Margins.Left = 0
       Margins.Top = 5
@@ -1765,20 +1763,9 @@ object formDemo: TformDemo
       Top = 339
       Width = 203
       Align = alTop
-      ParentColor = True
+      BevelOuter = bvNone
       TabOrder = 3
-      BorderColor.Enabled = False
-      BorderColor.Color = clBlack
-      BorderColor.LightColor = clBlack
-      BorderColor.DarkColor = clBlack
-      BorderColor.FocusedLightColor = clBlack
-      BorderColor.FocusedDarkColor = clBlack
-      Edit.Left = 5
-      Edit.Top = 5
-      Edit.Width = 194
-      Edit.ParentFont = False
-      Edit.PopupMenu = popupEdit
-      Edit.TextHint = 'Right click to open context menu'
+      BorderThickness = 2
       Transparent = True
     end
   end

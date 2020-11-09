@@ -53,8 +53,8 @@ type
     property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
 
     property BevelOuter default bvNone;
-    property ParentColor default false;
-    property ParentBackground default false;
+    property ParentColor default False;
+    property ParentBackground default False;
   end;
 
 implementation

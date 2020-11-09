@@ -88,8 +88,8 @@ begin
 
   FButtonState := csNone;
   FTextColors := TUThemeFocusableControlStateColors.Create;
-  FTextColors.SetColors(utLight, $D77800, clGray, clMedGray, clMedGray, $D77800);
-  FTextColors.SetColors(utDark,  $D77800, clMedGray, clGray, clGray, clMedGray);
+  FTextColors.SetColors(utLight, $D77800, clBlue, clMedGray, clGray, $D77800);
+  FTextColors.SetColors(utDark,  $D77800, clBlue, clMedGray, clGray, $D77800);
   FTextColors.OnChange := DoCustomTextColorsChange;
 
   FEnabled := true;
@@ -149,6 +149,7 @@ begin
     Font.Color := TM.AccentColor
   else
     Font.Color := TextColors.GetColor(TM.ThemeUsed, ButtonState);
+  Repaint;
 end;
 
 function TUHyperLink.IsCustomThemed: Boolean;
@@ -177,7 +178,6 @@ begin
   if Value <> FButtonState then begin
     FButtonState := Value;
     UpdateTheme;
-    Repaint;
   end;
 end;
 
@@ -194,7 +194,6 @@ begin
       Cursor := crHandPoint;
     end;
     UpdateTheme;
-    Repaint;
   end;
 end;
 
@@ -247,7 +246,6 @@ end;
 procedure TUHyperLink.DoCustomTextColorsChange(Sender: TObject);
 begin
   UpdateTheme;
-  Repaint;
 end;
 
 end.

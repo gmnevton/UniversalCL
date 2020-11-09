@@ -24,6 +24,8 @@ type
     procedure SetTextKind(const Value: TUTextKind);
     procedure SetUseAccentColor(const Value: Boolean);
 
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
@@ -45,6 +47,7 @@ type
 implementation
 
 uses
+  UCL.Utils,
   UCL.Colors;
 
 { TUText }
@@ -105,16 +108,19 @@ var
 begin
   TM:=SelectThemeManager(Self);
   //  Font color
-  if TextKind = tkDescription then
+  if not Enabled or (TextKind = tkDescription) then
     Font.Color := $666666
   else begin
     if UseAccentColor then
-      Font.Color := TM.AccentColor
+      Font.Color := SelectAccentColor(TM, $D77800)
     else if TM.ThemeUsed = utLight then
       Font.Color := $000000
     else
       Font.Color := $FFFFFF;
   end;
+  if csDesigning in Self.ComponentState then
+    Font.Color := GetTextColorFromBackground(Color);
+  Repaint;
 end;
 
 function TUText.IsCustomThemed: Boolean;
@@ -161,7 +167,6 @@ begin
     end;
 
     UpdateTheme;
-    Repaint;
   end;
 end;
 
@@ -170,8 +175,13 @@ begin
   if Value <> FUseAccentColor then begin
     FUseAccentColor := Value;
     UpdateTheme;
-    Repaint;
   end;
+end;
+
+procedure TUText.CMEnabledChanged(var Msg: TMessage);
+begin
+  UpdateTheme;
+  inherited;
 end;
 
 end.

@@ -231,6 +231,7 @@ var
 
 function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload;
 function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload;
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
 
 implementation
 
@@ -268,6 +269,18 @@ begin
   if TUCustomThemeManager.IsThemeAvailable(Control) then begin
     if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
       Result:=ThemedComponent.CustomThemeManager;
+  end;
+end;
+
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
+begin
+  if TM = Nil then
+    Result := CustomAccentColor
+  else begin
+    if TM.UseSystemAccentColor then
+      Result := TM.SystemAccentColor
+    else
+      Result := TM.AccentColor;
   end;
 end;
 
@@ -978,7 +991,7 @@ end;
 
 function TUThemeControlWithFocusColorSet.GetColor(const TM: TUCustomThemeManager; const Focused: Boolean): TColor;
 begin
-  Result:=clNone;
+//  Result:=clNone;
   if TM = Nil then
     Result := Color
   else begin

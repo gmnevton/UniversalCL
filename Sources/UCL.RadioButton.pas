@@ -37,6 +37,8 @@ type
     FCustomActiveColor: TColor;
     FTextOnGlass: Boolean;
 
+    FOnChange: TNotifyEvent;
+
     //  Internal
     procedure UpdateColors;
     procedure UpdateRects;
@@ -52,7 +54,7 @@ type
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
     procedure Paint; override;
     procedure Resize; override;
@@ -69,13 +71,14 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property IconFont: TFont read FIconFont write FIconFont;
-
+    //
     property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
     property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
     property Group: string read FGroup write FGroup;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
-
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    //
     property Caption;
     property Color;
     property ParentColor default true;
@@ -84,6 +87,9 @@ type
   end;
 
 implementation
+
+uses
+  UCL.Colors;
 
 { TURadioButton }
 
@@ -104,7 +110,7 @@ begin
   FIconFont.Name := 'Segoe MDL2 Assets';
   FIconFont.Size := 15;
 
-  ParentColor := true;
+  ParentColor := True;
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 10;
 
@@ -164,37 +170,58 @@ begin
   Result:=FThemeManager;
 end;
 
-{
 procedure TURadioButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  INTERNAL
 
 procedure TURadioButton.UpdateColors;
+var
+  TM: TUCustomThemeManager;
 begin
-  //  Active & text color
-  if ThemeManager = Nil then begin
-    ActiveColor := CustomActiveColor;
-    TextColor := $000000;
-  end
-  else if ThemeManager.Theme = ttLight then begin
-    ActiveColor := ThemeManager.AccentColor;
-    TextColor := $000000;
-  end
-  else begin
-    ActiveColor := ThemeManager.AccentColor;
-    TextColor := $FFFFFF;
-  end;
-
   //  Disabled
   if not Enabled then begin
     ActiveColor := $808080;
     TextColor := $808080;
+    Exit;
   end;
+  //
+  TM := SelectThemeManager(Self);
+  //  Active & text color
+  if CustomActiveColor <> clNone then begin
+    ActiveColor := CustomActiveColor;
+    if TM.ThemeUsed = utLight then
+      TextColor := $000000
+    else
+      TextColor := $FFFFFF;
+  end
+  else if CustomActiveColor = clDefault then begin
+    if TM.UseSystemAccentColor then
+      ActiveColor := TM.SystemAccentColor
+    else
+      ActiveColor := TM.AccentColor;
+    if TM.ThemeUsed = utLight then
+      TextColor := $000000
+    else
+      TextColor := $FFFFFF;
+  end
+  else if TM.ThemeUsed = utLight then begin
+    ActiveColor := TM.AccentColor;
+    TextColor := $000000;
+  end
+  else begin
+    ActiveColor := TM.AccentColor;
+    TextColor := $FFFFFF;
+  end;
+  //
+  if csDesigning in Self.ComponentState then
+    TextColor := GetTextColorFromBackground(Color);
 end;
 
 procedure TURadioButton.UpdateRects;
@@ -220,6 +247,8 @@ var
 begin
   if Value <> FIsChecked then begin
     FIsChecked := Value;
+    if Assigned(FOnChange) then
+      FOnChange(Self);
 
     //  Uncheck all items with the same group
     if Value then begin
@@ -266,12 +295,12 @@ begin
 
   //  Paint text
   Canvas.Brush.Style := bsClear;
-  Canvas.Font := Font;
+  Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
   DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, TextOnGlass);
 
   //  Paint icon
-  Canvas.Font := IconFont;
+  Canvas.Font.Assign(IconFont);
   if not IsChecked then begin
     Canvas.Font.Color := TextColor;
     DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
@@ -291,9 +320,9 @@ var
 begin
   if AutoSize and (Align = alNone) then begin
     Space := 5;
-    Canvas.Font := IconFont;
+    Canvas.Font.Assign(IconFont);
     Height := 2 * Space + Canvas.TextHeight(ICON_CIRCLE_BORDER);
-    Canvas.Font := Font;
+    Canvas.Font.Assign(Font);
     Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
   end
   else
@@ -305,9 +334,11 @@ end;
 
 procedure TURadioButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled then
+  if not Enabled then
+    Exit;
+  //
+  if PtInRect(IconRect, Msg.Pos) then
     IsChecked := True;
-
   inherited;
 end;
 
@@ -315,6 +346,7 @@ procedure TURadioButton.CMEnabledChanged(var Msg: TMessage);
 begin
   UpdateColors;
   Repaint;
+  inherited;
 end;
 
 end.
