@@ -113,6 +113,30 @@ uses
 type
   TUFormAccess = class(TUForm);
 
+{ TUMiniScrollBar }
+
+constructor TUMiniScrollBar.Create(aOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+{$IF CompilerVersion > 29}
+  StyleElements :=[];
+{$IFEND}
+  BevelOuter := bvNone;
+  BevelInner := bvNone;
+  FullRepaint := False;
+  DoubleBuffered := True;
+  ParentBackground := False;
+  ParentColor := False;
+
+  Visible := False;
+end;
+
+procedure TUMiniScrollBar.WMNCHitTest(var Msg: TWMNCHitTest);
+begin
+  Msg.Result := HTTRANSPARENT;
+end;
+
 { TUScrollBox }
 
 //  MAIN CLASS
@@ -547,30 +571,6 @@ begin
     FScrollBarTimer.Enabled := False;
     SetMiniSBVisible(False);
   end;
-end;
-
-{ TUMiniScrollBar }
-
-constructor TUMiniScrollBar.Create(aOwner: TComponent);
-begin
-  inherited Create(AOwner);
-
-{$IF CompilerVersion > 29}
-  StyleElements :=[];
-{$IFEND}
-  BevelOuter := bvNone;
-  BevelInner := bvNone;
-  FullRepaint := False;
-  DoubleBuffered := True;
-  ParentBackground := False;
-  ParentColor := False;
-
-  Visible := False;
-end;
-
-procedure TUMiniScrollBar.WMNCHitTest(var Msg: TWMNCHitTest);
-begin
-  Msg.Result := HTTRANSPARENT;
 end;
 
 end.

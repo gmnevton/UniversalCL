@@ -54,7 +54,7 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -85,6 +85,7 @@ type
 implementation
 
 uses
+  SysUtils,
   UCL.Colors;
 
 { TUQuickButton }
@@ -163,14 +164,15 @@ begin
   Result:=FThemeManager;
 end;
 
-{
 procedure TUQuickButton.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  INTERNAL
 
 procedure TUQuickButton.UpdateColors;

@@ -79,7 +79,7 @@ type
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
 
     property State: TUCheckBoxState read FState write SetState default cbsUnchecked;
-    property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default $D77800;
+    property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
 
     property Caption;
     property Color;
@@ -91,6 +91,7 @@ type
 implementation
 
 uses
+  SysUtils,
   UCL.Colors;
 
 { TUCheckBox }
@@ -110,7 +111,7 @@ begin
   FAllowGrayed := false;
   FTextOnGlass := false;
   FState := cbsUnchecked;
-  FCustomActiveColor := $D77800;  //  Default blue
+  FCustomActiveColor := clDefault; // $D77800 // Default blue
 
   ParentColor := true;
   //Font.Name := 'Segoe UI';
@@ -197,31 +198,22 @@ begin
   end;
   //
   TM := SelectThemeManager(Self);
-  if CustomActiveColor <> clNone then begin
+  if (CustomActiveColor <> clNone) and (CustomActiveColor <> clDefault) then begin
     ActiveColor := CustomActiveColor;
     if TM.ThemeUsed = utLight then
       TextColor := $000000
     else
       TextColor := $FFFFFF;
   end
-  else if CustomActiveColor = clDefault then begin
-    if TM.UseSystemAccentColor then
-      ActiveColor := TM.SystemAccentColor
-    else
-      ActiveColor := TM.AccentColor;
-    if TM.ThemeUsed = utLight then
-      TextColor := $000000
-    else
-      TextColor := $FFFFFF;
-  end
-  else if TM.ThemeUsed = utLight then begin
-    ActiveColor := TM.AccentColor;
-    TextColor := $000000;
-  end
-  else begin
-    ActiveColor := TM.AccentColor;
+  else if CustomActiveColor = clDefault then
+    ActiveColor := SelectAccentColor(TM, clNone)
+  else
+    ActiveColor := SelectAccentColor(TM, CustomActiveColor);
+  //
+  if TM.ThemeUsed = utLight then
+    TextColor := $000000
+  else
     TextColor := $FFFFFF;
-  end;
   //
   if csDesigning in Self.ComponentState then
     TextColor := GetTextColorFromBackground(Color);

@@ -47,6 +47,9 @@ type
 implementation
 
 uses
+  SysUtils,
+  Graphics,
+  UITypes,
   UCL.Utils,
   UCL.Colors;
 

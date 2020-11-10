@@ -190,6 +190,7 @@ type
 implementation
 
 uses
+  SysUtils,
   UCL.Colors;
 
 { TUItemButton }

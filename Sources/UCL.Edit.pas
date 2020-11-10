@@ -100,6 +100,7 @@ type
 implementation
 
 uses
+  UITypes,
   UCL.Graphics;
 
 { TUEdit }

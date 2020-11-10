@@ -13,6 +13,7 @@ object formDemo: TformDemo
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 17
   object linkConnected: TUHyperLink
@@ -22,7 +23,7 @@ object formDemo: TformDemo
     Height = 17
     Caption = 'TUHyperLink (default)'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 14120960
+    Font.Color = clDefault
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -36,7 +37,7 @@ object formDemo: TformDemo
     Height = 17
     Caption = 'TUHyperLink (custom color)'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = 8951296
+    Font.Color = clDefault
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -52,7 +53,7 @@ object formDemo: TformDemo
     Caption = 'TUHyperLink (disabled)'
     Enabled = False
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clMedGray
+    Font.Color = clGray
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -202,7 +203,6 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupA'
-    CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio A1'
   end
@@ -222,7 +222,6 @@ object formDemo: TformDemo
     IconFont.Style = []
     IsChecked = True
     Group = 'GroupA'
-    CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio A2'
   end
@@ -242,7 +241,6 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupA'
-    CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio A3'
   end
@@ -261,7 +259,6 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupB'
-    CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio B1'
   end
@@ -281,7 +278,6 @@ object formDemo: TformDemo
     IconFont.Style = []
     IsChecked = True
     Group = 'GroupB'
-    CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Radio B2'
   end
@@ -1584,7 +1580,6 @@ object formDemo: TformDemo
       IconFont.Style = []
       IsChecked = True
       Group = 'AppTheme'
-      CustomActiveColor = 14120960
       Caption = 'Use system setting'
     end
     object radioLightTheme: TURadioButton
@@ -1599,7 +1594,6 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
-      CustomActiveColor = 14120960
       Caption = 'Light'
     end
     object radioDarkTheme: TURadioButton
@@ -1614,7 +1608,6 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
-      CustomActiveColor = 14120960
       Caption = 'Dark'
     end
     object radioFreeAccount: TURadioButton
@@ -1629,7 +1622,6 @@ object formDemo: TformDemo
       IconFont.Style = []
       IsChecked = True
       Group = 'AccountType'
-      CustomActiveColor = 14120960
       Caption = 'Free user'
       ExplicitTop = 530
     end
@@ -1644,7 +1636,6 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AccountType'
-      CustomActiveColor = 14120960
       Caption = 'Professional user'
       ExplicitTop = 560
     end
@@ -1659,7 +1650,6 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AccountType'
-      CustomActiveColor = 14120960
       Caption = 'Developer'
       ExplicitTop = 590
     end

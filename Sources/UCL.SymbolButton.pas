@@ -163,6 +163,7 @@ type
 implementation
 
 uses
+  SysUtils,
   Forms,
   UCL.Colors,
   UCL.CaptionBar;

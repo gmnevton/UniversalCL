@@ -97,6 +97,9 @@ type
 
 implementation
 
+uses
+  SysUtils;
+
 type
   TGraphicAccess = class(TGraphic);
 

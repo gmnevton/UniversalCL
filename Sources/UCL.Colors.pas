@@ -214,8 +214,8 @@ var
   QUICKBUTTON_BACK: TUThemeControlColorSet;
 
   // Slider
-  SLIDER_BACK: TUThemeControlColorSet;
-  SLIDER_CURSOR: TUThemeControlColorSet;
+  SLIDER_BACK: TUThemeFocusableControlStateColors;
+  SLIDER_CURSOR: TUThemeFocusableControlStateColors;
 
   // Hyperlink
   HYPERLINK_FONT_NAME: String;
@@ -229,9 +229,9 @@ var
   DETAIL_COLOR: TColor;
   DETAIL_COLOR_HIGHLIGHED: TColor;
 
-function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload;
-function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload;
-function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
+function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload; inline;
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload; inline;
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;{ inline;}
 
 implementation
 
@@ -274,7 +274,7 @@ end;
 
 function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
 begin
-  if TM = Nil then
+  if (TM = Nil) or (CustomAccentColor <> clNone) then
     Result := CustomAccentColor
   else begin
     if TM.UseSystemAccentColor then
@@ -1065,12 +1065,12 @@ initialization
   QUICKBUTTON_BACK := TUThemeControlColorSet.Create(0, $CFCFCF, $3C3C3C);
 
   // Slider
-  SLIDER_BACK := TUThemeControlColorSet.Create;
-  //SLIDER_BACK.SetLightColor($999999, $666666, $999999, $999999, $666666, $999999);
-  //SLIDER_BACK.SetDarkColor($666666, $999999, $666666, $666666, $999999, $666666);
-  SLIDER_CURSOR := TUThemeControlColorSet.Create;
-  //SLIDER_CURSOR.SetLightColor($D77800, $171717, $CCCCCC, $D77800, $171717, $CCCCCC);
-  //SLIDER_CURSOR.SetDarkColor($D77800, $F2F2F2, $767676, $D77800, $F2F2F2, $767676);
+  SLIDER_BACK := TUThemeFocusableControlStateColors.Create;
+  SLIDER_BACK.SetColors(utLight, $999999, $666666, $999999, $999999, $666666);
+  SLIDER_BACK.SetColors(utDark,  $666666, $999999, $666666, $666666, $999999);
+  SLIDER_CURSOR := TUThemeFocusableControlStateColors.Create;
+  SLIDER_CURSOR.SetColors(utLight, $D77800, $171717, $CCCCCC, $D77800, $171717);
+  SLIDER_CURSOR.SetColors(utDark,  $D77800, $F2F2F2, $767676, $D77800, $F2F2F2);
 
   // Hyperlink
   HYPERLINK_FONT_NAME := 'Segoe UI';

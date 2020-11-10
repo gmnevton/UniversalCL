@@ -178,7 +178,7 @@ var
 begin
   // Prepairing
   TM := SelectThemeManager(Self);
-  AccentColor := TM.AccentColor;
+  AccentColor := SelectAccentColor(TM, clNone);
 
   //  Disabled
   if not Enabled then begin

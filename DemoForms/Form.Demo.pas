@@ -176,6 +176,7 @@ type
     procedure buttonHighlightClick(Sender: TObject);
     procedure buttonAppListFormClick(Sender: TObject);
     procedure buttonBlurFormClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
 
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
@@ -206,6 +207,14 @@ begin
   TM := SelectThemeManager(Self);
   TM.OnBeforeUpdate := AppThemeBeforeUpdate;
   TM.OnAfterUpdate  := AppThemeAfterUpdate;
+end;
+
+procedure TformDemo.FormShow(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
+begin
+  TM := SelectThemeManager(Self);
+  TM.Reload;
 end;
 
 procedure TformDemo.AppThemeBeforeUpdate(Sender: TObject);

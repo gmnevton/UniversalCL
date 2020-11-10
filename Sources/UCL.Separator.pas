@@ -42,7 +42,7 @@ type
     procedure SetUseAccentColor(const Value: Boolean);
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -57,17 +57,22 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
 
-    property CustomColor: TColor read FCustomColor write SetCustomColor default $999999;
+    property CustomColor: TColor read FCustomColor write SetCustomColor default clNone;
     property Orientation: TUOrientation read FOrientation write SetOrientation default oVertical;
     property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 10;
     property LineBetween: Boolean read FLineBetween write SetLineBetween default true;
     property UseAccentColor: Boolean read FUseAccentColor write SetUseAccentColor default false;
 
-      property Height default 50;
-      property Width default 20;
+    property Height default 50;
+    property Width default 20;
   end;
 
 implementation
+
+uses
+  SysUtils,
+  UITypes,
+  UCL.Colors;
 
 { TUSeparator }
 
@@ -78,7 +83,7 @@ begin
   inherited Create(AOwner);
   FThemeManager := Nil;
 
-  FCustomColor := $000000;
+  FCustomColor := clNone;
   FOrientation := oVertical;
   FAlignSpace := 10;
   FLineBetween := true;
@@ -94,9 +99,11 @@ begin
 end;
 
 destructor TUSeparator.Destroy;
+var
+  TM: TUCustomThemeManager;
 begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
   inherited;
 end;
 
@@ -137,23 +144,27 @@ begin
   Result:=FThemeManager;
 end;
 
-{
 procedure TUSeparator.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  INTERNAL
 
 procedure TUSeparator.UpdateColors;
+var
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager = Nil then
+  TM:=SelectThemeManager(Self);
+  if CustomColor <> clNone then
     LineColor := CustomColor
   else if UseAccentColor then
-    LineColor := ThemeManager.AccentColor
-  else if ThemeManager.Theme = ttLight then
+    LineColor := SelectAccentColor(TM, $999999)
+  else if TM.ThemeUsed = utLight then
     LineColor := $999999
   else
     LineColor := $666666;
@@ -174,8 +185,7 @@ procedure TUSeparator.SetCustomColor(const Value: TColor);
 begin
   if Value <> FCustomColor then begin
     FCustomColor := Value;
-    UpdateColors;
-    Repaint;
+    UpdateTheme;
   end;
 end;
 
@@ -201,8 +211,7 @@ procedure TUSeparator.SetUseAccentColor(const Value: Boolean);
 begin
   if Value <> FUseAccentColor then begin
     FUseAccentColor := Value;
-    UpdateColors;
-    Repaint;
+    UpdateTheme;
   end;
 end;
 
@@ -210,8 +219,7 @@ end;
 
 procedure TUSeparator.Paint;
 begin
-  inherited;
-
+//  inherited;
   if not LineBetween then
     Exit;
 

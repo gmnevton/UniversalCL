@@ -75,7 +75,7 @@ type
     property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
     property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
     property Group: string read FGroup write FGroup;
-    property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor;
+    property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
@@ -89,6 +89,7 @@ type
 implementation
 
 uses
+  SysUtils,
   UCL.Colors;
 
 { TURadioButton }
@@ -103,7 +104,7 @@ begin
   //  New props
   FAutoSize := false;
   FIsChecked := false;
-  FCustomActiveColor := $D77800;
+  FCustomActiveColor := clDefault; // $D77800;
   FTextOnGlass := false;
 
   FIconFont := TFont.Create;
@@ -194,31 +195,22 @@ begin
   //
   TM := SelectThemeManager(Self);
   //  Active & text color
-  if CustomActiveColor <> clNone then begin
+  if (CustomActiveColor <> clNone) and (CustomActiveColor <> clDefault) then begin
     ActiveColor := CustomActiveColor;
     if TM.ThemeUsed = utLight then
       TextColor := $000000
     else
       TextColor := $FFFFFF;
   end
-  else if CustomActiveColor = clDefault then begin
-    if TM.UseSystemAccentColor then
-      ActiveColor := TM.SystemAccentColor
-    else
-      ActiveColor := TM.AccentColor;
-    if TM.ThemeUsed = utLight then
-      TextColor := $000000
-    else
-      TextColor := $FFFFFF;
-  end
-  else if TM.ThemeUsed = utLight then begin
-    ActiveColor := TM.AccentColor;
-    TextColor := $000000;
-  end
-  else begin
-    ActiveColor := TM.AccentColor;
+  else if CustomActiveColor = clDefault then
+    ActiveColor := SelectAccentColor(TM, clNone)
+  else
+    ActiveColor := SelectAccentColor(TM, CustomActiveColor);
+  //
+  if TM.ThemeUsed = utLight then
+    TextColor := $000000
+  else
     TextColor := $FFFFFF;
-  end;
   //
   if csDesigning in Self.ComponentState then
     TextColor := GetTextColorFromBackground(Color);

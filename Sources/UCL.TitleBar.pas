@@ -38,7 +38,7 @@ type
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -65,7 +65,9 @@ type
 implementation
 
 uses
-  Types;
+  SysUtils,
+  Types,
+  UCL.Colors;
 
 { TUTitleBar }
 
@@ -78,8 +80,8 @@ begin
 
   FTextPosition := 12;
   FAlignment := taLeftJustify;
-  FDragMovement := true;
-  FEnableSystemMenu := true;
+  FDragMovement := True;
+  FEnableSystemMenu := True;
 
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 9;
@@ -91,9 +93,11 @@ begin
 end;
 
 destructor TUTitleBar.Destroy;
+var
+  TM: TUCustomThemeManager;
 begin
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
   inherited;
 end;
 
@@ -120,17 +124,15 @@ end;
 
 procedure TUTitleBar.UpdateTheme;
 var
-  IsLightTheme: Boolean;
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager = Nil then
-    IsLightTheme := True
-  else
-    IsLightTheme := ThemeManager.Theme = ttLight;
-
-  if IsLightTheme then
+  TM:=SelectThemeManager(Self);
+  if TM.ThemeUsed = utLight then
     Font.Color := $000000
   else
     Font.Color := $FFFFFF;
+  //
+  Repaint;
 end;
 
 function TUTitleBar.IsCustomThemed: Boolean;
@@ -143,14 +145,14 @@ begin
   Result:=FThemeManager;
 end;
 
-{
 procedure TUTitleBar.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
 
 //  CUSTOM METHODS
 
@@ -162,11 +164,11 @@ begin
 
   //  Do not paint background
   Canvas.Brush.Style := bsClear;
-  Canvas.Font := Font;
+  Canvas.Font.Assign(Font);
 
   //  Draw text
   TextRect := Rect(TextPosition, 0, Width, Height);
-  DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, true);
+  DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, True);
 end;
 
 procedure TUTitleBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);

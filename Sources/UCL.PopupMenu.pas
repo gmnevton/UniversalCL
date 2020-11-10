@@ -81,6 +81,7 @@ type
 implementation
 
 uses
+  SysUtils,
   UCL.Colors;
 
 { TUPopupMenu }
@@ -98,7 +99,7 @@ begin
   FItemHeight := 32;
   FTopSpace := 5;
   FImageKind := ikFontIcon;
-  FCloseAnimation := false;
+  FCloseAnimation := False;
 
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkQuartic, 0, 120, 20);
@@ -264,7 +265,7 @@ begin
   Form := TUForm.CreateNew(Self);
   Form.OnDeactivate := PopupForm_OnDeactivate;
 
-  Form.DoubleBuffered := true;
+  Form.DoubleBuffered := True;
   Form.BorderStyle := bsToolWindow;
   Form.Color := BackColor;
 
@@ -298,7 +299,7 @@ begin
     UItem.Align := alBottom;
     UItem.Width := ItemWidth;
     UItem.Height := ItemHeight;
-    UItem.ShowHint := true;
+    UItem.ShowHint := True;
 
     //  Scale item
     UItem.ScaleForPPI(DPI);
@@ -312,7 +313,7 @@ begin
 //  ShowWindow(Form.Handle, SW_SHOWNOACTIVATE);
   Form.Left := X;
   Form.Top := Y;
-  Form.Visible := true;
+  Form.Visible := True;
 
   //  Animation
   Ani := TIntAni.Create(0, TotalItemsHeight + 2 * Spacing,

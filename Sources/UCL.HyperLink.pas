@@ -77,6 +77,9 @@ type
 
 implementation
 
+uses
+  SysUtils;
+
 { TUHyperLink }
 
 //  MAIN CLASS

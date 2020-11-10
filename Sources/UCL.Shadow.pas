@@ -7,25 +7,26 @@ interface
 {$IFEND}
 
 uses
-  Classes, 
+  Classes,
   Types,
   Windows,
-  Controls, 
-  Graphics, 
+  Controls,
+  Graphics,
   ExtCtrls,
   UCL.Classes,
   UCL.Types,
-  UCL.Utils, 
+  UCL.Utils,
   UCL.Graphics,
   UCL.ThemeManager;
 
 type
   TUShadow = class(TUGraphicControl, IUThemedComponent)
-  private
-    var Color: TColor;
-    var BlendFunc: BLENDFUNCTION;
-    var BlendBmp: TBitmap;
+  private var
+    Color: TColor;
+    BlendFunc: BLENDFUNCTION;
+    BlendBmp: TBitmap;
 
+  private
     FThemeManager: TUThemeManager;
 
     FLightColor: TColor;
@@ -36,12 +37,12 @@ type
 
     //  Setters
     procedure SetThemeManager(const Value: TUThemeManager);
-    procedure SetAlpha(Index: Integer; const Value: Byte);      
+    procedure SetAlpha(Index: Integer; const Value: Byte);
     procedure SetColor(Index: Integer; const Value: TColor);
     procedure SetDirection(const Value: TUDirection);
 
   protected
-    //procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -64,6 +65,10 @@ type
   end;
 
 implementation
+
+uses
+  SysUtils,
+  UCL.Colors;
 
 { TUShadow }
 
@@ -89,16 +94,18 @@ begin
 end;
 
 destructor TUShadow.Destroy;
+var
+  TM: TUCustomThemeManager;
 begin
   BlendBmp.Free;
-  if FThemeManager <> Nil then
-    FThemeManager.Disconnect(Self);
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
   inherited;
 end;
 
 procedure TUShadow.Paint;
 begin
-  inherited;
+//  inherited;
 
   BlendBmp.Width := Width;
   BlendBmp.Height := Height;
@@ -130,14 +137,10 @@ end;
 
 procedure TUShadow.UpdateTheme;
 var
-  IsLightTheme: Boolean;
+  TM: TUCustomThemeManager;
 begin
-  if ThemeManager = Nil then
-    IsLightTheme := True
-  else
-    IsLightTheme := ThemeManager.Theme = ttLight;
-
-  if IsLightTheme then
+  TM := SelectThemeManager(Self);
+  if TM.ThemeUsed = utLight then
     Color := LightColor
   else
     Color := DarkColor;
@@ -155,14 +158,15 @@ begin
   Result:=FThemeManager;
 end;
 
-{
 procedure TUShadow.Notification(AComponent: TComponent; Operation: TOperation);
 begin
+  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
+    ThemeManager:=Nil;
+    Exit;
+  end;
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = FThemeManager) then
-    FThemeManager := nil;
 end;
-}
+
 //  SETTERS
 
 procedure TUShadow.SetAlpha(Index: Integer; const Value: Byte);
