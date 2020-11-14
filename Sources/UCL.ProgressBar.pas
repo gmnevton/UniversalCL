@@ -202,24 +202,21 @@ end;
 procedure TUProgressBar.UpdateColors;
 var
   TM: TUCustomThemeManager;
-  ColorSet: TUThemeControlColorSet;
 begin
   TM:=SelectThemeManager(Self);
   // Background & fill color
-  ColorSet := BackColor;
   if BackColor.Enabled then
     Back_Color := BackColor.Color
   else
-    Back_Color := ColorSet.GetColor(TM);
+    Back_Color := BackColor.GetColor(TM);
   //
-  ColorSet := FillColor;
   if FillColor.Enabled then
     Fill_Color := FillColor.Color
-  else
-    Fill_Color := ColorSet.GetColor(TM);
-  //
-  if TM.UseSystemAccentColor then
-    Fill_Color := TM.AccentColor;
+  else begin
+    Fill_Color := SelectAccentColor(TM, clNone);
+    if (Fill_Color = clNone) or (Fill_Color = clDefault) then
+      Fill_Color := FillColor.GetColor(TM);
+  end;
 end;
 
 procedure TUProgressBar.UpdateRects;

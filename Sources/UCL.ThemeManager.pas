@@ -8,6 +8,7 @@ uses
   TypInfo,
   Controls,
   Graphics,
+  Menus,
   Generics.Collections,
   UCL.Classes,
   UCL.SystemSettings;
@@ -122,6 +123,10 @@ type
   TUThemeManager = class(TUCustomThemeManager);
 
 function GetCommonThemeManager: TUCustomThemeManager;
+function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload; inline;
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload; inline;
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor; inline;
+
 
 implementation
 
@@ -142,6 +147,51 @@ begin
     CommonThemeManager:=TUApplicationThemeManager.Create(Nil);
   //
   Result := CommonThemeManager;
+end;
+
+//function SelectThemeManager(Control: TControl): TUThemeManager;
+//var
+//  ParentForm: TCustomForm;
+//begin
+//  ParentForm := GetParentForm(Control, True);
+//  if (ParentForm <> Nil) and (ParentForm is TUForm) then
+//    Result := (ParentForm as TUForm).ThemeManager
+//  else
+//    Result := Nil;
+//end;
+
+function SelectThemeManager(Control: TControl): TUCustomThemeManager;
+var
+  ThemedComponent: IUThemedComponent;
+begin
+  Result:=GetCommonThemeManager;
+  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+    if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
+      Result:=ThemedComponent.CustomThemeManager;
+  end;
+end;
+
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload;
+var
+  ThemedComponent: IUThemedComponent;
+begin
+  Result:=GetCommonThemeManager;
+  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+    if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
+      Result:=ThemedComponent.CustomThemeManager;
+  end;
+end;
+
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
+begin
+  if (TM = Nil) or ((CustomAccentColor <> clNone) and (CustomAccentColor <> clDefault))  then
+    Result := CustomAccentColor
+  else begin
+    if TM.UseSystemAccentColor then
+      Result := TM.SystemAccentColor
+    else
+      Result := TM.AccentColor;
+  end;
 end;
 
 { TUCustomThemeManager }
