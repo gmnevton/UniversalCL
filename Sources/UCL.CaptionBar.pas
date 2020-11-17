@@ -22,7 +22,6 @@ type
     BackColor, TextColor: TColor;
 
   private
-    FThemeManager: TUThemeManager;
     FBackColors: TUThemeCaptionBarColorSet;
 
     FCollapsed: Boolean;
@@ -35,7 +34,6 @@ type
     procedure UpdateColors;
 
     // Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetCollapsed(const Value: Boolean);
     procedure SetUseSystemCaptionColor(const Value: Boolean);
 
@@ -59,15 +57,12 @@ type
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
     //
     procedure UpdateChildControls(const Root: TControl);
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BackColors: TUThemeCaptionBarColorSet read FBackColors;
 
     property Collapsed: Boolean read FCollapsed write SetCollapsed default False;
@@ -102,8 +97,7 @@ type
 constructor TUCaptionBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
-
+  //
   FCollapsed := False;
   FDragMovement := True;
   FSystemMenuEnabled := True;
@@ -124,17 +118,17 @@ begin
   FBackColors.Assign(CAPTIONBAR_BACK);
   FBackColors.OnChange := BackColor_OnChange;
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
+//  if GetCommonThemeManager <> Nil then
+//    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUCaptionBar.Destroy;
-var
-  TM: TUCustomThemeManager;
+//var
+//  TM: TUCustomThemeManager;
 begin
   FBackColors.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
+//  TM:=SelectThemeManager(Self);
+//  TM.Disconnect(Self);
   inherited;
 end;
 

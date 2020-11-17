@@ -7,13 +7,30 @@ interface
 {$IFEND}
 
 uses
+  SysUtils,
+  Classes,
   Controls,
   StdCtrls,
-  Forms;
+  Forms,
+  UCL.ThemeManager;
 
 type
-  TUCustomControl = class(TCustomControl)
+  TUCustomControl = class(TCustomControl, IUThemedComponent)
+  protected
+    FThemeManager: TUThemeManager;
+    procedure SetThemeManager(const Value: TUThemeManager); virtual;
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    // IUThemedComponent
+    procedure UpdateTheme; virtual;
+    function IsCustomThemed: Boolean; virtual;
+    function CustomThemeManager: TUCustomThemeManager; virtual;
+
   published
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    //
     property Align;
     property Anchors;
     property AutoSize;
@@ -59,8 +76,22 @@ type
     property OnStartDrag;
   end;
 
-  TUGraphicControl = class(TGraphicControl)
+  TUGraphicControl = class(TGraphicControl, IUThemedComponent)
+  protected
+    FThemeManager: TUThemeManager;
+    procedure SetThemeManager(const Value: TUThemeManager); virtual;
+
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    // IUThemedComponent
+    procedure UpdateTheme; virtual;
+    function IsCustomThemed: Boolean; virtual;
+    function CustomThemeManager: TUCustomThemeManager; virtual;
+
   published
+    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
+    //
     property Align;
     property Anchors;
     property AutoSize;
@@ -106,10 +137,15 @@ type
     property OnStartDrag;
   end;
 
-  TUCustomEdit = class(TCustomEdit)
+  TUCustomEdit = class(TCustomEdit, IUThemedComponent)
 //  private
 //    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
 //    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+  public
+    // IUThemedComponent
+    procedure UpdateTheme; virtual; abstract;
+    function IsCustomThemed: Boolean; virtual;
+    function CustomThemeManager: TUCustomThemeManager; virtual;
 
   published
     // Chenged properties
@@ -186,5 +222,58 @@ type
   end;
 
 implementation
+
+{ TUCustomControl }
+
+constructor TUCustomControl.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FThemeManager := Nil;
+  //
+  if GetCommonThemeManager <> Nil then
+    GetCommonThemeManager.Connect(Self);
+end;
+
+destructor TUCustomControl.Destroy;
+var
+  TM: TUCustomThemeManager;
+begin
+  TM:=SelectThemeManager(Self);
+  TM.Disconnect(Self);
+  inherited;
+end;
+
+procedure TUCustomControl.SetThemeManager(const Value: TUThemeManager);
+begin
+  if (Value <> Nil) and (FThemeManager = Nil) then
+    GetCommonThemeManager.Disconnect(Self);
+
+  if (Value = Nil) and (FThemeManager <> Nil) then
+    FThemeManager.Disconnect(Self);
+
+  FThemeManager := Value;
+
+  if FThemeManager <> Nil then
+    FThemeManager.Connect(Self)
+  else
+    GetCommonThemeManager.Connect(Self);
+
+  UpdateTheme;
+end;
+
+procedure TUCustomControl.UpdateTheme;
+begin
+// nothing here
+end;
+
+function TUCustomControl.IsCustomThemed: Boolean;
+begin
+  Result:=(FThemeManager <> Nil);
+end;
+
+function TUCustomControl.CustomThemeManager: TUCustomThemeManager;
+begin
+  Result:=FThemeManager;
+end;
 
 end.
