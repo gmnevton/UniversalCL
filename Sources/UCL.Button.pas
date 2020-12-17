@@ -17,20 +17,18 @@ uses
   ImgList,
   UCL.Classes,
   UCL.Types,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics,
   UCL.Colors;
 
 type
-  TUButton = class(TUCustomControl, IUThemedComponent)
+  TUButton = class(TUCustomControl)
   private var
     BorderThickness: Integer;
     BorderColor, BackColor, TextColor: TColor;
     ImgRect, TextRect: TRect;
 
   private
-    FThemeManager: TUThemeManager;
     FBackColors: TUThemeButtonStateColorSet;
     FBorderColors: TUThemeButtonStateColorSet;
     FTextColors: TUThemeButtonStateColorSet;
@@ -51,7 +49,6 @@ type
     procedure UpdateRects;
 
     // Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetAlignment(const Value: TAlignment);
     procedure SetImages(const Value: TCustomImageList);
@@ -83,23 +80,18 @@ type
     procedure TextColorChange(Sender: TObject);
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     // IUThemedComponent
-    //procedure SetThemeManager; // (const Value: TUThemeManager);
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BackColors: TUThemeButtonStateColorSet read FBackColors;
     property BorderColors: TUThemeButtonStateColorSet read FBorderColors;
     property TextColors: TUThemeButtonStateColorSet read FTextColors;
@@ -122,53 +114,69 @@ type
 
 implementation
 
+uses
+  UITypes,
+  UCL.ThemeManager;
+
 { TUButton }
 
-// IUThemedComponent
-
-procedure TUButton.SetThemeManager(const Value: TUThemeManager);
+constructor TUButton.Create(aOwner: TComponent);
 begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
+  inherited Create(aOwner);
+  ControlStyle := ControlStyle - [csDoubleClicks];
 
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
+  BorderThickness := 2;
 
-  FThemeManager := Value;
+  //  New properties
+  FBackColors := TUThemeButtonStateColorSet.Create;
+  //FBackColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FBackColors.Assign(BUTTON_BACK);
 
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
 
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
+  FBorderColors := TUThemeButtonStateColorSet.Create;
+  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
 
-  UpdateTheme;
+  FTextColors := TUThemeButtonStateColorSet.Create;
+  FTextColors.SetColors(utLight, clBlack, clBlack, clBlack, clGray, clBlack);
+
+  FBackColors.OnChange := BackColorChange;
+  FBorderColors.OnChange := BorderColorChange;
+  FTextColors.OnChange := TextColorChange;
+
+  FButtonState := csNone;
+  FAlignment := taCenter;
+  FImageIndex := -1;
+  FAllowFocus := True;
+  FHighlight := False;
+  FIsToggleButton := False;
+  FIsToggled := False;
+  FTransparent := False;
+
+  //  Property
+  Height := 30;
+  Width := 135;
+//  Font.Name := 'Segoe UI';
+//  Font.Size := 10;
+  TabStop := True;
+
+  InitBumpMap;
 end;
+
+destructor TUButton.Destroy;
+begin
+  FBackColors.Free;
+  FBorderColors.Free;
+  FTextColors.Free;
+  inherited;
+end;
+
+// IUThemedComponent
 
 procedure TUButton.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Invalidate;
-end;
-
-function TUButton.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUButton.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUButton.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 procedure TUButton.UpdateColors;
@@ -309,65 +317,6 @@ begin
   end;
 end;
 
-constructor TUButton.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  ControlStyle := ControlStyle - [csDoubleClicks];
-  
-  FThemeManager := Nil;
-
-  BorderThickness := 2;
-
-  //  New properties
-  FBackColors := TUThemeButtonStateColorSet.Create;
-  //FBackColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
-  FBackColors.Assign(BUTTON_BACK);
-  
-
-  FBorderColors := TUThemeButtonStateColorSet.Create;
-  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
-
-  FTextColors := TUThemeButtonStateColorSet.Create;
-  FTextColors.SetColors(utLight, clBlack, clBlack, clBlack, clGray, clBlack);
-
-  FBackColors.OnChange := BackColorChange;
-  FBorderColors.OnChange := BorderColorChange;
-  FTextColors.OnChange := TextColorChange;
-
-  FButtonState := csNone;
-  FAlignment := taCenter;
-  FImageIndex := -1;
-  FAllowFocus := True;
-  FHighlight := False;
-  FIsToggleButton := False;
-  FIsToggled := False;
-  FTransparent := False;
-
-  //  Property
-  Height := 30;
-  Width := 135;
-//  Font.Name := 'Segoe UI';
-//  Font.Size := 10;
-  TabStop := True;
-
-  InitBumpMap;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-end;
-
-destructor TUButton.Destroy;
-var
-  TM: TUCustomThemeManager;
-begin
-  TM := SelectThemeManager(Self);
-  FBackColors.Free;
-  FBorderColors.Free;
-  FTextColors.Free;
-  TM.Disconnect(Self);
-  inherited;
-end;
-
 procedure TUButton.Paint;
 var
   TM: TUCustomThemeManager;
@@ -426,9 +375,8 @@ begin
   UpdateRects;
 end;
 
-procedure TUButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUButton.DoChangeScale(M, D: Integer);
 begin
-  inherited;
   BorderThickness := MulDiv(BorderThickness, M, D);
   UpdateRects;
 end;

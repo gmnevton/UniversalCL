@@ -8,16 +8,14 @@ uses
   Windows,
   Messages,
   Controls,
-  ExtCtrls,
   Forms,
   Graphics,
   UCL.Classes,
   UCL.Colors,
-  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUCaptionBar = class(TPanel, IUThemedComponent)
+  TUCaptionBar = class(TUCustomPanel)
   private var
     BackColor, TextColor: TColor;
 
@@ -50,7 +48,6 @@ type
 
   protected
     procedure Paint; override;
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -83,6 +80,7 @@ implementation
 uses
   Types,
   UCL.SystemSettings,
+  UCL.ThemeManager,
   UCL.Form,
   UCL.IntAnimation,
   UCL.Graphics;
@@ -117,18 +115,11 @@ begin
   FBackColors := TUThemeCaptionBarColorSet.Create;
   FBackColors.Assign(CAPTIONBAR_BACK);
   FBackColors.OnChange := BackColor_OnChange;
-
-//  if GetCommonThemeManager <> Nil then
-//    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUCaptionBar.Destroy;
-//var
-//  TM: TUCustomThemeManager;
 begin
   FBackColors.Free;
-//  TM:=SelectThemeManager(Self);
-//  TM.Disconnect(Self);
   inherited;
 end;
 
@@ -181,27 +172,6 @@ begin
   Color := BackColor;
 end;
 
-//  THEME
-
-procedure TUCaptionBar.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
-
 procedure TUCaptionBar.SetCollapsed(const Value: Boolean);
 var
   Ani: TIntAni;
@@ -248,11 +218,6 @@ begin
   UpdateChildControls(Self);
 end;
 
-function TUCaptionBar.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
 procedure TUCaptionBar.Paint;
 begin
   //  Do not inherited
@@ -267,11 +232,6 @@ begin
     Canvas.Font.Color := TextColor;
     DrawTextRect(Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
   end;
-end;
-
-function TUCaptionBar.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
 end;
 
 procedure TUCaptionBar.UpdateChildControls(const Root: TControl);
@@ -300,15 +260,6 @@ begin
   else if Root is TGraphicControl then begin
     TGraphicControl(Root).Invalidate;
   end;
-end;
-
-procedure TUCaptionBar.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 // MESSAGES

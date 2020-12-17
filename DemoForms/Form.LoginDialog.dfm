@@ -168,7 +168,6 @@ object formLoginDialog: TformLoginDialog
       Width = 330
       Height = 80
       Align = alTop
-      Color = 2039583
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
@@ -264,7 +263,6 @@ object formLoginDialog: TformLoginDialog
     Top = 0
     Width = 410
     Caption = '   Login'
-    Color = 2829099
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -337,7 +335,6 @@ object formLoginDialog: TformLoginDialog
     Width = 410
     Height = 52
     Align = alBottom
-    Color = 2039583
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13

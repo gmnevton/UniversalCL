@@ -2,10 +2,6 @@ unit UCL.TitleBar;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Windows,
@@ -14,22 +10,16 @@ uses
   Graphics,
   Forms,
   UCL.Classes,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
-  TUTitleBar = class(TUGraphicControl, IUThemedComponent)
+  TUTitleBar = class(TUGraphicControl)
   private
-    FThemeManager: TUThemeManager;
-
     FTextPosition: Integer;
     FAlignment: TAlignment;
     FDragMovement: Boolean;
     FEnableSystemMenu: Boolean;
-
-    //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
 
     //  Mesages
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
@@ -38,7 +28,6 @@ type
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -46,13 +35,9 @@ type
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-
     property TextPosition: Integer read FTextPosition write FTextPosition default 12;
     property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
     property DragMovement: Boolean read FDragMovement write FDragMovement default true;
@@ -67,6 +52,7 @@ implementation
 uses
   SysUtils,
   Types,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUTitleBar }
@@ -76,7 +62,6 @@ uses
 constructor TUTitleBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   FTextPosition := 12;
   FAlignment := taLeftJustify;
@@ -87,40 +72,14 @@ begin
 //  Font.Size := 9;
   Height := 32;
 //  Width := 400;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUTitleBar.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUTitleBar.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUTitleBar.UpdateTheme;
 var
@@ -135,32 +94,13 @@ begin
   Repaint;
 end;
 
-function TUTitleBar.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUTitleBar.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUTitleBar.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
-end;
-
 //  CUSTOM METHODS
 
 procedure TUTitleBar.Paint;
 var
   TextRect: TRect;
 begin
-  inherited;
+//  inherited;
 
   //  Do not paint background
   Canvas.Brush.Style := bsClear;

@@ -2,10 +2,6 @@
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Types,
@@ -15,20 +11,18 @@ uses
   Forms,
   UCL.Classes,
   UCL.Types,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
   TUQuickButtonStyle = (sbsNone, sbsQuit, sbsMax, sbsMin, sbsSysButton, sbsHighlight);
 
-  TUQuickButton = class(TUGraphicControl, IUThemedComponent)
+  TUQuickButton = class(TUGraphicControl)
   private var
     BackColor: TColor;
     TextColor: TColor;
 
   private
-    FThemeManager: TUThemeManager;
     FButtonState: TUControlState;
     FButtonStyle: TUQuickButtonStyle;
     FLightColor: TColor;
@@ -41,7 +35,6 @@ type
     procedure UpdateColors;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetButtonStyle(const Value: TUQuickButtonStyle);
     procedure SetTransparent(const Value: Boolean);
@@ -54,7 +47,6 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -62,12 +54,9 @@ type
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
 
@@ -86,6 +75,7 @@ implementation
 
 uses
   SysUtils,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUQuickButton }
@@ -95,7 +85,6 @@ uses
 constructor TUQuickButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   //  New props
   FButtonState := csNone;
@@ -112,65 +101,20 @@ begin
   Height := 32;
   Width := 45;
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
   UpdateColors;
 end;
 
 destructor TUQuickButton.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
 
-procedure TUQuickButton.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
-
 procedure TUQuickButton.UpdateTheme;
 begin
   UpdateColors;
   Repaint;
-end;
-
-function TUQuickButton.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUQuickButton.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUQuickButton.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL

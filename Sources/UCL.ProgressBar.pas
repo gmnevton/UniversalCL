@@ -2,10 +2,6 @@ unit UCL.ProgressBar;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Types,
@@ -15,7 +11,6 @@ uses
   UCL.Classes,
   UCL.Types,
   UCL.Colors,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.IntAnimation;
 
@@ -25,7 +20,7 @@ type
   TUWaterMarkPositionEvent = procedure (Sender: TUProgressBar; var WaterMarkX, WaterMarkY: Integer; var Streatch: Boolean; var StreatchWidth, StreatchHeight: Integer) of object;
   TUProgressBarPaintEvent = procedure (Sender: TUProgressBar; const Canvas: TCanvas) of object;
 
-  TUProgressBar = class(TUCustomControl, IUThemedComponent)
+  TUProgressBar = class(TUCustomControl)
   private var
     FFillColor: TUThemeControlColorSet;
     FBackColor: TUThemeControlColorSet;
@@ -35,7 +30,6 @@ type
     BackRect: TRect;
 
   private
-    FThemeManager: TUThemeManager;
     FAniSet: TIntAniSet;
 
     FValue: Integer;
@@ -51,7 +45,6 @@ type
     procedure UpdateRects;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetWaterMark(const Value: TPicture);
     procedure SetValue(const Value: Integer);
     procedure SetOrientation(const Value: TUOrientation);
@@ -61,24 +54,20 @@ type
     procedure BackColor_OnChange(Sender: TObject);
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
     procedure GoToValue(Value: Integer);
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property AniSet: TIntAniSet read FAniSet write FAniSet;
 
     property FillColor: TUThemeControlColorSet read FFillColor; // read only subcomponent declaration, but its internal properties can be modified
@@ -98,7 +87,9 @@ type
 implementation
 
 uses
-  SysUtils;
+  SysUtils,
+  UITypes,
+  UCL.ThemeManager;
 
 type
   TGraphicAccess = class(TGraphic);
@@ -110,7 +101,6 @@ type
 constructor TUProgressBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
   FWaterMark := TPicture.Create;
 
   //  Parent properties
@@ -130,71 +120,29 @@ begin
   FAniSet := TIntAniSet.Create;
   FAniSet.QuickAssign(akOut, afkQuartic, 0, 250, 25);
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
   UpdateColors;
   UpdateRects;
 end;
 
 destructor TUProgressBar.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FAniSet.Free;
   FWaterMark.Free;
   FFillColor.Free;
   FBackColor.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
 
-procedure TUProgressBar.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
-
 procedure TUProgressBar.UpdateTheme;
 begin
+  if csCreating in ControlState then
+    Exit;
+  //
   UpdateColors;
   UpdateRects;
   Repaint;
-end;
-
-function TUProgressBar.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUProgressBar.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUProgressBar.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -203,6 +151,9 @@ procedure TUProgressBar.UpdateColors;
 var
   TM: TUCustomThemeManager;
 begin
+  if csCreating in ControlState then
+    Exit;
+  //
   TM:=SelectThemeManager(Self);
   // Background & fill color
   if BackColor.Enabled then
@@ -341,9 +292,8 @@ begin
   Invalidate;
 end;
 
-procedure TUProgressBar.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUProgressBar.DoChangeScale(M, D: Integer);
 begin
-  inherited;
   UpdateRects;
   Invalidate;
 end;

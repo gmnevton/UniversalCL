@@ -18,7 +18,6 @@ object Form1: TForm1
     Top = 0
     Width = 635
     Caption = '   Caption bar'
-    Color = clLime
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWhite
     Font.Height = -11

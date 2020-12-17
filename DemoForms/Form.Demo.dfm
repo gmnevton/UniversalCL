@@ -326,7 +326,6 @@ object formDemo: TformDemo
     Top = 0
     Width = 1000
     Caption = '                Delphi UWP app'
-    Color = 2829099
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -975,7 +974,6 @@ object formDemo: TformDemo
     Width = 45
     Height = 498
     Align = alLeft
-    Color = 2039583
     FullRepaint = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWhite
@@ -1677,7 +1675,6 @@ object formDemo: TformDemo
       Margins.Bottom = 5
       Align = alTop
       Caption = 'Select custom accent color'
-      Color = 2039583
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWhite
       Font.Height = -13

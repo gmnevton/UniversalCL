@@ -2,10 +2,6 @@
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Messages,
@@ -13,14 +9,13 @@ uses
   Controls,
   Graphics,
   UCL.Classes,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
   TUCheckBoxState = (cbsChecked, cbsUnchecked, cbsGrayed);
 
-  TUCheckBox = class(TUGraphicControl, IUThemedComponent)
+  TUCheckBox = class(TUGraphicControl)
   const
     ICON_CHECKED = '';
     ICON_UNCHECKED = '';
@@ -30,7 +25,6 @@ type
     var ActiveColor, TextColor: TColor;
     var IconRect, TextRect: TRect;
 
-    FThemeManager: TUThemeManager;
     FIconFont: TFont;
 
     FAutoSize: Boolean;
@@ -45,7 +39,6 @@ type
     procedure UpdateRects;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetAutoSize(const Value: Boolean); reintroduce;
     procedure SetTextOnGlass(const Value: Boolean);
     procedure SetAllowGrayed(const Value: Boolean);
@@ -56,22 +49,18 @@ type
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property IconFont: TFont read FIconFont write FIconFont;
 
     property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
@@ -92,6 +81,8 @@ implementation
 
 uses
   SysUtils,
+  UITypes,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUCheckBox }
@@ -101,7 +92,6 @@ uses
 constructor TUCheckBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
@@ -120,68 +110,23 @@ begin
   Height := 30;
   Width := 180;
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
   UpdateColors;
   UpdateRects;
 end;
 
 destructor TUCheckBox.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FIconFont.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUCheckBox.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUCheckBox.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
-end;
-
-function TUCheckBox.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUCheckBox.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUCheckBox.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -322,9 +267,8 @@ begin
   UpdateRects;
 end;
 
-procedure TUCheckBox.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUCheckBox.DoChangeScale(M, D: Integer);
 begin
-  inherited;
   IconFont.Height := MulDiv(IconFont.Height, M, D);
   Resize;   //  Autosize
   //UpdateRects;  //  Do not update rects, resize already do that

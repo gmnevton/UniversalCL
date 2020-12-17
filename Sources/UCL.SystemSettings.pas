@@ -3,7 +3,6 @@ unit UCL.SystemSettings;
 interface
 
 uses
-  UCL.Classes,
   Registry,
   Windows,
   Graphics;

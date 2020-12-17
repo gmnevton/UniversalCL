@@ -2,10 +2,6 @@
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Types,
@@ -16,7 +12,6 @@ uses
   ImgList,
   UCL.Classes,
   UCL.Types,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
@@ -29,7 +24,7 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
-  TUItemButton = class(TUCustomControl, IUThemedComponent)
+  TUItemButton = class(TUCustomControl)
   private const
     ICON_CHECKED = '';
     ICON_UNCHECKED = '';
@@ -46,8 +41,6 @@ type
     CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
 
   private
-    FThemeManager: TUThemeManager;
-
     FObjectSelected: TUItemObjectKind;
     FButtonState: TUControlState;
     FLeftIconKind: TUImageKind;
@@ -89,7 +82,6 @@ type
     procedure DoToggle;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetImageLeftIndex(const Value: Integer);
     procedure SetImageRightIndex(const Value: Integer);
@@ -122,25 +114,21 @@ type
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
-
+    procedure UpdateTheme; override;
+    //
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
 
     //  Image
@@ -191,6 +179,7 @@ implementation
 
 uses
   SysUtils,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUItemButton }
@@ -200,7 +189,6 @@ uses
 constructor TUItemButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   FObjectSelected := iokNone;
   FButtonState := csNone;
@@ -247,67 +235,22 @@ begin
   Width := 250;
 
   InitBumpMap;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUItemButton.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FIconFont.Free;
   FDetailFont.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUItemButton.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUItemButton.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
-end;
-
-function TUItemButton.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUItemButton.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUItemButton.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -327,7 +270,7 @@ begin
   end
   //  Highlight enabled
   else if (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
-    BackColor := ThemeManager.AccentColor;
+    BackColor := TM.AccentColor;
     TextColor := GetTextColorFromBackground(BackColor);
     DetailColor := clSilver;
   end
@@ -654,7 +597,7 @@ begin
   UpdateColors;
 end;
 
-procedure TUItemButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUItemButton.DoChangeScale(M, D: Integer);
 begin
   inherited;
 

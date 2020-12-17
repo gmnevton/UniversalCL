@@ -2,10 +2,6 @@ unit UCL.Slider;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Windows,
@@ -14,12 +10,11 @@ uses
   Graphics,
   UCL.Classes,
   UCL.Types,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Colors;
 
 type
-  TUSlider = class(TUGraphicControl, IUThemedComponent)
+  TUSlider = class(TUGraphicControl)
 //  private const
 //    DefActiveColor: TDefColor = (
 //      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
@@ -40,7 +35,6 @@ type
     LAccentColor, LBackColor, LCurColor: TColor;
 
   private
-    FThemeManager: TUThemeManager;
     FBackColor: TUThemeFocusableControlStateColors;
     FCurColor: TUThemeFocusableControlStateColors;
     FIsSliding: Boolean;
@@ -58,7 +52,6 @@ type
     procedure UpdateRects;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetControlState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetMin(const Value: Integer);
@@ -78,23 +71,20 @@ type
     procedure CurColor_OnChange(Sender: TObject);
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    //
     property IsSliding: Boolean read FIsSliding;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BackColor: TUThemeFocusableControlStateColors read FBackColor;
     property CurColor: TUThemeFocusableControlStateColors read FCurColor;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
@@ -114,7 +104,8 @@ implementation
 
 uses
   SysUtils,
-  UITypes;
+  UITypes,
+  UCL.ThemeManager;
 
 { TUSlider }
 
@@ -123,7 +114,6 @@ uses
 constructor TUSlider.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   //  New properties
   LCurWidth := 8;
@@ -147,9 +137,6 @@ begin
   FCurColor.Assign(SLIDER_CURSOR);
   FCurColor.OnChange := CurColor_OnChange;
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
   //  Common properties
   Height := 25;
   Width := 100;
@@ -159,61 +146,19 @@ begin
 end;
 
 destructor TUSlider.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FBackColor.Free;
   FCurColor.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUSlider.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUSlider.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
-end;
-
-function TUSlider.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUSlider.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUSlider.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -359,9 +304,8 @@ begin
   UpdateTheme;
 end;
 
-procedure TUSlider.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUSlider.DoChangeScale(M, D: Integer);
 begin
-  inherited;
   LCurWidth  := MulDiv(LCurWidth, M, D);
   LCurHeight := MulDiv(LCurHeight, M, D);
   LCurCorner := MulDiv(LCurCorner, M, D);

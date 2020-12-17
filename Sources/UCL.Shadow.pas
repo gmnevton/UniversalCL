@@ -2,10 +2,6 @@ unit UCL.Shadow;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Types,
@@ -16,19 +12,16 @@ uses
   UCL.Classes,
   UCL.Types,
   UCL.Utils,
-  UCL.Graphics,
-  UCL.ThemeManager;
+  UCL.Graphics;
 
 type
-  TUShadow = class(TUGraphicControl, IUThemedComponent)
+  TUShadow = class(TUGraphicControl)
   private var
     Color: TColor;
     BlendFunc: BLENDFUNCTION;
     BlendBmp: TBitmap;
 
   private
-    FThemeManager: TUThemeManager;
-
     FLightColor: TColor;
     FDarkColor: TColor;
     FAlphaA: Byte;
@@ -36,13 +29,11 @@ type
     FDirection: TUDirection;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetAlpha(Index: Integer; const Value: Byte);
     procedure SetColor(Index: Integer; const Value: TColor);
     procedure SetDirection(const Value: TUDirection);
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -50,13 +41,9 @@ type
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-
     property AlphaA: Byte index 0 read FAlphaA write SetAlpha default 255;
     property AlphaB: Byte index 1 read FAlphaB write SetAlpha default 255;
     property LightColor: TColor index 0 read FLightColor write SetColor default $F2F2F2;
@@ -68,6 +55,7 @@ implementation
 
 uses
   SysUtils,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUShadow }
@@ -77,7 +65,6 @@ uses
 constructor TUShadow.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   FAlphaA := 255;
   FAlphaB := 255;
@@ -88,18 +75,11 @@ begin
   Color := $F2F2F2;
   BlendFunc := CreateBlendFunc(255, True);
   BlendBmp := TBitmap.Create;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUShadow.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   BlendBmp.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
@@ -116,25 +96,6 @@ end;
 
 //  THEME
 
-procedure TUShadow.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
-
 procedure TUShadow.UpdateTheme;
 var
   TM: TUCustomThemeManager;
@@ -146,25 +107,6 @@ begin
     Color := DarkColor;
 
   Repaint;
-end;
-
-function TUShadow.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUShadow.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUShadow.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  SETTERS

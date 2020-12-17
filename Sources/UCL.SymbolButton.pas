@@ -2,10 +2,6 @@
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Types,
@@ -17,14 +13,13 @@ uses
   UCL.Classes,
   UCL.Types,
   UCL.SystemSettings,
-  UCL.ThemeManager,
   UCL.Utils,
   UCL.Graphics;
 
 type
   TUSymbolButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
 
-  TUSymbolButton = class(TUCustomControl, IUThemedComponent)
+  TUSymbolButton = class(TUCustomControl)
 //  private const
 //    DefBackColor: TDefColor = (
 //      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
@@ -40,8 +35,6 @@ type
     IconRect, TextRect, DetailRect: TRect;
   
   private
-    FThemeManager: TUThemeManager;
-
     FSymbolFont: TFont;
     FDetailFont: TFont;
 
@@ -72,7 +65,6 @@ type
     procedure DoToggle;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetSymbolChar(const Value: string);
@@ -102,33 +94,19 @@ type
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
-  {$IF CompilerVersion < 30}
-    FCurrentPPI: Integer;
-    FIsScaling: Boolean;
-    function GetDesignDpi: Integer; virtual;
-    function GetParentCurrentDpi: Integer; virtual;
-  {$IFEND}
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure Resize; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-  {$IF CompilerVersion < 30}
-    procedure ScaleForPPI(NewPPI: Integer); virtual;
-  {$IFEND}
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-
     property SymbolFont: TFont read FSymbolFont write FSymbolFont;
     property DetailFont: TFont read FDetailFont write FDetailFont;
 
@@ -165,6 +143,7 @@ implementation
 uses
   SysUtils,
   Forms,
+  UCL.ThemeManager,
   UCL.Colors,
   UCL.CaptionBar;
 
@@ -176,7 +155,6 @@ constructor TUSymbolButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
-  FThemeManager := Nil;
 
   FImageIndex := -1;
   FImageKind := ikFontIcon;
@@ -208,109 +186,22 @@ begin
   Width := 250;
 
   InitBumpMap;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
 end;
 
 destructor TUSymbolButton.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FSymbolFont.Free;
   FDetailFont.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUSymbolButton.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUSymbolButton.UpdateTheme;
 begin
   UpdateColors;
   UpdateRects;
   Repaint;
-end;
-
-function TUSymbolButton.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUSymbolButton.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-{$REGION 'Compatibility with older Delphi'}
-{$IF CompilerVersion < 30}
-function TUSymbolButton.GetDesignDpi: Integer;
-var
-  LForm: TCustomForm;
-begin
-  LForm := GetParentForm(Self);
-
-  if (LForm <> Nil) and (LForm is TForm) then
-    Result := TForm(LForm).PixelsPerInch
-  else
-    Result := Windows.USER_DEFAULT_SCREEN_DPI;
-end;
-
-function TUSymbolButton.GetParentCurrentDpi: Integer;
-begin
-//  if Parent <> nil then
-//    Result := Parent.GetParentCurrentDpi
-//  else
-    Result := FCurrentPPI;
-end;
-
-procedure TUSymbolButton.ScaleForPPI(NewPPI: Integer);
-begin
-  if not FIsScaling and (NewPPI > 0) then begin
-    FIsScaling := True;
-    try
-      if FCurrentPPI = 0 then
-        FCurrentPPI := GetDesignDpi;
-
-      if NewPPI <> FCurrentPPI then begin
-        ChangeScale(NewPPI, FCurrentPPI);
-        FCurrentPPI := NewPPI;
-      end
-    finally
-      FIsScaling := False;
-    end;
-  end;
-end;
-{$IFEND}
-{$ENDREGION}
-
-procedure TUSymbolButton.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -623,10 +514,8 @@ begin
   UpdateRects;
 end;
 
-procedure TUSymbolButton.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUSymbolButton.DoChangeScale(M, D: Integer);
 begin
-  inherited;
-
   TextOffset := MulDiv(TextOffset, M, D);
   DetailRightOffset := MulDiv(DetailRightOffset, M, D);
 

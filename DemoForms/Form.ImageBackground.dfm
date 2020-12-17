@@ -14663,7 +14663,6 @@ object formImageBackground: TformImageBackground
     Height = 58
     Align = alBottom
     Caption = 'panelBottom'
-    Color = 2039583
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13

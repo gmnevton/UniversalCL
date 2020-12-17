@@ -2,10 +2,6 @@ unit UCL.Separator;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   Classes,
   Messages,
@@ -13,17 +9,14 @@ uses
   Graphics,
   UCL.Classes,
   UCL.Types,
-  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUSeparator = class(TUGraphicControl, IUThemedComponent)
+  TUSeparator = class(TUGraphicControl)
   private var
     LineColor: TColor;
 
   private
-    FThemeManager: TUThemeManager;
-
     FCustomColor: TColor;
     FOrientation: TUOrientation;
     FAlignSpace: Integer;
@@ -34,7 +27,6 @@ type
     procedure UpdateColors;
 
     //  Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetCustomColor(const Value: TColor);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetAlignSpace(const Value: Integer);
@@ -42,7 +34,6 @@ type
     procedure SetUseAccentColor(const Value: Boolean);
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
 
   public
@@ -50,13 +41,9 @@ type
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-
     property CustomColor: TColor read FCustomColor write SetCustomColor default clNone;
     property Orientation: TUOrientation read FOrientation write SetOrientation default oVertical;
     property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 10;
@@ -72,6 +59,7 @@ implementation
 uses
   SysUtils,
   UITypes,
+  UCL.ThemeManager,
   UCL.Colors;
 
 { TUSeparator }
@@ -81,76 +69,30 @@ uses
 constructor TUSeparator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FThemeManager := Nil;
 
   FCustomColor := clNone;
   FOrientation := oVertical;
   FAlignSpace := 10;
-  FLineBetween := true;
-  FUseAccentColor := false;
+  FLineBetween := True;
+  FUseAccentColor := False;
 
   Width := 20;
   Height := 50;
-
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
 
   UpdateColors;
 end;
 
 destructor TUSeparator.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
 
-procedure TUSeparator.SetThemeManager(const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
-
 procedure TUSeparator.UpdateTheme;
 begin
   UpdateColors;
   Repaint;
-end;
-
-function TUSeparator.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUSeparator.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUSeparator.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL

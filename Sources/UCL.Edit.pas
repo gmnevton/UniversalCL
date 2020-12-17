@@ -2,10 +2,6 @@ unit UCL.Edit;
 
 interface
 
-{$IF CompilerVersion > 29}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
 uses
   SysUtils,
   Classes,
@@ -19,11 +15,10 @@ uses
   UCL.Classes,
   UCL.Types,
   UCL.Colors,
-  UCL.ThemeManager,
   UCL.Utils;
 
 type
-  TUEdit = class(TUCustomEdit, IUThemedComponent)
+  TUEdit = class(TUCustomEdit)
 //  private const
 //    DefBorderColor: TDefColor = (
 //      ($999999, $666666, $D77800, $CCCCCC, $D77800),
@@ -35,7 +30,6 @@ type
     LTextColor: TColor;
 
   private
-    FThemeManager: TUThemeManager;
     FBorderThickness: Byte;
     FBorderColor: TUThemeControlWithFocusColorSet;
     FBackColor: TUThemeControlWithFocusColorSet;
@@ -47,7 +41,6 @@ type
     procedure UpdateColors;
 
     // Setters
-    procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetBorderThickness(const Value: Byte);
     procedure SetControlState(const Value: TUControlState);
     procedure SetTransparent(const Value: Boolean);
@@ -72,22 +65,18 @@ type
     //procedure UMSubEditKillFocus(var Msg: TMessage); message UM_SUBEDIT_KILLFOCUS;
 
   protected
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     //procedure Paint; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
-    procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
 
     // IUThemedComponent
-    procedure UpdateTheme;
-    function IsCustomThemed: Boolean;
-    function CustomThemeManager: TUCustomThemeManager;
+    procedure UpdateTheme; override;
 
   published
-    property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property BorderThickness: Byte read FBorderThickness write SetBorderThickness;
     property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor;
     property BackColor: TUThemeControlWithFocusColorSet read FBackColor;
@@ -101,6 +90,7 @@ implementation
 
 uses
   UITypes,
+  UCL.ThemeManager,
   UCL.Graphics;
 
 { TUEdit }
@@ -110,7 +100,6 @@ uses
 constructor TUEdit.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FThemeManager := Nil;
 
   FBorderThickness := 2;
   FControlState := csNone;
@@ -136,9 +125,6 @@ begin
   FBorderColor.Assign(EDIT_BORDER);
   FBorderColor.OnChange := BorderColor_OnChange;
 
-  if GetCommonThemeManager <> Nil then
-    GetCommonThemeManager.Connect(Self);
-
   UpdateColors;
 end;
 
@@ -149,36 +135,13 @@ begin
 end;
 
 destructor TUEdit.Destroy;
-var
-  TM: TUCustomThemeManager;
 begin
   FBackColor.Free;
   FBorderColor.Free;
-  TM:=SelectThemeManager(Self);
-  TM.Disconnect(Self);
   inherited;
 end;
 
 //  THEME
-
-procedure TUEdit.SetThemeManager; // (const Value: TUThemeManager);
-begin
-  if (Value <> Nil) and (FThemeManager = Nil) then
-    GetCommonThemeManager.Disconnect(Self);
-
-  if (Value = Nil) and (FThemeManager <> Nil) then
-    FThemeManager.Disconnect(Self);
-
-  FThemeManager := Value;
-
-  if FThemeManager <> Nil then
-    FThemeManager.Connect(Self);
-
-  if FThemeManager = Nil then
-    GetCommonThemeManager.Connect(Self);
-
-  UpdateTheme;
-end;
 
 procedure TUEdit.UpdateTheme;
 begin
@@ -192,25 +155,6 @@ begin
     Font.Color := LTextColor;
 
   Repaint;
-end;
-
-function TUEdit.IsCustomThemed: Boolean;
-begin
-  Result:=(FThemeManager <> Nil);
-end;
-
-function TUEdit.CustomThemeManager: TUCustomThemeManager;
-begin
-  Result:=FThemeManager;
-end;
-
-procedure TUEdit.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  if (Operation = opRemove) and (AComponent = FThemeManager) then begin
-    ThemeManager:=Nil;
-    Exit;
-  end;
-  inherited Notification(AComponent, Operation);
 end;
 
 //  INTERNAL
@@ -332,9 +276,8 @@ begin
   FEdit.Font.Color := TextColor;
 end;
 }
-procedure TUEdit.ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND});
+procedure TUEdit.DoChangeScale(M, D: Integer);
 begin
-  inherited;
   BorderThickness := MulDiv(BorderThickness, M, D);
   BorderWidth := MulDiv(BorderWidth, M, D);
   Font.Height := MulDiv(Font.Height, M, D);
