@@ -7,30 +7,25 @@ uses
   Messages,
   Windows,
   Controls,
+  StdCtrls,
   Graphics,
   UCL.Classes,
   UCL.Utils,
   UCL.Graphics;
 
 type
-  TURadioButton = class(TUGraphicControl)
-  private const
-    ICON_CIRCLE_BORDER = '';
-    ICON_CIRCLE_INSIDE = '';
-
+  TURadioButton = class(TUCustomControl)
   private var
     ActiveColor, TextColor: TColor;
-    IconRect, TextRect: TRect;
+    IconRect, TextRect, FocusRect: TRect;
 
   private
     FIconFont: TFont;
-
     FAutoSize: Boolean;
-    FIsChecked: Boolean;
+    FChecked: Boolean;
     FGroup: string;
     FCustomActiveColor: TColor;
     FTextOnGlass: Boolean;
-
     FOnChange: TNotifyEvent;
 
     //  Internal
@@ -39,10 +34,13 @@ type
 
     //  Setters
     procedure SetAutoSize(const Value: Boolean); reintroduce;
-    procedure SetIsChecked(const Value: Boolean);
+    procedure SetChecked(const Value: Boolean);
     procedure SetTextOnGlass(const Value: Boolean);
 
     //  Messages
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
@@ -61,11 +59,11 @@ type
   published
     property IconFont: TFont read FIconFont write FIconFont;
     //
-    property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
-    property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    property Checked: Boolean read FChecked write SetChecked default False;
     property Group: string read FGroup write FGroup;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
-    property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
+    property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
     property Caption;
@@ -73,6 +71,8 @@ type
     property ParentColor default true;
     property Height default 30;
     property Width default 180;
+    property TabOrder;
+    property TabStop default True;
   end;
 
 implementation
@@ -81,7 +81,8 @@ uses
   SysUtils,
   UITypes,
   UCL.ThemeManager,
-  UCL.Colors;
+  UCL.Colors,
+  UCL.FontIcons;
 
 { TURadioButton }
 
@@ -92,10 +93,10 @@ begin
   inherited Create(AOwner);
 
   //  New props
-  FAutoSize := false;
-  FIsChecked := false;
+  FAutoSize := False;
+  FChecked := False;
   FCustomActiveColor := clDefault; // $D77800;
-  FTextOnGlass := false;
+  FTextOnGlass := False;
 
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
@@ -107,6 +108,7 @@ begin
 
   Height := 30;
   Width := 180;
+  TabStop := True;
 
   UpdateColors;
   UpdateRects;
@@ -134,7 +136,7 @@ var
   TM: TUCustomThemeManager;
 begin
   //  Disabled
-  if not Enabled then begin
+  if not Enabled or (csCreating in ControlState) then begin
     ActiveColor := $808080;
     TextColor := $808080;
     Exit;
@@ -159,7 +161,7 @@ begin
   else
     TextColor := $FFFFFF;
   //
-  if csDesigning in Self.ComponentState then
+  if IsDesigning then
     TextColor := GetTextColorFromBackground(Color);
 end;
 
@@ -167,6 +169,7 @@ procedure TURadioButton.UpdateRects;
 begin
   IconRect := Rect(0, 0, Height, Height);
   TextRect := Rect(Height, 0, Width, Height);
+  FocusRect:= Rect(Height - 3, 2, Width - 2, Height - 2);
 end;
 
 //  SETTERS
@@ -179,27 +182,32 @@ begin
   end;
 end;
 
-procedure TURadioButton.SetIsChecked(const Value: Boolean);
-var
-  i: Integer;
-  control: TControl;
-begin
-  if Value <> FIsChecked then begin
-    FIsChecked := Value;
-    if Assigned(FOnChange) then
-      FOnChange(Self);
+procedure TURadioButton.SetChecked(const Value: Boolean);
 
-    //  Uncheck all items with the same group
-    if Value then begin
-      for i := 0 to Parent.ControlCount - 1 do begin
-        control := Parent.Controls[i];
-        if (control = Self) or not (control is TURadioButton) then
-          Continue;
-        if TURadioButton(control).Group = Group then
-          TURadioButton(control).IsChecked := False;
+  procedure TurnSiblingsOff;
+  var
+    I: Integer;
+    Sibling: TControl;
+  begin
+    if Parent <> Nil then begin
+      for I:= 0 to Parent.ControlCount - 1 do begin
+        Sibling := Parent.Controls[I];
+        if (Sibling <> Self) and (Sibling is TURadioButton) and (TURadioButton(Sibling).Group = Group) then
+          TURadioButton(Sibling).SetChecked(False);
       end;
     end;
-    Repaint;
+  end;
+
+begin
+  if Value <> FChecked then begin
+    FChecked := Value;
+    //  Uncheck all items with the same group
+    if Value then
+      TurnSiblingsOff;
+    Invalidate;
+    //
+    if Assigned(FOnChange) then
+      FOnChange(Self);
   end;
 end;
 
@@ -222,33 +230,39 @@ end;
 
 procedure TURadioButton.Paint;
 begin
-  inherited;
-
-  //  Paint background
+  // Paint background
   if not TextOnGlass then begin
     Canvas.Brush.Style := bsSolid;
     Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
     Canvas.FillRect(Rect(0, 0, Width, Height));
   end;
 
-  //  Paint text
+  // Paint text
   Canvas.Brush.Style := bsClear;
   Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
   DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, TextOnGlass);
 
-  //  Paint icon
+  // Paint icon
   Canvas.Font.Assign(IconFont);
-  if not IsChecked then begin
-    Canvas.Font.Color := TextColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
-  end
+  Canvas.Font.Color := ActiveColor;
+  if not Checked then
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, TextOnGlass)
   else begin
-    Canvas.Font.Color := ActiveColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_BORDER, TextOnGlass);
-
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, TextOnGlass);
+    //
     Canvas.Font.Color := TextColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CIRCLE_INSIDE, TextOnGlass);
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_SMALL, TextOnGlass);
+  end;
+
+  // Paint focus rect
+  if Focused then begin
+    Canvas.Font.Color := TextColor;
+    Canvas.Pen.Style := psDot;
+    Canvas.Pen.Color := TextColor;
+    DrawFocusRect(Canvas.Handle, FocusRect);
+    Canvas.Pen.Style := psClear;
+    Canvas.Pen.Color := Color;
   end;
 end;
 
@@ -259,7 +273,7 @@ begin
   if AutoSize and (Align = alNone) then begin
     Space := 5;
     Canvas.Font.Assign(IconFont);
-    Height := 2 * Space + Canvas.TextHeight(ICON_CIRCLE_BORDER);
+    Height := 2 * Space + Canvas.TextHeight(UF_RADIO_OUTLINE);
     Canvas.Font.Assign(Font);
     Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
   end
@@ -270,13 +284,41 @@ end;
 
 //  MESSAGES
 
+procedure TURadioButton.WMSetFocus(var Msg: TWMSetFocus);
+var
+  LFocused: Boolean;
+begin
+  LFocused:=Enabled and CanFocus;
+  inherited;
+  if LFocused then begin
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TURadioButton.WMKillFocus(var Msg: TWMKillFocus);
+begin
+  inherited;
+  UpdateColors;
+  Invalidate;
+end;
+
+procedure TURadioButton.WMLButtonDown(var Msg: TWMLButtonDown);
+begin
+  if Enabled then begin
+    if not Focused and CanFocus then
+      SetFocus;
+    inherited;
+  end;
+end;
+
 procedure TURadioButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if not Enabled then
     Exit;
   //
   if PtInRect(IconRect, Msg.Pos) then
-    IsChecked := True;
+    Checked := True;
   inherited;
 end;
 

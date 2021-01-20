@@ -67,7 +67,8 @@ contains
   UCL.Tooltip in 'Sources\UCL.Tooltip.pas',
   UCL.Types in 'Sources\UCL.Types.pas',
   UCL.Colors in 'Sources\UCL.Colors.pas',
-  UCL.FormOverlay in 'Sources\UCL.FormOverlay.pas';
+  UCL.FormOverlay in 'Sources\UCL.FormOverlay.pas',
+  UCL.FontIcons in 'Sources\UCL.FontIcons.pas';
 
 end.
 

@@ -14501,55 +14501,6 @@ object formImageBackground: TformImageBackground
     Height = 41
     Value = 45
   end
-  object radioSystemTheme: TURadioButton
-    Left = 20
-    Top = 60
-    Width = 151
-    AutoSize = True
-    OnClick = radioSystemThemeClick
-    IconFont.Charset = DEFAULT_CHARSET
-    IconFont.Color = clWindowText
-    IconFont.Height = -20
-    IconFont.Name = 'Segoe MDL2 Assets'
-    IconFont.Style = []
-    IsChecked = True
-    Group = 'Theme'
-    CustomActiveColor = 14120960
-    TextOnGlass = True
-    Caption = 'Use system settings'
-  end
-  object radioLightTheme: TURadioButton
-    Left = 20
-    Top = 90
-    Width = 64
-    AutoSize = True
-    OnClick = radioLightThemeClick
-    IconFont.Charset = DEFAULT_CHARSET
-    IconFont.Color = clWindowText
-    IconFont.Height = -20
-    IconFont.Name = 'Segoe MDL2 Assets'
-    IconFont.Style = []
-    Group = 'Theme'
-    CustomActiveColor = 14120960
-    TextOnGlass = True
-    Caption = 'Light'
-  end
-  object radioDarkTheme: TURadioButton
-    Left = 20
-    Top = 120
-    Width = 63
-    AutoSize = True
-    OnClick = radioDarkThemeClick
-    IconFont.Charset = DEFAULT_CHARSET
-    IconFont.Color = clWindowText
-    IconFont.Height = -20
-    IconFont.Name = 'Segoe MDL2 Assets'
-    IconFont.Style = []
-    Group = 'Theme'
-    CustomActiveColor = 14120960
-    TextOnGlass = True
-    Caption = 'Dark'
-  end
   object entryChooseTheme: TUText
     Left = 20
     Top = 40
@@ -14557,7 +14508,7 @@ object formImageBackground: TformImageBackground
     Height = 17
     Caption = 'Theme'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
+    Font.Color = clBlack
     Font.Height = -13
     Font.Name = 'Segoe UI Semibold'
     Font.Style = []
@@ -14619,6 +14570,58 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     Caption = 'Transparent caption bar form'
   end
+  object radioSystemTheme: TURadioButton
+    Left = 20
+    Top = 60
+    Width = 151
+    AutoSize = True
+    OnClick = radioSystemThemeClick
+    IconFont.Charset = DEFAULT_CHARSET
+    IconFont.Color = clWindowText
+    IconFont.Height = -20
+    IconFont.Name = 'Segoe MDL2 Assets'
+    IconFont.Style = []
+    Checked = True
+    Group = 'Theme'
+    CustomActiveColor = 14120960
+    TextOnGlass = True
+    Caption = 'Use system settings'
+    TabOrder = 0
+  end
+  object radioLightTheme: TURadioButton
+    Left = 20
+    Top = 90
+    Width = 64
+    AutoSize = True
+    OnClick = radioLightThemeClick
+    IconFont.Charset = DEFAULT_CHARSET
+    IconFont.Color = clWindowText
+    IconFont.Height = -20
+    IconFont.Name = 'Segoe MDL2 Assets'
+    IconFont.Style = []
+    Group = 'Theme'
+    CustomActiveColor = 14120960
+    TextOnGlass = True
+    Caption = 'Light'
+    TabOrder = 1
+  end
+  object radioDarkTheme: TURadioButton
+    Left = 20
+    Top = 120
+    Width = 63
+    AutoSize = True
+    OnClick = radioDarkThemeClick
+    IconFont.Charset = DEFAULT_CHARSET
+    IconFont.Color = clWindowText
+    IconFont.Height = -20
+    IconFont.Name = 'Segoe MDL2 Assets'
+    IconFont.Style = []
+    Group = 'Theme'
+    CustomActiveColor = 14120960
+    TextOnGlass = True
+    Caption = 'Dark'
+    TabOrder = 2
+  end
   object progressMain: TUProgressBar
     Left = 240
     Top = 110
@@ -14654,7 +14657,7 @@ object formImageBackground: TformImageBackground
     Detail = 'F1'
     IsToggleButton = True
     KeepOrginalColor = False
-    TabOrder = 1
+    TabOrder = 3
   end
   object panelBottom: TUPanel
     Left = 0
@@ -14674,7 +14677,7 @@ object formImageBackground: TformImageBackground
     Padding.Bottom = 14
     ParentFont = False
     ShowCaption = False
-    TabOrder = 2
+    TabOrder = 4
     BackColor.Enabled = False
     BackColor.Color = clBlack
     BackColor.LightColor = 15132390

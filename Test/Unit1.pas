@@ -8,12 +8,13 @@ uses
   Graphics,
   Controls,
   Forms,
-  UCL.Form, UCL.ThemeManager, Vcl.ExtCtrls, UCL.CaptionBar;
+  UCL.Form, UCL.ThemeManager, Vcl.ExtCtrls, UCL.CaptionBar, UCL.QuickButton, Vcl.StdCtrls, UCL.Button, UCL.SymbolButton, UCL.Separator, UCL.ScrollBox;
 
 type
   TForm1 = class(TUForm)
     UCaptionBar1: TUCaptionBar;
     UThemeManager1: TUThemeManager;
+    panelRibbon: TUScrollBox;
   private
   public
   end;

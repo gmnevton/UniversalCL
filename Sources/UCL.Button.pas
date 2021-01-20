@@ -188,7 +188,7 @@ begin
   TM := SelectThemeManager(Self);
   AccentColor := SelectAccentColor(TM, clNone);
 
-  //  Disabled
+  // Disabled
   if not Enabled then begin
     BackColor   := BackColors.GetColor(TM.ThemeUsed, csDisabled);
     BorderColor := BorderColors.GetColor(TM.ThemeUsed, csDisabled);

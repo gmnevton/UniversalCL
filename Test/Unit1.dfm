@@ -3,8 +3,9 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 299
-  ClientWidth = 635
+  ClientWidth = 805
   Color = clBtnFace
+  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,8 +17,9 @@ object Form1: TForm1
   object UCaptionBar1: TUCaptionBar
     Left = 0
     Top = 0
-    Width = 635
-    Caption = '   Caption bar'
+    Width = 805
+    ThemeManager = UThemeManager1
+    Caption = '                    Caption bar'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWhite
     Font.Height = -11
@@ -25,11 +27,36 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ThemeManager = UThemeManager1
     UseSystemCaptionColor = True
+    ExplicitTop = -6
+  end
+  object panelRibbon: TUScrollBox
+    Left = 0
+    Top = 32
+    Width = 805
+    Height = 60
+    HorzScrollBar.Tracking = True
+    VertScrollBar.Tracking = True
+    Align = alTop
+    Color = 3355443
+    ParentColor = False
+    TabOrder = 1
+    StyleElements = []
+    ThemeManager = UThemeManager1
+    AniSet.AniKind = akOut
+    AniSet.AniFunctionKind = afkQuartic
+    AniSet.DelayStartTime = 0
+    AniSet.Duration = 120
+    AniSet.Step = 6
+    AniSet.Queue = True
+    BackColor.Enabled = True
+    BackColor.Color = clBlack
+    BackColor.LightColor = 14342874
+    BackColor.DarkColor = 3355443
+    ScrollOrientation = oHorizontal
   end
   object UThemeManager1: TUThemeManager
-    Theme = ttLight
+    Theme = ttDark
     Left = 408
     Top = 112
   end

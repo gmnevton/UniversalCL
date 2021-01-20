@@ -169,9 +169,11 @@ object formDemo: TformDemo
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
+    Checked = True
     TextOnGlass = True
     State = cbsChecked
     Caption = '2-state checkbox'
+    TabOrder = 12
   end
   object check3State: TUCheckBox
     Left = 390
@@ -187,6 +189,7 @@ object formDemo: TformDemo
     TextOnGlass = True
     State = cbsGrayed
     Caption = '3-state checkbox'
+    TabOrder = 13
   end
   object radioA1: TURadioButton
     Left = 390
@@ -205,6 +208,7 @@ object formDemo: TformDemo
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A1'
+    TabOrder = 9
   end
   object radioA2: TURadioButton
     Left = 390
@@ -220,10 +224,10 @@ object formDemo: TformDemo
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
-    IsChecked = True
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A2'
+    TabOrder = 10
   end
   object radioA3: TURadioButton
     Left = 390
@@ -243,6 +247,7 @@ object formDemo: TformDemo
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A3'
+    TabOrder = 11
   end
   object radioB1: TURadioButton
     Left = 540
@@ -261,6 +266,7 @@ object formDemo: TformDemo
     Group = 'GroupB'
     TextOnGlass = True
     Caption = 'Radio B1'
+    TabOrder = 15
   end
   object radioB2: TURadioButton
     Left = 540
@@ -276,10 +282,10 @@ object formDemo: TformDemo
     IconFont.Height = -20
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
-    IsChecked = True
     Group = 'GroupB'
     TextOnGlass = True
     Caption = 'Radio B2'
+    TabOrder = 19
   end
   object progressVert: TUProgressBar
     Left = 660
@@ -332,7 +338,7 @@ object formDemo: TformDemo
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 22
+    TabOrder = 14
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
@@ -443,7 +449,7 @@ object formDemo: TformDemo
       Font.Style = []
       ItemIndex = 0
       ParentFont = False
-      TabOrder = 0
+      TabOrder = 1
       Text = '100%'
       OnChange = comboAppDPIChange
       Items.Strings = (
@@ -475,7 +481,7 @@ object formDemo: TformDemo
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 1
+      TabOrder = 0
       Text = 'bsSizeable'
       OnChange = comboAppBorderStyleChange
       Items.Strings = (
@@ -496,7 +502,7 @@ object formDemo: TformDemo
     Align = alTop
     Color = 3355443
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 4
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -759,8 +765,8 @@ object formDemo: TformDemo
     Caption = 'Custom button'
   end
   object buttonReloadSettings: TUSymbolButton
-    Left = 220
-    Top = 270
+    Left = 216
+    Top = 273
     Width = 150
     Height = 31
     OnClick = buttonReloadSettingsClick
@@ -779,7 +785,7 @@ object formDemo: TformDemo
     Detail = 'Detail'
     ShowDetail = False
     KeepOrginalColor = False
-    TabOrder = 8
+    TabOrder = 5
   end
   object buttonHighlight: TUButton
     Tag = 6
@@ -801,7 +807,7 @@ object formDemo: TformDemo
   end
   object buttonToggled: TUButton
     Tag = 5
-    Left = 220
+    Left = 216
     Top = 310
     Width = 150
     IsToggleButton = True
@@ -875,7 +881,7 @@ object formDemo: TformDemo
     Text = 'Open file (disabled)'
     Detail = 'Ctrl+O'
     KeepOrginalColor = False
-    TabOrder = 9
+    TabOrder = 7
   end
   object symbolbuttonSaveHorz: TUSymbolButton
     Left = 130
@@ -897,7 +903,7 @@ object formDemo: TformDemo
     Detail = 'Ctrl+S'
     IsToggleButton = True
     KeepOrginalColor = False
-    TabOrder = 10
+    TabOrder = 8
   end
   object symbolbuttonSaveVert: TUSymbolButton
     Left = 60
@@ -919,7 +925,7 @@ object formDemo: TformDemo
     Text = 'New'
     Detail = 'Ctrl+N'
     KeepOrginalColor = False
-    TabOrder = 11
+    TabOrder = 6
   end
   object buttonRandomProgress: TUButton
     Tag = 5
@@ -940,7 +946,7 @@ object formDemo: TformDemo
     Height = 25
     Hint = 'ABC'
     Caption = 'Here we go'
-    TabOrder = 5
+    TabOrder = 0
   end
   object buttonAniToRight: TButton
     Left = 60
@@ -948,7 +954,7 @@ object formDemo: TformDemo
     Width = 151
     Height = 31
     Caption = 'Start animation'
-    TabOrder = 6
+    TabOrder = 1
     OnClick = buttonAniToRightClick
   end
   object buttonAniToLeft: TButton
@@ -958,7 +964,7 @@ object formDemo: TformDemo
     Height = 31
     Caption = 'Reserve animation'
     ImageIndex = 0
-    TabOrder = 7
+    TabOrder = 2
     OnClick = buttonAniToLeftClick
   end
   object buttonWithImage: TUButton
@@ -981,7 +987,7 @@ object formDemo: TformDemo
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 0
+    TabOrder = 3
     BackColor.Enabled = False
     BackColor.Color = clWhite
     BackColor.LightColor = 15132390
@@ -1148,7 +1154,7 @@ object formDemo: TformDemo
     Padding.Right = 15
     Padding.Bottom = 15
     ParentColor = False
-    TabOrder = 23
+    TabOrder = 30
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
@@ -1507,6 +1513,18 @@ object formDemo: TformDemo
       URL = 'https://example.com/'
       ExplicitWidth = 104
     end
+    object separatorLastBox: TUSeparator
+      Left = 15
+      Top = 989
+      Width = 203
+      Height = 10
+      Align = alTop
+      CustomColor = clBlack
+      Orientation = oHorizontal
+      AlignSpace = 5
+      LineBetween = False
+      ExplicitTop = 488
+    end
     object checkColorBorder: TUCheckBox
       Left = 15
       Top = 200
@@ -1519,7 +1537,7 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Color on window border'
-      ExplicitTop = 230
+      TabOrder = 4
     end
     object checkAutoSync: TUCheckBox
       AlignWithMargins = True
@@ -1537,7 +1555,7 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Auto synchronize'
-      ExplicitTop = 403
+      TabOrder = 6
     end
     object checkKeepEmailPrivate: TUCheckBox
       Left = 15
@@ -1550,7 +1568,7 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Keep my email in private'
-      ExplicitTop = 463
+      TabOrder = 8
     end
     object checkSendEmail: TUCheckBox
       Left = 15
@@ -1563,7 +1581,7 @@ object formDemo: TformDemo
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Send me emails'
-      ExplicitTop = 433
+      TabOrder = 7
     end
     object radioSystemTheme: TURadioButton
       Left = 15
@@ -1576,9 +1594,9 @@ object formDemo: TformDemo
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
-      IsChecked = True
       Group = 'AppTheme'
       Caption = 'Use system setting'
+      TabOrder = 0
     end
     object radioLightTheme: TURadioButton
       Left = 15
@@ -1593,6 +1611,7 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AppTheme'
       Caption = 'Light'
+      TabOrder = 1
     end
     object radioDarkTheme: TURadioButton
       Left = 15
@@ -1607,6 +1626,7 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AppTheme'
       Caption = 'Dark'
+      TabOrder = 2
     end
     object radioFreeAccount: TURadioButton
       Left = 15
@@ -1618,10 +1638,9 @@ object formDemo: TformDemo
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
-      IsChecked = True
       Group = 'AccountType'
       Caption = 'Free user'
-      ExplicitTop = 530
+      TabOrder = 9
     end
     object radioProAccount: TURadioButton
       Left = 15
@@ -1635,7 +1654,7 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AccountType'
       Caption = 'Professional user'
-      ExplicitTop = 560
+      TabOrder = 10
     end
     object radioDevAccount: TURadioButton
       Left = 15
@@ -1649,19 +1668,7 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AccountType'
       Caption = 'Developer'
-      ExplicitTop = 590
-    end
-    object separatorLastBox: TUSeparator
-      Left = 15
-      Top = 989
-      Width = 203
-      Height = 10
-      Align = alTop
-      CustomColor = clBlack
-      Orientation = oHorizontal
-      AlignSpace = 5
-      LineBetween = False
-      ExplicitTop = 488
+      TabOrder = 11
     end
     object panelSelectAccentColor: TUPanel
       AlignWithMargins = True
@@ -1681,7 +1688,7 @@ object formDemo: TformDemo
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 3
       OnClick = panelSelectAccentColorClick
       BackColor.Enabled = False
       BackColor.Color = -1
@@ -1751,7 +1758,7 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       BevelOuter = bvNone
-      TabOrder = 3
+      TabOrder = 5
       BorderThickness = 2
       Transparent = True
     end

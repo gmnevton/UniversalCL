@@ -1,4 +1,4 @@
-﻿unit UCL.CheckBox;
+unit UCL.CheckBox;
 
 interface
 
@@ -7,44 +7,46 @@ uses
   Messages,
   Windows,
   Controls,
+  StdCtrls,
   Graphics,
   UCL.Classes,
   UCL.Utils,
   UCL.Graphics;
 
 type
-  TUCheckBoxState = (cbsChecked, cbsUnchecked, cbsGrayed);
+  TUCheckBoxState = (cbsUnchecked, cbsChecked, cbsGrayed);
 
-  TUCheckBox = class(TUGraphicControl)
-  const
-    ICON_CHECKED = '';
-    ICON_UNCHECKED = '';
-    ICON_GRAYED = '';
+  TUCheckBox = class(TUCustomControl)
+  private var
+    ActiveColor, TextColor: TColor;
+    IconRect, TextRect, FocusRect: TRect;
 
   private
-    var ActiveColor, TextColor: TColor;
-    var IconRect, TextRect: TRect;
-
     FIconFont: TFont;
-
     FAutoSize: Boolean;
     FAllowGrayed: Boolean;
     FTextOnGlass: Boolean;
-
     FState: TUCheckBoxState;
     FCustomActiveColor: TColor;
+    FOnChange: TNotifyEvent;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
+    procedure Toggle;
 
-    //  Setters
+    // Getters / Setters
+    function GetChecked: Boolean;
+    procedure SetChecked(const Value: Boolean);
     procedure SetAutoSize(const Value: Boolean); reintroduce;
     procedure SetTextOnGlass(const Value: Boolean);
     procedure SetAllowGrayed(const Value: Boolean);
     procedure SetState(const Value: TUCheckBoxState);
 
-    //  Messages
+    // Messages
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
@@ -52,6 +54,7 @@ type
     procedure Paint; override;
     procedure Resize; override;
     procedure DoChangeScale(M, D: Integer); override;
+    procedure KeyPress(var Key: Char); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -62,19 +65,23 @@ type
 
   published
     property IconFont: TFont read FIconFont write FIconFont;
-
-    property AutoSize: Boolean read FAutoSize write SetAutoSize default false;
-    property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default false;
-    property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default false;
-
+    //
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default False;
+    property Checked: Boolean read GetChecked write SetChecked default False;
+    property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
+    //
     property State: TUCheckBoxState read FState write SetState default cbsUnchecked;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
-
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    //
     property Caption;
     property Color;
     property ParentColor default True;
     property Height default 30;
     property Width default 180;
+    property TabOrder;
+    property TabStop default True;
   end;
 
 implementation
@@ -82,8 +89,10 @@ implementation
 uses
   SysUtils,
   UITypes,
+  Forms,
   UCL.ThemeManager,
-  UCL.Colors;
+  UCL.Colors,
+  UCL.FontIcons;
 
 { TUCheckBox }
 
@@ -97,18 +106,19 @@ begin
   FIconFont.Name := 'Segoe MDL2 Assets';
   FIconFont.Size := 15;
 
-  FAutoSize := false;
-  FAllowGrayed := false;
-  FTextOnGlass := false;
+  FAutoSize := False;
+  FAllowGrayed := False;
+  FTextOnGlass := False;
   FState := cbsUnchecked;
   FCustomActiveColor := clDefault; // $D77800 // Default blue
 
-  ParentColor := true;
+  ParentColor := True;
   //Font.Name := 'Segoe UI';
   //Font.Size := 10;
 
   Height := 30;
   Width := 180;
+  TabStop := True;
 
   UpdateColors;
   UpdateRects;
@@ -136,7 +146,7 @@ var
   TM: TUCustomThemeManager;
 begin
   //  Disabled
-  if not Enabled then begin
+  if not Enabled or (csCreating in ControlState) then begin
     ActiveColor := $808080;
     TextColor := $808080;
     Exit;
@@ -160,7 +170,7 @@ begin
   else
     TextColor := $FFFFFF;
   //
-  if csDesigning in Self.ComponentState then
+  if IsDesigning then
     TextColor := GetTextColorFromBackground(Color);
 end;
 
@@ -168,18 +178,51 @@ procedure TUCheckBox.UpdateRects;
 begin
   IconRect := Rect(0, 0, Height, Height);
   TextRect := Rect(Height, 0, Width, Height);
+  FocusRect:= Rect(Height - 3, 2, Width - 2, Height - 2);
 end;
 
-//  SETTERS
+procedure TUCheckBox.Toggle;
+begin
+  if not Enabled then
+    Exit;
+  //
+  // Unchecked > (Grayed) > Checked > ...
+  case State of
+    cbsUnchecked: if AllowGrayed then
+      State := cbsGrayed
+    else
+      State := cbsChecked;
+    cbsChecked  : State := cbsUnchecked;
+    cbsGrayed   : State := cbsChecked;
+  end;
+end;
+
+// GETTERS / SETTERS
+
+function TUCheckBox.GetChecked: Boolean;
+begin
+  Result := (State = cbsChecked);
+end;
+
+procedure TUCheckBox.SetChecked(const Value: Boolean);
+begin
+  if Value then
+    State := cbsChecked
+  else
+    State := cbsUnchecked;
+end;
 
 procedure TUCheckBox.SetState(const Value: TUCheckBoxState);
 begin
   if Value <> FState then begin
-    if (not AllowGrayed) and (Value = cbsGrayed) then
-      FState := cbsUnchecked
+    if not AllowGrayed and (Value = cbsGrayed) then
+      FState := cbsChecked
     else
       FState := Value;
-    Repaint;
+    Invalidate;
+    //
+    if Assigned(FOnChange) then
+      FOnChange(Self);
   end;
 end;
 
@@ -187,8 +230,8 @@ procedure TUCheckBox.SetAllowGrayed(const Value: Boolean);
 begin
   if Value <> FAllowGrayed then begin
     FAllowGrayed := Value;
-    if (not FAllowGrayed) and (FState = cbsGrayed) then
-      FState := cbsUnchecked;
+    if not FAllowGrayed and (FState = cbsGrayed) then
+      FState := cbsChecked;
     Repaint;
   end;
 end;
@@ -197,7 +240,7 @@ procedure TUCheckBox.SetAutoSize(const Value: Boolean);
 begin
   if Value <> FAutoSize then begin
     FAutoSize := Value;
-    Resize;
+    Invalidate;
   end;
 end;
 
@@ -205,49 +248,49 @@ procedure TUCheckBox.SetTextOnGlass(const Value: Boolean);
 begin
   if Value <> FTextOnGlass then begin
     FTextOnGlass := Value;
-    Repaint;
+    Invalidate;
   end;
 end;
 
-//  CUSTOM METHODS
+// CUSTOM METHODS
 
 procedure TUCheckBox.Paint;
 begin
-//  inherited;
-
-  //  Paint background
+  // Paint background
   if not TextOnGlass then begin
     Canvas.Brush.Style := bsSolid;
     Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
     Canvas.FillRect(Rect(0, 0, Width, Height));
   end;
 
-  //  Paint text
+  // Paint text
   Canvas.Brush.Style := bsClear;
   Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
   DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, TextOnGlass);
 
-  //  Paint icon
+  // Paint icon
   Canvas.Font.Assign(IconFont);
+  Canvas.Font.Color := ActiveColor;
   case State of
-    cbsChecked: begin
-      Canvas.Font.Color := ActiveColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_CHECKED, TextOnGlass);
-    end;
-
-    cbsUnchecked: begin
+    cbsChecked  : DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_CHECKED, TextOnGlass);
+    cbsUnchecked: DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, TextOnGlass);
+    cbsGrayed   : begin
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, TextOnGlass);
+      //
       Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_SMALL, TextOnGlass);
     end;
+  end;
 
-    cbsGrayed: begin
-      Canvas.Font.Color := ActiveColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_UNCHECKED, TextOnGlass);
-
-      Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, ICON_GRAYED, TextOnGlass);
-    end;
+  // Paint focus rect
+  if Focused then begin
+    Canvas.Font.Color := TextColor;
+    Canvas.Pen.Style := psDot;
+    Canvas.Pen.Color := TextColor;
+    DrawFocusRect(Canvas.Handle, FocusRect);
+    Canvas.Pen.Style := psClear;
+    Canvas.Pen.Color := Color;
   end;
 end;
 
@@ -258,7 +301,7 @@ begin
   if AutoSize and (Align = alNone) then begin
     Space := 5;
     Canvas.Font.Assign(IconFont);
-    Height := 2 * Space + Canvas.TextHeight(ICON_UNCHECKED);
+    Height := 2 * Space + Canvas.TextHeight(UF_CHECKBOX_OUTLINE);
     Canvas.Font.Assign(Font);
     Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
   end
@@ -274,24 +317,50 @@ begin
   //UpdateRects;  //  Do not update rects, resize already do that
 end;
 
-//  MESSAGES
+procedure TUCheckBox.KeyPress(var Key: Char);
+begin
+  inherited KeyPress(Key);
+  if Key = ' ' then
+    Toggle;
+end;
+
+// MESSAGES
+
+procedure TUCheckBox.WMSetFocus(var Msg: TWMSetFocus);
+var
+  LFocused: Boolean;
+begin
+  LFocused:=Enabled and CanFocus;
+  inherited;
+  if LFocused then begin
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TUCheckBox.WMKillFocus(var Msg: TWMKillFocus);
+begin
+  inherited;
+  UpdateColors;
+  Invalidate;
+end;
+
+procedure TUCheckBox.WMLButtonDown(var Msg: TWMLButtonDown);
+begin
+  if Enabled then begin
+    if not Focused and CanFocus then
+      SetFocus;
+    inherited;
+  end;
+end;
 
 procedure TUCheckBox.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
-  if Enabled then
-    if AllowGrayed then   //  Unchecked > Checked > Grayed > ...
-      case State of
-        cbsUnchecked: State := cbsChecked;
-        cbsChecked  : State := cbsGrayed;
-        cbsGrayed   : State := cbsUnchecked;
-      end
-    else
-      case State of
-        cbsUnchecked: State := cbsChecked;
-        cbsChecked  : State := cbsUnchecked;
-        cbsGrayed   : State := cbsUnchecked;
-      end;
-
+  if not Enabled then
+    Exit;
+  //
+  if PtInRect(IconRect, Msg.Pos) then
+    Toggle;
   inherited;
 end;
 
@@ -299,6 +368,7 @@ procedure TUCheckBox.CMEnabledChanged(var Msg: TMessage);
 begin
   UpdateColors;
   Repaint;
+  inherited;
 end;
 
 end.

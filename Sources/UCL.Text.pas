@@ -14,7 +14,7 @@ uses
 type
   TUTextKind = (tkCustom, tkNormal, tkDescription, tkEntry, tkHeading, tkTitle);
 
-  TUText = class(TLabel, IUThemedComponent)
+  TUText = class(TLabel, IUThemedComponent, IUIDEAware)
   private
     FThemeManager: TUThemeManager;
     FTextKind: TUTextKind;
@@ -28,6 +28,11 @@ type
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -84,6 +89,26 @@ begin
   inherited;
 end;
 
+function TUText.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUText.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUText.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUText.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
+end;
+
 //  THEME
 
 procedure TUText.SetThemeManager(const Value: TUThemeManager);
@@ -121,7 +146,7 @@ begin
     else
       Font.Color := $FFFFFF;
   end;
-  if csDesigning in Self.ComponentState then
+  if IsDesigning then
     Font.Color := GetTextColorFromBackground(Color);
   Repaint;
 end;

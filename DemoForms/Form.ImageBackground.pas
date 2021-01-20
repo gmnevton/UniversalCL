@@ -65,22 +65,31 @@ begin
 end;
 
 procedure TformImageBackground.radioSystemThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.Theme := ttSystem;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttSystem;
 //  ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioLightThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.Theme := ttLight;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttLight;
 //  ThemeManager.CustomTheme := utLight;
 //  ThemeManager.UseSystemTheme := False;
 //  ThemeManager.Reload;
 end;
 
 procedure TformImageBackground.radioDarkThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-  ThemeManager.Theme := ttDark;
+  TM := SelectThemeManager(Self);
+  TM.Theme := ttDark;
 //  ThemeManager.CustomTheme := utDark;
 //  ThemeManager.UseSystemTheme := False;
 //  ThemeManager.Reload;

@@ -57,7 +57,7 @@ object formLoginDialog: TformLoginDialog
       Alignment = taCenter
       Caption = 'Hello, John'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 14120960
+      Font.Color = clWhite
       Font.Height = -28
       Font.Name = 'Segoe UI'
       Font.Style = []
@@ -102,7 +102,6 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitTop = 207
       ExplicitWidth = 58
     end
     object entryEmail: TUText
@@ -135,14 +134,13 @@ object formLoginDialog: TformLoginDialog
       Align = alTop
       Caption = 'Show more options'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6710886
+      Font.Color = clWhite
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
       OnClick = textShowMoreOptionsClick
       TextKind = tkDescription
-      ExplicitTop = 349
       ExplicitWidth = 103
     end
     object entryDescription: TUText
@@ -159,7 +157,6 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitTop = 278
       ExplicitWidth = 130
     end
     object panelMoreOptions: TUPanel
@@ -175,7 +172,7 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       ShowCaption = False
-      TabOrder = 0
+      TabOrder = 3
       Visible = False
       BackColor.Enabled = False
       BackColor.Color = clBlack
@@ -192,6 +189,7 @@ object formLoginDialog: TformLoginDialog
         IconFont.Name = 'Segoe MDL2 Assets'
         IconFont.Style = []
         Caption = 'Send me news about offers'
+        TabOrder = 1
       end
       object checkKeepLogin: TUCheckBox
         Left = 0
@@ -203,8 +201,10 @@ object formLoginDialog: TformLoginDialog
         IconFont.Height = -20
         IconFont.Name = 'Segoe MDL2 Assets'
         IconFont.Style = []
+        Checked = True
         State = cbsChecked
         Caption = 'Keep me logged in'
+        TabOrder = 0
       end
     end
     object editEmail: TUEdit
@@ -221,7 +221,7 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       BevelOuter = bvNone
       Color = clBlack
-      TabOrder = 1
+      TabOrder = 0
       BorderThickness = 2
     end
     object editPassword: TUEdit
@@ -238,7 +238,7 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       BevelOuter = bvNone
       Color = clBlack
-      TabOrder = 2
+      TabOrder = 1
       BorderThickness = 2
     end
     object editDescription: TUEdit
@@ -251,9 +251,8 @@ object formLoginDialog: TformLoginDialog
       Margins.Right = 0
       Margins.Bottom = 20
       Align = alTop
-      ParentFont = False
       BevelOuter = bvNone
-      TabOrder = 3
+      TabOrder = 2
       BorderThickness = 2
       Transparent = True
     end

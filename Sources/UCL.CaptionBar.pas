@@ -180,7 +180,7 @@ begin
   if Value <> FCollapsed then begin
     FCollapsed := Value;
 
-    if csDesigning in ComponentState then
+    if IsDesigning then
       Exit;
 
     ShowCaption := not Value;
@@ -220,8 +220,11 @@ end;
 
 procedure TUCaptionBar.Paint;
 begin
-  //  Do not inherited
-  //inherited;
+//  if IsDesigning then begin
+//    // Do not inherited
+//    inherited;
+//    Exit;
+//  end;
   //  Paint background
   Canvas.Brush.Color := BackColor;
   Canvas.FillRect(Rect(0, 0, Width, Height));
@@ -269,6 +272,8 @@ var
   ParentForm: TCustomForm;
 begin
   inherited;
+  if IsDesigning then
+    Exit;
 
   ParentForm := GetParentForm(Self, True);
   if (ParentForm is TForm) and (biMaximize in (ParentForm as TForm).BorderIcons) then begin
@@ -282,6 +287,9 @@ end;
 procedure TUCaptionBar.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   inherited;
+  if IsDesigning then
+    Exit;
+
   if DragMovement then begin
     ReleaseCapture;
     Parent.Perform(WM_SYSCOMMAND, $F012, 0);
@@ -295,6 +303,9 @@ var
   P: TPoint;
 begin
   inherited;
+  if IsDesigning then
+    Exit;
+
   if SystemMenuEnabled then begin
     P.X := Msg.LParamLo;
     P.Y := Msg.LParamHi;
@@ -312,6 +323,8 @@ var
   BorderSpace: Integer;
 begin
   inherited;
+  if IsDesigning then
+    Exit;
 
   ParentForm := GetParentForm(Self, True);
   if (ParentForm.WindowState = wsNormal) and (Align = alTop) then begin
@@ -330,6 +343,9 @@ var
   ParentForm: TCustomForm;
 begin
   inherited;
+  if IsDesigning then
+    Exit;
+
   ParentForm := GetParentForm(Self, True);
   if (ParentForm is TUForm) and (ParentForm as TUForm).FullScreen then
     Collapsed := False;
@@ -340,6 +356,9 @@ var
   ParentForm: TCustomForm;
 begin
   inherited;
+  if IsDesigning then
+    Exit;
+
   ParentForm := GetParentForm(Self, True);
   if (ParentForm is TUForm) and (ParentForm as TUForm).FullScreen then
     if not PtInRect(GetClientRect, ScreenToClient(Mouse.CursorPos)) then

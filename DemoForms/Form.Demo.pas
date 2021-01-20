@@ -236,11 +236,11 @@ begin
   if formDemo <> Nil then begin
     //  Theme changed
     if TM.Theme = ttSystem then
-      formDemo.radioSystemTheme.IsChecked := True
+      formDemo.radioSystemTheme.Checked := True
     else if TM.Theme = ttLight then
-      formDemo.radioLightTheme.IsChecked := True
+      formDemo.radioLightTheme.Checked := True
     else
-      formDemo.radioDarkTheme.IsChecked := True;
+      formDemo.radioDarkTheme.Checked := True;
 
     //  Accent color changed
     formDemo.panelSelectAccentColor.Color := TM.AccentColor;
@@ -257,11 +257,11 @@ begin
   if formImageBackground <> Nil then begin
     //  Theme changed
     if TM.Theme = ttSystem then
-      formImageBackground.radioSystemTheme.IsChecked := True
+      formImageBackground.radioSystemTheme.Checked := True
     else if TM.Theme = ttLight then
-      formImageBackground.radioLightTheme.IsChecked := True
+      formImageBackground.radioLightTheme.Checked := True
     else
-      formImageBackground.radioDarkTheme.IsChecked := True;
+      formImageBackground.radioDarkTheme.Checked := True;
   end;
 
   LockWindowUpdate(0);

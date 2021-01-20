@@ -8,6 +8,7 @@ interface
 
 uses
   SysUtils,
+  Messages,
   Classes,
   Controls,
   StdCtrls,
@@ -16,7 +17,14 @@ uses
   UCL.ThemeManager;
 
 type
-  TUCustomControl = class(TCustomControl, IUThemedComponent)
+  IUIDEAware = interface ['{5DA6292C-87B7-4434-93CD-BFDF4852DA4B}']
+    function IsCreating: Boolean;
+    function IsDestroying: Boolean;
+    function IsLoading: Boolean;
+    function IsDesigning: Boolean;
+  end;
+
+  TUCustomControl = class(TCustomControl, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;
   {$IF CompilerVersion < 30}
@@ -35,6 +43,11 @@ type
     procedure UpdateTheme; virtual;
     function IsCustomThemed: Boolean; virtual;
     function CustomThemeManager: TUCustomThemeManager; virtual;
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -93,7 +106,7 @@ type
     property OnStartDrag;
   end;
 
-  TUGraphicControl = class(TGraphicControl, IUThemedComponent)
+  TUGraphicControl = class(TGraphicControl, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;
   {$IF CompilerVersion < 30}
@@ -112,6 +125,11 @@ type
     procedure UpdateTheme; virtual;
     function IsCustomThemed: Boolean; virtual;
     function CustomThemeManager: TUCustomThemeManager; virtual;
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -170,10 +188,11 @@ type
     property OnStartDrag;
   end;
 
-  TUCustomEdit = class(TCustomEdit, IUThemedComponent)
-//  private
-//    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
-//    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
+//  TUCustomCheckBox = class(TCustomCheckBox, IUThemedComponent)
+//
+//  end;
+
+  TUCustomEdit = class(TCustomEdit, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;
   {$IF CompilerVersion < 30}
@@ -192,6 +211,11 @@ type
     procedure UpdateTheme; virtual;
     function IsCustomThemed: Boolean; virtual;
     function CustomThemeManager: TUCustomThemeManager; virtual;
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -277,7 +301,10 @@ type
     property OnStartDrag;
   end;
 
-  TUCustomPanel = class(TCustomPanel, IUThemedComponent)
+  TUCustomPanel = class(TCustomPanel, IUThemedComponent, IUIDEAware)
+  private
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+
   protected
     FThemeManager: TUThemeManager;
   {$IF CompilerVersion < 30}
@@ -296,7 +323,11 @@ type
     procedure UpdateTheme; virtual;
     function IsCustomThemed: Boolean; virtual;
     function CustomThemeManager: TUCustomThemeManager; virtual;
-    //
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -387,6 +418,26 @@ begin
   inherited;
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
+end;
+
+function TUCustomControl.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUCustomControl.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUCustomControl.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUCustomControl.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
 end;
 
 {$REGION 'Compatibility with older Delphi'}
@@ -508,6 +559,26 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
+function TUGraphicControl.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUGraphicControl.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUGraphicControl.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUGraphicControl.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
+end;
+
 {$REGION 'Compatibility with older Delphi'}
 {$IF CompilerVersion < 30}
 function TUGraphicControl.GetDesignDpi: Integer;
@@ -627,6 +698,26 @@ begin
     GetCommonThemeManager.Connect(Self);
 end;
 
+function TUCustomEdit.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUCustomEdit.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUCustomEdit.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUCustomEdit.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
+end;
+
 {$REGION 'Compatibility with older Delphi'}
 {$IF CompilerVersion < 30}
 function TUCustomEdit.GetDesignDpi: Integer;
@@ -744,6 +835,32 @@ begin
   inherited;
   if GetCommonThemeManager <> Nil then
     GetCommonThemeManager.Connect(Self);
+end;
+
+function TUCustomPanel.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUCustomPanel.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUCustomPanel.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUCustomPanel.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
+end;
+
+procedure TUCustomPanel.CMColorChanged(var Message: TMessage);
+begin
+  // switch off this message, it calls Invalidate after Color property is modified
+  Message.Result := 1;
 end;
 
 {$REGION 'Compatibility with older Delphi'}

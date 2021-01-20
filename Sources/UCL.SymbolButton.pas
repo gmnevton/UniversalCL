@@ -215,6 +215,7 @@ begin
   ParentControl:=Self.Parent;
 
   if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
+    ParentColor := False;
     BackColor := Color;
     TextColor := GetTextColorFromBackground(Color);
     DetailColor := $808080;
@@ -562,7 +563,7 @@ end;
 
 procedure TUSymbolButton.WMMouseMove(var Msg: TWMMouseMove);
 begin
-  if Enabled then
+  if Enabled and not IsDesigning then
     Repaint;
   inherited;
 end;
@@ -585,7 +586,8 @@ end;
 
 procedure TUSymbolButton.CMColorChanged(var Message: TMessage);
 begin
-  UpdateColors;
+  if not IsDesigning then
+    UpdateColors;
   inherited;
 end;
 
@@ -610,7 +612,8 @@ end;
 
 procedure TUSymbolButton.CMFontChanged(var Msg: TMessage);
 begin
-  Repaint;
+  if not IsDesigning then
+    Repaint;
 end;
 
 procedure TUSymbolButton.CMEnabledChanged(var Msg: TMessage);

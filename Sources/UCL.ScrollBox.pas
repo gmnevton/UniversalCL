@@ -28,13 +28,13 @@ type
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
 
   published
     property Visible default False;
   end;
 
-  TUScrollBox = class(TScrollBox, IUThemedComponent)
+  TUScrollBox = class(TScrollBox, IUThemedComponent, IUIDEAware)
   private var
     MiniSB: TUMiniScrollBar;
     MINI_SB_THICKNESS: Byte;
@@ -65,6 +65,7 @@ type
     //  Messages
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
+//    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
     procedure CMMouseWheel(var Msg: TWMMouseWheel); message CM_MOUSEWHEEL;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
@@ -77,10 +78,16 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
     procedure CreateParams(var Params: TCreateParams); override; // suppress default scrollbar blinking
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
 
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    //
     procedure SetOldSBVisible(IsVisible: Boolean);
     procedure UpdateMiniSB;
     procedure SetMiniSBVisible(IsVisible: Boolean);
@@ -115,7 +122,7 @@ type
 
 { TUMiniScrollBar }
 
-constructor TUMiniScrollBar.Create(aOwner: TComponent);
+constructor TUMiniScrollBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
@@ -215,6 +222,26 @@ begin
   inherited;
 end;
 
+function TUScrollBox.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUScrollBox.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUScrollBox.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUScrollBox.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
+end;
+
 //  THEME
 
 procedure TUScrollBox.SetThemeManager(const Value: TUThemeManager);
@@ -261,6 +288,7 @@ begin
     MiniSB.Color := MINI_SB_COLOR_LIGHT
   else
     MiniSB.Color := MINI_SB_COLOR_DARK;
+  Invalidate;
 end;
 
 function TUScrollBox.IsCustomThemed: Boolean;
@@ -295,7 +323,7 @@ end;
 
 procedure TUScrollBox.SetOldSBVisible(IsVisible: Boolean);
 begin
-  if not (csDesigning in ComponentState) then
+  if not IsDesigning then
     FlatSB_ShowScrollBar(Handle, SB_BOTH, IsVisible);
 end;
 
@@ -424,7 +452,13 @@ begin
 
   inherited;
 end;
-
+{
+procedure TUScrollBox.CMColorChanged(var Message: TMessage);
+begin
+  // switch off this message, it calls Invalidate after Color property is modified
+  Message.Result := 1;
+end;
+}
 procedure TUScrollBox.CMMouseEnter(var Msg: TMessage);
 begin
   if (Win32MajorVersion <> 10) and CanFocus then
@@ -484,8 +518,8 @@ begin
     SB := HorzScrollBar;
   
   //  Scroll by touchpad
-  if (Abs(Msg.WheelDelta) < 100) or (csDesigning in ComponentState) then begin
-    if csDesigning in ComponentState then
+  if (Abs(Msg.WheelDelta) < 100) or IsDesigning then begin
+    if IsDesigning then
       Msg.WheelDelta := 10 * Msg.WheelDelta div Abs(Msg.WheelDelta);
 
     DisableAlign;
