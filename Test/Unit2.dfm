@@ -1,11 +1,10 @@
-object Form1: TForm1
+object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'Form2'
   ClientHeight = 299
-  ClientWidth = 805
+  ClientWidth = 635
   Color = clBtnFace
-  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -17,8 +16,7 @@ object Form1: TForm1
   object UCaptionBar1: TUCaptionBar
     Left = 0
     Top = 0
-    Width = 805
-    ThemeManager = UThemeManager1
+    Width = 635
     Caption = '                    Caption bar'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWhite
@@ -32,7 +30,7 @@ object Form1: TForm1
   object panelRibbon: TUScrollBox
     Left = 0
     Top = 32
-    Width = 805
+    Width = 635
     Height = 60
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
@@ -41,7 +39,6 @@ object Form1: TForm1
     ParentColor = False
     TabOrder = 1
     StyleElements = []
-    ThemeManager = UThemeManager1
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -53,10 +50,15 @@ object Form1: TForm1
     BackColor.LightColor = 14342874
     BackColor.DarkColor = 3355443
     ScrollOrientation = oHorizontal
+    ExplicitLeft = -170
+    ExplicitWidth = 805
   end
-  object UThemeManager1: TUThemeManager
-    Theme = ttDark
-    Left = 408
-    Top = 112
+  object Panel1: TPanel
+    Left = 72
+    Top = 160
+    Width = 185
+    Height = 41
+    Caption = 'Panel1'
+    TabOrder = 2
   end
 end

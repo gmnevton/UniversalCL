@@ -23,7 +23,7 @@ uses
   UCL.FormOverlay;
 
 type
-  TUForm = class(TForm, IUThemedComponent)
+  TUForm = class(TForm, IUThemedComponent, IUIDEAware)
   public type
     TBorderSide = (bsDefault, bsTop, bsLeft, bsBottom, bsRight);
   public const
@@ -47,16 +47,22 @@ type
     FFitDesktopSize: Boolean;
     FFullScreen: Boolean;
 
-    //  Setters
+    // Setters
     procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetFullScreen(const Value: Boolean);
     procedure SetOverlayType(const Value: TUOverlayType);
 
-    //  Child events
+    // Child events
     procedure BackColor_OnChange(Sender: TObject);
 
+    // IUIDEAware
+    function IsCreating: Boolean; inline;
+    function IsDestroying: Boolean; inline;
+    function IsLoading: Boolean; inline;
+    function IsDesigning: Boolean; inline;
+
   private
-    //  Messages
+    // Messages
     procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
     procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
     procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
@@ -66,7 +72,7 @@ type
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   protected
-    //  Internal
+    // Internal
     function IsLEWin7: Boolean; virtual; // LE - less equal than
     function IsResizeable: Boolean; virtual;
     function IsBorderless: Boolean; virtual;
@@ -100,7 +106,7 @@ type
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
 
-     // IUThemedControl
+    // IUThemedControl
     procedure UpdateTheme; virtual;
     function IsCustomThemed: Boolean;
     function CustomThemeManager: TUCustomThemeManager;
@@ -166,6 +172,26 @@ begin
   inherited;
   TM := SelectThemeManager(Self);
   TM.UpdateTheme;
+end;
+
+function TUForm.IsCreating: Boolean;
+begin
+  Result := (csCreating in ControlState);
+end;
+
+function TUForm.IsDestroying: Boolean;
+begin
+  Result := (csDestroying in ComponentState);
+end;
+
+function TUForm.IsLoading: Boolean;
+begin
+  Result := (csLoading in ComponentState);
+end;
+
+function TUForm.IsDesigning: Boolean;
+begin
+  Result := (csDesigning in ComponentState);
 end;
 
 {$REGION 'Internal functions'}
@@ -561,7 +587,7 @@ begin
 
   //  Update cation bar
   if CaptionBar <> Nil then begin
-    if TUThemeManager.IsThemeAvailable(CaptionBar) then
+    if not IsDesigning and TUThemeManager.IsThemeAvailable(CaptionBar) then
       (CaptionBar as IUThemedComponent).UpdateTheme;
     CaptionBar.Repaint; // this is important and it must be repaint and not invalidate
   end;
