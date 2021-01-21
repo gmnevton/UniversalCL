@@ -151,6 +151,7 @@ end;
 constructor TUScrollBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle - [csNeedsBorderPaint];
   FThemeManager := Nil;
 
   //  Internal

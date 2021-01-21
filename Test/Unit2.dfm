@@ -11,6 +11,7 @@ object Form2: TForm2
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poDesigned
   PixelsPerInch = 96
   TextHeight = 13
   object UCaptionBar1: TUCaptionBar
@@ -50,8 +51,6 @@ object Form2: TForm2
     BackColor.LightColor = 14342874
     BackColor.DarkColor = 3355443
     ScrollOrientation = oHorizontal
-    ExplicitLeft = -170
-    ExplicitWidth = 805
   end
   object Panel1: TPanel
     Left = 72
