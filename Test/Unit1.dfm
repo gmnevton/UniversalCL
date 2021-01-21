@@ -37,6 +37,9 @@ object Form1: TForm1
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alTop
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = 3355443
     ParentColor = False
     TabOrder = 1

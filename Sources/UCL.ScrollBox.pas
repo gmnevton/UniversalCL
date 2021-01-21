@@ -151,7 +151,7 @@ end;
 constructor TUScrollBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  ControlStyle := ControlStyle - [csNeedsBorderPaint];
+//  ControlStyle := ControlStyle - [csNeedsBorderPaint];
   FThemeManager := Nil;
 
   //  Internal
@@ -160,7 +160,14 @@ begin
   MINI_SB_COLOR := $7A7A7A;
 
   //  Parent properties
+  BevelEdges:=[];
+  BevelInner:=bvNone;
+  BevelOuter:=bvNone;
+  BevelKind:=bkNone;
   BorderStyle := bsNone;
+{$IF CompilerVersion > 29}
+  StyleElements:=[];
+{$IFEND}
   VertScrollBar.Tracking := True;
   HorzScrollBar.Tracking := True;
 
@@ -174,11 +181,12 @@ begin
 
   //  Mini scrollbar
   MiniSB := TUMiniScrollBar.Create(Self);
-  MiniSB.Color := MINI_SB_COLOR;
   MiniSB.Parent := Self;
   MiniSB.SetSubComponent(True);
   MiniSB.Visible := False;
   MiniSB.Width := 0;
+  MiniSB.Height := 0;
+  MiniSB.Color := MINI_SB_COLOR;
 
   //  Custom AniSet
   FAniSet := TIntAniSet.Create;
@@ -203,9 +211,8 @@ procedure TUScrollBox.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   if FScrollBarStyle = sbsMini then begin
-    Params.ExStyle := Params.ExStyle or WS_CLIPCHILDREN;
-    with Params.WindowClass do
-      style := style and not (CS_HREDRAW or CS_VREDRAW);
+//    Params.ExStyle := Params.ExStyle or WS_CLIPCHILDREN;
+    Params.WindowClass.style := Params.WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
   end;
 end;
 

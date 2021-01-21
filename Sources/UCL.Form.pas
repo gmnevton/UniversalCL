@@ -587,9 +587,9 @@ begin
 
   //  Update cation bar
   if CaptionBar <> Nil then begin
-    if not IsDesigning and TUThemeManager.IsThemeAvailable(CaptionBar) then
+    if not IsDesigning and TUThemeManager.IsThemingAvailable(CaptionBar) then
       (CaptionBar as IUThemedComponent).UpdateTheme;
-    CaptionBar.Repaint; // this is important and it must be repaint and not invalidate
+//    CaptionBar.Repaint; // this is important and it must be repaint and not invalidate
   end;
 end;
 

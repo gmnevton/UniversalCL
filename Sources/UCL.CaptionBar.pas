@@ -214,7 +214,7 @@ end;
 procedure TUCaptionBar.UpdateTheme;
 begin
   UpdateColors;
-  Invalidate;
+  Repaint;
   UpdateChildControls(Self);
 end;
 
@@ -248,7 +248,7 @@ begin
       if control = Root then
         Continue;
       //
-      if TUThemeManager.IsThemeAvailable(control) then
+      if TUThemeManager.IsThemingAvailable(control) then
         (control as IUThemedComponent).UpdateTheme;
       //
       if control is TWinControl then begin

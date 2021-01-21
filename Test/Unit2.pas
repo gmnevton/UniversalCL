@@ -11,6 +11,7 @@ type
     UCaptionBar1: TUCaptionBar;
     panelRibbon: TUScrollBox;
     Panel1: TPanel;
+    ScrollBox1: TScrollBox;
   private
     { Private declarations }
   public

@@ -115,6 +115,7 @@ procedure TUQuickButton.UpdateTheme;
 begin
   UpdateColors;
   Repaint;
+//  Invalidate;
 end;
 
 //  INTERNAL

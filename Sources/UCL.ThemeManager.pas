@@ -85,7 +85,7 @@ type
     procedure UpdateTheme;
 
     // Components connecting
-    class function IsThemeAvailable(const Comp: TComponent): Boolean;
+    class function IsThemingAvailable(const Comp: TComponent): Boolean;
     function ConnectedComponentCount: Integer;
     procedure Connect(const Comp: TComponent);
     procedure Disconnect(const Comp: TComponent);
@@ -165,7 +165,7 @@ var
   ThemedComponent: IUThemedComponent;
 begin
   Result:=GetCommonThemeManager;
-  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+  if TUCustomThemeManager.IsThemingAvailable(Control) then begin
     if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
       Result:=ThemedComponent.CustomThemeManager;
   end;
@@ -176,7 +176,7 @@ var
   ThemedComponent: IUThemedComponent;
 begin
   Result:=GetCommonThemeManager;
-  if TUCustomThemeManager.IsThemeAvailable(Control) then begin
+  if TUCustomThemeManager.IsThemingAvailable(Control) then begin
     if Supports(Control, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and ThemedComponent.IsCustomThemed then
       Result:=ThemedComponent.CustomThemeManager;
   end;
@@ -351,7 +351,7 @@ end;
 
 //  COMPONENTS CONNECTING
 
-class function TUCustomThemeManager.IsThemeAvailable(const Comp: TComponent): Boolean;
+class function TUCustomThemeManager.IsThemingAvailable(const Comp: TComponent): Boolean;
 begin
   Result := Supports(Comp, IUThemedComponent) and IsPublishedProp(Comp, 'ThemeManager');
 end;
@@ -368,7 +368,7 @@ var
   ConnectedYet: Boolean;
   ThemedComponent: IUThemedComponent;
 begin
-  if IsThemeAvailable(Comp) then begin
+  if IsThemingAvailable(Comp) then begin
     ConnectedYet := (FCompList.IndexOf(Comp) <> -1);
     if not ConnectedYet then begin
       if Supports(Comp, IUThemedComponent, ThemedComponent) and (ThemedComponent <> Nil) and not ThemedComponent.IsCustomThemed then begin
@@ -404,10 +404,11 @@ end;
 
 function TUCustomThemeManager.ThemeUsed: TUTheme;
 begin
-  Result:=TUTheme(-1);
-  if ((Theme = ttSystem) and (SystemTheme = utLight)) or (Theme = ttLight) then
+  //if Theme = ttSystem then
+  Result:=SystemTheme;
+  if Theme = ttLight then
     Result:=utLight
-  else if ((Theme = ttSystem) and (SystemTheme = utDark)) or (Theme = ttDark) then
+  else if Theme = ttDark then
     Result:=utDark;
 end;
 

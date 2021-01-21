@@ -36,6 +36,9 @@ object Form2: TForm2
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alTop
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = 3355443
     ParentColor = False
     TabOrder = 1
@@ -59,5 +62,21 @@ object Form2: TForm2
     Height = 41
     Caption = 'Panel1'
     TabOrder = 2
+  end
+  object ScrollBox1: TScrollBox
+    Left = 280
+    Top = 130
+    Width = 313
+    Height = 161
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    Color = clHighlight
+    Ctl3D = True
+    ParentColor = False
+    ParentCtl3D = False
+    TabOrder = 3
+    StyleElements = []
   end
 end

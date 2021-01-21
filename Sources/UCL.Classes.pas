@@ -107,6 +107,9 @@ type
   end;
 
   TUGraphicControl = class(TGraphicControl, IUThemedComponent, IUIDEAware)
+  private
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+
   protected
     FThemeManager: TUThemeManager;
   {$IF CompilerVersion < 30}
@@ -339,6 +342,10 @@ type
   {$IFEND}
     //
     property Color;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnStartDrag;
+    property OnEndDrag;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -374,10 +381,7 @@ type
 //    property OnDockDrop;
 //    property OnDockOver;
     property OnDblClick;
-//    property OnDragDrop;
-//    property OnDragOver;
 //    property OnEndDock;
-//    property OnEndDrag;
     property OnEnter;
     property OnExit;
     property OnGesture;
@@ -390,7 +394,6 @@ type
     property OnMouseUp;
     property OnResize;
 //    property OnStartDock;
-//    property OnStartDrag;
 //    property OnUnDock;
   end;
 
@@ -577,6 +580,12 @@ end;
 function TUGraphicControl.IsDesigning: Boolean;
 begin
   Result := (csDesigning in ComponentState);
+end;
+
+procedure TUGraphicControl.CMColorChanged(var Message: TMessage);
+begin
+  // switch off this message, it calls Invalidate after Color property is modified
+  Message.Result := 1;
 end;
 
 {$REGION 'Compatibility with older Delphi'}
@@ -860,6 +869,8 @@ end;
 procedure TUCustomPanel.CMColorChanged(var Message: TMessage);
 begin
   // switch off this message, it calls Invalidate after Color property is modified
+  Brush.Color := Color;
+  NotifyControls(CM_PARENTCOLORCHANGED);
   Message.Result := 1;
 end;
 

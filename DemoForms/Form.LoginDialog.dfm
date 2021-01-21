@@ -26,12 +26,16 @@ object formLoginDialog: TformLoginDialog
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alClient
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = 2039583
     Padding.Left = 40
     Padding.Right = 40
     Padding.Bottom = 50
     ParentColor = False
     TabOrder = 0
+    StyleElements = []
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -190,6 +194,7 @@ object formLoginDialog: TformLoginDialog
         IconFont.Style = []
         Caption = 'Send me news about offers'
         TabOrder = 1
+        ExplicitTop = 36
       end
       object checkKeepLogin: TUCheckBox
         Left = 0

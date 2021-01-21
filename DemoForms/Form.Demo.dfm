@@ -500,9 +500,13 @@ object formDemo: TformDemo
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alTop
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = 3355443
     ParentColor = False
     TabOrder = 4
+    StyleElements = []
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -1148,6 +1152,9 @@ object formDemo: TformDemo
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alRight
+    BevelEdges = []
+    BevelInner = bvNone
+    BevelOuter = bvNone
     Color = clWhite
     Padding.Left = 15
     Padding.Top = 5
@@ -1155,6 +1162,7 @@ object formDemo: TformDemo
     Padding.Bottom = 15
     ParentColor = False
     TabOrder = 30
+    StyleElements = []
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
