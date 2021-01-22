@@ -1,8 +1,6 @@
 program Test;
 
 uses
-  madListHardware,
-  madListProcesses,
   madExcept,
   madLinkDisAsm,
   madListModules,

@@ -14,6 +14,8 @@ object formAppList: TformAppList
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 17
   object boxHorizontal: TUScrollBox
@@ -265,6 +267,7 @@ object formAppList: TformAppList
     Width = 440
     Height = 478
     HorzScrollBar.Tracking = True
+    VertScrollBar.Position = 722
     VertScrollBar.Tracking = True
     Align = alClient
     BevelEdges = []
@@ -286,7 +289,7 @@ object formAppList: TformAppList
     BackColor.DarkColor = 2039583
     object UItemButton1: TUItemButton
       Left = 0
-      Top = 1160
+      Top = 438
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -301,14 +304,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 30'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton2: TUItemButton
       Left = 0
-      Top = 1080
+      Top = 358
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -323,14 +326,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 28'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton3: TUItemButton
       Left = 0
-      Top = 1040
+      Top = 318
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -345,14 +348,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 27'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton4: TUItemButton
       Left = 0
-      Top = 1000
+      Top = 278
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -367,14 +370,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 26'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton5: TUItemButton
       Left = 0
-      Top = 960
+      Top = 238
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -389,14 +392,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 25'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton6: TUItemButton
       Left = 0
-      Top = 920
+      Top = 198
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -411,14 +414,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 24'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton7: TUItemButton
       Left = 0
-      Top = 1120
+      Top = 398
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -433,14 +436,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 29'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton8: TUItemButton
       Left = 0
-      Top = 680
+      Top = -42
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -455,14 +458,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 18'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton9: TUItemButton
       Left = 0
-      Top = 720
+      Top = -2
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -477,14 +480,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 19'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton10: TUItemButton
       Left = 0
-      Top = 760
+      Top = 38
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -499,14 +502,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 20'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton11: TUItemButton
       Left = 0
-      Top = 800
+      Top = 78
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -521,14 +524,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 21'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton12: TUItemButton
       Left = 0
-      Top = 840
+      Top = 118
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -543,14 +546,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 22'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton13: TUItemButton
       Left = 0
-      Top = 880
+      Top = 158
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -565,14 +568,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 23'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton14: TUItemButton
       Left = 0
-      Top = 440
+      Top = -282
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -587,14 +590,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 12'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton15: TUItemButton
       Left = 0
-      Top = 480
+      Top = -242
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -609,14 +612,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 13'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton16: TUItemButton
       Left = 0
-      Top = 520
+      Top = -202
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -631,14 +634,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 14'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton17: TUItemButton
       Left = 0
-      Top = 560
+      Top = -162
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -653,14 +656,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 15'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton18: TUItemButton
       Left = 0
-      Top = 600
+      Top = -122
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -675,14 +678,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 16'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton19: TUItemButton
       Left = 0
-      Top = 640
+      Top = -82
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -697,14 +700,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 17'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton20: TUItemButton
       Left = 0
-      Top = 200
+      Top = -522
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -719,14 +722,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 6'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton21: TUItemButton
       Left = 0
-      Top = 240
+      Top = -482
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -741,14 +744,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 7'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton22: TUItemButton
       Left = 0
-      Top = 280
+      Top = -442
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -763,14 +766,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 8'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton23: TUItemButton
       Left = 0
-      Top = 320
+      Top = -402
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -785,14 +788,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 9'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton24: TUItemButton
       Left = 0
-      Top = 360
+      Top = -362
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -807,14 +810,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 10'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton25: TUItemButton
       Left = 0
-      Top = 400
+      Top = -322
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -829,14 +832,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 11'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton26: TUItemButton
       Left = 0
-      Top = 0
+      Top = -722
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -851,14 +854,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 1'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton27: TUItemButton
       Left = 0
-      Top = 40
+      Top = -682
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -873,14 +876,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 2'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton28: TUItemButton
       Left = 0
-      Top = 80
+      Top = -642
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -895,14 +898,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 3'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton29: TUItemButton
       Left = 0
-      Top = 120
+      Top = -602
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -917,14 +920,14 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 4'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
     end
     object UItemButton30: TUItemButton
       Left = 0
-      Top = 160
+      Top = -562
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -939,7 +942,7 @@ object formAppList: TformAppList
       DetailFont.Style = []
       ObjectsVisible = [iokNone, iokCheckBox, iokLeftIcon, iokText, iokDetail, iokRightIcon]
       LeftIcon = #58031
-      Text = 'Text'
+      Text = 'Item 5'
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960

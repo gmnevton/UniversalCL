@@ -36,8 +36,8 @@ type
   public
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); virtual; abstract;
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
-    procedure OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
     procedure OnStartDrag(Sender: TObject; var DragObject: TDragObject); virtual;
+    procedure OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
   end;
 
   TUVerticalDragHandler = class(TUCustomDragHandler)
@@ -51,23 +51,26 @@ type
   end;
 
 var
-  DragReorderObject: TDragObject;
+  DragReorderObject: TUDragObject;
   VertDragHandler: TUVerticalDragHandler;
   HorzDragHandler: TUHorizontalDragHandler;
 
-function IsDraggingSupported(const Control: TObject): Boolean;
-procedure AssignVertDragHandler(const Control: TUCustomPanel; const Handler: TUCustomDragHandler = Nil);
-procedure AssignHorzDragHandler(const Control: TUCustomPanel; const Handler: TUCustomDragHandler = Nil);
-procedure RemoveDragHandler(const Control: TUCustomPanel);
+function IsDraggingSupported(const Control: TControl): Boolean; inline;
+procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+procedure RemoveDragHandler(const Control: TControl);
 
 implementation
 
 uses
   UCL.ThemeManager;
 
+type
+  TControlAccess = class(TControl);
+
 { Utils }
 
-function IsDraggingSupported(const Control: TObject): Boolean;
+function IsDraggingSupported(const Control: TControl): Boolean;
 begin
   Result := TUCustomThemeManager.IsThemingAvailable(Control) and
             IsPublishedProp(Control, 'OnDragDrop') and
@@ -76,44 +79,50 @@ begin
             IsPublishedProp(Control, 'OnMouseDown');
 end;
 
-procedure AssignVertDragHandler(const Control: TUCustomPanel; const Handler: TUCustomDragHandler = Nil);
-var
-  LHandler: TUCustomDragHandler;
+procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 begin
-  LHandler:= VertDragHandler;
-  if Handler = Nil then
-    LHandler:= Handler;
+  if not IsDraggingSupported(Control) then
+    Exit;
   //
-  Control.OnDragDrop := LHandler.OnDragDrop;
-  Control.OnDragOver := LHandler.OnDragOver;
-  Control.OnStartDrag := LHandler.OnStartDrag;
-  Control.OnMouseDown := LHandler.OnMouseDown;
+  if Handler = Nil then
+    Handler := VertDragHandler;
+  //
+  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
+  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).OnStartDrag := Handler.OnStartDrag;
+  TControlAccess(Control).OnMouseDown := Handler.OnMouseDown;
 end;
 
-procedure AssignDragHorzHandle(const Control: TPanel);
+procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 begin
-  Control.OnDragDrop := DragHorzHandle.OnDragDrop;
-  Control.OnDragOver := DragHorzHandle.OnDragOver;
-  Control.OnMouseDown := DragHorzHandle.OnMouseDown;
-  Control.OnStartDrag := DragHorzHandle.OnStartDrag;
+  if not IsDraggingSupported(Control) then
+    Exit;
+  //
+  if Handler = Nil then
+    Handler := HorzDragHandler;
+  //
+  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
+  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).OnStartDrag := Handler.OnStartDrag;
+  TControlAccess(Control).OnMouseDown := Handler.OnMouseDown;
 end;
 
-procedure RemoveDragHandle(Control: TPanel);
+procedure RemoveDragHandler(const Control: TControl);
 begin
-  Control.OnDragDrop := nil;
-  Control.OnDragOver := nil;
-  Control.OnMouseDown := nil;
-  Control.OnStartDrag := nil;
+  TControlAccess(Control).OnDragDrop  := Nil;
+  TControlAccess(Control).OnDragOver  := Nil;
+  TControlAccess(Control).OnMouseDown := Nil;
+  TControlAccess(Control).OnStartDrag := Nil;
 end;
 
 { TUDragObject }
 
 //  MAIN CLASS
 
-constructor TUDragObject.Create(aControl: TWinControl);
+constructor TUDragObject.Create(AControl: TWinControl);
 begin
   inherited Create;
-  FControl := aControl;
+  FControl := AControl;
 end;
 
 destructor TUDragObject.Destroy;
@@ -127,80 +136,75 @@ end;
 function TUDragObject.GetDragImages: TDragImageList;
 var
   Bmp: Graphics.TBitmap;
-  Pt: TPoint;
+  P: TPoint;
 begin
   //  Create images
-  if not Assigned(FDragImages) then
-    begin
-      Bmp := Graphics.TBitmap.Create;
-      try
-        Bmp.PixelFormat := pf32bit;
-        Bmp.Canvas.Brush.Color := clFuchsia;
+  if not Assigned(FDragImages) then begin
+    Bmp := Graphics.TBitmap.Create;
+    try
+      Bmp.PixelFormat := pf32bit;
+      Bmp.Canvas.Brush.Color := clFuchsia;
 
-        // 2px margin at each side just to show image can have transparency.
-        Bmp.Width := FControl.Width + 4;
-        Bmp.Height := FControl.Height + 4;
-        Bmp.Canvas.Lock;
-        FControl.PaintTo(Bmp.Canvas.Handle, 2, 2);
-        Bmp.Canvas.Unlock;
+      // 2px margin at each side just to show image can have transparency.
+      Bmp.Width := FControl.Width + 4;
+      Bmp.Height := FControl.Height + 4;
+      Bmp.Canvas.Lock;
+      FControl.PaintTo(Bmp.Canvas.Handle, 2, 2);
+      Bmp.Canvas.Unlock;
 
-        FDragImages := TDragImageList.Create(nil);
-        FDragImages.Width := Bmp.Width;
-        FDragImages.Height := Bmp.Height;
-        Pt := Mouse.CursorPos;
-        MapWindowPoints(HWND_DESKTOP, FControl.Handle, Pt, 1);
-        FDragImages.DragHotspot := Pt;
-        FDragImages.Masked := True;
-        FDragImages.AddMasked(Bmp, clFuchsia);
-      finally
-        Bmp.Free;
-      end;
+      FDragImages := TDragImageList.Create(Nil);
+      FDragImages.Width := Bmp.Width;
+      FDragImages.Height := Bmp.Height;
+      P := Mouse.CursorPos;
+      MapWindowPoints(HWND_DESKTOP, FControl.Handle, P, 1);
+      FDragImages.DragHotspot := P;
+      FDragImages.Masked := True;
+      FDragImages.AddMasked(Bmp, clFuchsia);
+    finally
+      Bmp.Free;
     end;
+  end;
 
   Result := FDragImages;
 end;
 
-{ TUDragHandle }
+{ TUCustomDragHandler }
 
-procedure TUDragHandle.OnDragOver(Sender, Source: TObject; X, Y: Integer;
-  State: TDragState; var Accept: Boolean);
+procedure TUCustomDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
-  Accept := true;
+  Accept := True;
 end;
 
-procedure TUDragHandle.OnMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TUCustomDragHandler.OnStartDrag(Sender: TObject; var DragObject: TDragObject);
 begin
-  if (Sender = nil) or (not (Sender is TWinControl)) then
-    exit;
+  if (Sender = Nil) or not (Sender is TWinControl) then
+    Exit;
 
-  (Sender as TWinControl).BeginDrag(false);
-  ImageList_SetDragCursorImage(
-    (DragReorderObject as TUDragObject).GetDragImages.Handle, 1, 0, 0);
+  DragReorderObject := TUDragObject.Create(TWinControl(Sender));
+  DragReorderObject.AlwaysShowDragImages := True;
+  DragObject := DragReorderObject;
 end;
 
-procedure TUDragHandle.OnStartDrag(Sender: TObject;
-  var DragObject: TDragObject);
+procedure TUCustomDragHandler.OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  WC: TWinControl;
 begin
-  if (Sender = nil) or (not (Sender is TWinControl)) then
-    exit;
+  if (Sender = Nil) or not (Sender is TWinControl) then
+    Exit;
 
-  DragObject := TUDragObject.Create(Sender as TWinControl);
-  DragObject.AlwaysShowDragImages := true;
-  DragReorderObject := DragObject;
+  WC:=TWinControl(Sender);
+  WC.BeginDrag(False);
+  ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
 end;
 
-{ TUDragVertHandle }
+{ TUVerticalDragHandler }
 
-procedure TUDragVertHandle.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TUVerticalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   Src, Dest: TControl;
 begin
-  if
-    (Sender = nil) or (Source = nil) or
-    (not (Sender is TControl)) or (not (Source is TUDragObject))
-  then
-    exit;
+  if (Sender = Nil) or (Source = Nil) or not (Sender is TControl) or not (Source is TUDragObject) then
+    Exit;
 
   Src := (Source as TUDragObject).Control;
   Dest := Sender as TControl;
@@ -210,17 +214,14 @@ begin
     Src.Top := Dest.Top + Dest.Height;
 end;
 
-{ TUDragHorzHandle }
+{ TUHorizontalDragHandler }
 
-procedure TUDragHorzHandle.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
+procedure TUHorizontalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
   Src, Dest: TControl;
 begin
-  if
-    (Sender = nil) or (Source = nil) or
-    (not (Sender is TControl)) or (not (Source is TUDragObject))
-  then
-    exit;
+  if (Sender = Nil) or (Source = Nil) or not (Sender is TControl) or not (Source is TUDragObject) then
+    Exit;
 
   Src := (Source as TUDragObject).Control;
   Dest := Sender as TControl;
@@ -231,11 +232,11 @@ begin
 end;
 
 initialization
-  DragVertHandle := TUDragVertHandle.Create;
-  DragHorzHandle := TUDragHorzHandle.Create;
+  VertDragHandler := TUVerticalDragHandler.Create;
+  HorzDragHandler := TUHorizontalDragHandler.Create;
 
 finalization
-  DragVertHandle.Free;
-  DragHorzHandle.Free;
+  VertDragHandler.Free;
+  HorzDragHandler.Free;
 
 end.

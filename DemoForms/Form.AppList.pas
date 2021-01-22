@@ -62,6 +62,9 @@ type
     USymbolButton2: TUSymbolButton;
     USymbolButton4: TUSymbolButton;
     USymbolButton3: TUSymbolButton;
+    //
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
   public
   end;
@@ -72,5 +75,30 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+  UCL.DragReorder;
+
+procedure TformAppList.FormCreate(Sender: TObject);
+var
+  i: Integer;
+begin
+  for i := 0 to boxVertical.ControlCount - 1 do
+    if boxVertical.Controls[i] is TUItemButton then begin
+      AssignVertDragHandler(boxVertical.Controls[i]);
+//      RemoveDragHandler(boxVertical.Controls[i]);
+    end;
+end;
+
+procedure TformAppList.FormDestroy(Sender: TObject);
+var
+  i: Integer;
+begin
+  for i := 0 to boxVertical.ControlCount - 1 do
+    if boxVertical.Controls[i] is TUItemButton then begin
+//      AssignVertDragHandler(boxVertical.Controls[i]);
+      RemoveDragHandler(boxVertical.Controls[i]);
+    end;
+end;
 
 end.
