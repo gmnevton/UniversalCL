@@ -11,7 +11,6 @@ uses
   Types,
   Windows,
   Variants,
-  TypInfo,
   StdCtrls,
   ExtCtrls,
   UCL.Classes;
@@ -23,6 +22,7 @@ type
     FControl: TWinControl;
 
   protected
+    function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
     function GetDragImages: TDragImageList; override;
 
   public
@@ -33,11 +33,18 @@ type
   end;
 
   TUCustomDragHandler = class
+  private
+    Control: TControl;
+    MousePressed: Boolean;
   public
-    procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); virtual; abstract;
-    procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
     procedure OnStartDrag(Sender: TObject; var DragObject: TDragObject); virtual;
+    procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
+    procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); virtual; abstract;
+    procedure OnEndDrag(Sender, Target: TObject; X, Y: Integer); virtual;
+    //
     procedure OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
   end;
 
   TUVerticalDragHandler = class(TUCustomDragHandler)
@@ -50,33 +57,88 @@ type
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
   end;
 
+  TUDockObject = class(TDragDockObjectEx)
+  private
+    FDragImages: TDragImageList;
+
+  protected
+    function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
+    function GetDragImages: TDragImageList; override;
+
+  public
+    destructor Destroy; override;
+  end;
+
+  TUCustomDockHandler = class
+  private
+    Control: TControl;
+    MousePressed: Boolean;
+  public
+    procedure OnStartDock(Sender: TObject; var DragObject: TDragDockObject); virtual;
+    procedure OnDockOver(Sender: TObject; Source: TDragDockObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
+    procedure OnDockDrop(Sender: TObject; Source: TDragDockObject; X, Y: Integer); virtual;
+    procedure OnEndDock(Sender, Target: TObject; X, Y: Integer); virtual;
+    //
+    procedure OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+  end;
+
+  TUDockHandler = class(TUCustomDockHandler);
+
 var
   DragReorderObject: TUDragObject;
   VertDragHandler: TUVerticalDragHandler;
   HorzDragHandler: TUHorizontalDragHandler;
+  //
+  DockReorderObject: TUDockObject;
+  DockHandler: TUDockHandler;
 
+// Dragging
 function IsDraggingSupported(const Control: TControl): Boolean; inline;
 procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure RemoveDragHandler(const Control: TControl);
 
+// Docking
+function IsDockingSupported(const Control: TControl): Boolean; inline;
+procedure AssignDockHandler(const Control: TControl; const DockSiteClass: TWinControlClass; Handler: TUCustomDockHandler = Nil);
+procedure RemoveDockHandler(const Control: TControl);
+
 implementation
 
 uses
-  UCL.ThemeManager;
+  UCL.ThemeManager,
+  UCL.Utils;
 
 type
   TControlAccess = class(TControl);
+  TWinControlAccess = class(TWinControl);
 
 { Utils }
 
 function IsDraggingSupported(const Control: TControl): Boolean;
 begin
   Result := TUCustomThemeManager.IsThemingAvailable(Control) and
-            IsPublishedProp(Control, 'OnDragDrop') and
-            IsPublishedProp(Control, 'OnDragOver') and
-            IsPublishedProp(Control, 'OnStartDrag') and
-            IsPublishedProp(Control, 'OnMouseDown');
+            IsPropAvailable(Control, 'OnStartDrag') and
+            IsPropAvailable(Control, 'OnDragOver') and
+            IsPropAvailable(Control, 'OnDragDrop') and
+            IsPropAvailable(Control, 'OnEndDrag') and
+            IsPropAvailable(Control, 'OnMouseDown') and
+            IsPropAvailable(Control, 'OnMouseMove') and
+            IsPropAvailable(Control, 'OnMouseUp');
+end;
+
+function IsDockingSupported(const Control: TControl): Boolean; inline;
+begin
+  Result := TUCustomThemeManager.IsThemingAvailable(Control) and
+            IsPropAvailable(Control, 'OnStartDock') and
+            IsPropAvailable(Control, 'OnDockOver') and
+            IsPropAvailable(Control, 'OnDockDrop') and
+            IsPropAvailable(Control, 'OnEndDock') and
+            IsPropAvailable(Control, 'OnMouseDown') and
+            IsPropAvailable(Control, 'OnMouseMove') and
+            IsPropAvailable(Control, 'OnMouseUp');
 end;
 
 procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
@@ -87,10 +149,15 @@ begin
   if Handler = Nil then
     Handler := VertDragHandler;
   //
-  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
-  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).DragKind    := dkDrag;
   TControlAccess(Control).OnStartDrag := Handler.OnStartDrag;
+  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
+  TControlAccess(Control).OnEndDrag   := Handler.OnEndDrag;
+  //
   TControlAccess(Control).OnMouseDown := Handler.OnMouseDown;
+  TControlAccess(Control).OnMouseMove := Handler.OnMouseMove;
+  TControlAccess(Control).OnMouseUp   := Handler.OnMouseUp;
 end;
 
 procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
@@ -101,18 +168,65 @@ begin
   if Handler = Nil then
     Handler := HorzDragHandler;
   //
-  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
-  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).DragKind    := dkDrag;
   TControlAccess(Control).OnStartDrag := Handler.OnStartDrag;
+  TControlAccess(Control).OnDragOver  := Handler.OnDragOver;
+  TControlAccess(Control).OnDragDrop  := Handler.OnDragDrop;
+  TControlAccess(Control).OnEndDrag   := Handler.OnEndDrag;
+  //
   TControlAccess(Control).OnMouseDown := Handler.OnMouseDown;
+  TControlAccess(Control).OnMouseMove := Handler.OnMouseMove;
+  TControlAccess(Control).OnMouseUp   := Handler.OnMouseUp;
 end;
 
 procedure RemoveDragHandler(const Control: TControl);
 begin
-  TControlAccess(Control).OnDragDrop  := Nil;
-  TControlAccess(Control).OnDragOver  := Nil;
-  TControlAccess(Control).OnMouseDown := Nil;
+  if not IsDraggingSupported(Control) then
+    Exit;
+  //
+  TControlAccess(Control).DragKind    := dkDrag;
   TControlAccess(Control).OnStartDrag := Nil;
+  TControlAccess(Control).OnDragOver  := Nil;
+  TControlAccess(Control).OnDragDrop  := Nil;
+  TControlAccess(Control).OnEndDrag   := Nil;
+  TControlAccess(Control).OnMouseDown := Nil;
+  TControlAccess(Control).OnMouseMove := Nil;
+  TControlAccess(Control).OnMouseUp   := Nil;
+end;
+
+procedure AssignDockHandler(const Control: TControl; const DockSiteClass: TWinControlClass; Handler: TUCustomDockHandler = Nil);
+begin
+  if not IsDockingSupported(Control) or not (Control is TWinControl) then
+    Exit;
+  //
+  if Handler = Nil then
+    Handler := DockHandler;
+  //
+  TWinControlAccess(Control).DragKind    := dkDock;
+  TWinControlAccess(Control).FloatingDockSiteClass := DockSiteClass;
+  TWinControlAccess(Control).OnStartDock := Handler.OnStartDock;
+  TWinControlAccess(Control).OnDockOver  := Handler.OnDockOver;
+  TWinControlAccess(Control).OnDockDrop  := Handler.OnDockDrop;
+  TWinControlAccess(Control).OnEndDock   := Handler.OnEndDock;
+  //
+  TControlAccess(Control).OnMouseDown := Handler.OnMouseDown;
+  TControlAccess(Control).OnMouseMove := Handler.OnMouseMove;
+  TControlAccess(Control).OnMouseUp   := Handler.OnMouseUp;
+end;
+
+procedure RemoveDockHandler(const Control: TControl);
+begin
+  if not (Control is TWinControl) then
+    Exit;
+  TWinControlAccess(Control).DragKind    := dkDrag;
+  TWinControlAccess(Control).OnStartDock := Nil;
+  TWinControlAccess(Control).OnDockOver  := Nil;
+  TWinControlAccess(Control).OnDockDrop  := Nil;
+  TWinControlAccess(Control).OnEndDock   := Nil;
+  //
+  TControlAccess(Control).OnMouseDown := Nil;
+  TControlAccess(Control).OnMouseMove := Nil;
+  TControlAccess(Control).OnMouseUp   := Nil;
 end;
 
 { TUDragObject }
@@ -127,11 +241,20 @@ end;
 
 destructor TUDragObject.Destroy;
 begin
-  FDragImages.Free;
+  if FDragImages <> Nil then
+    FDragImages.Free;
   inherited;
 end;
 
 //  CUSTOM METHODS
+
+function TUDragObject.GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor;
+begin
+  if Accepted then
+    Result := crNone
+  else
+    Result := crNoDrop;
+end;
 
 function TUDragObject.GetDragImages: TDragImageList;
 var
@@ -170,11 +293,6 @@ end;
 
 { TUCustomDragHandler }
 
-procedure TUCustomDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-begin
-  Accept := True;
-end;
-
 procedure TUCustomDragHandler.OnStartDrag(Sender: TObject; var DragObject: TDragObject);
 begin
   if (Sender = Nil) or not (Sender is TWinControl) then
@@ -185,16 +303,44 @@ begin
   DragObject := DragReorderObject;
 end;
 
-procedure TUCustomDragHandler.OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  WC: TWinControl;
+procedure TUCustomDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
-  if (Sender = Nil) or not (Sender is TWinControl) then
-    Exit;
+  Accept := True;
+end;
 
-  WC:=TWinControl(Sender);
-  WC.BeginDrag(False);
-  ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
+procedure TUCustomDragHandler.OnEndDrag(Sender, Target: TObject; X, Y: Integer);
+begin
+  Control:=Nil;
+  MousePressed:=False;
+  DragReorderObject := Nil;
+end;
+
+procedure TUCustomDragHandler.OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Sender = Nil) or not (Sender is TControl) then
+    Exit;
+  //
+  if Button = mbLeft then begin
+    Control:=TControl(Sender);
+    MousePressed:=True;
+  end;
+end;
+
+procedure TUCustomDragHandler.OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Control <> Nil) and (Sender = Control) and MousePressed then begin
+    MousePressed:=False;
+    Control.BeginDrag(False);
+    ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
+  end;
+end;
+
+procedure TUCustomDragHandler.OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Control <> Nil) or MousePressed then begin
+    Control:=Nil;
+    MousePressed:=False;
+  end;
 end;
 
 { TUVerticalDragHandler }
@@ -231,12 +377,131 @@ begin
     Src.Left := Dest.Left + Dest.Width;
 end;
 
+{ TUDockObject }
+
+destructor TUDockObject.Destroy;
+begin
+  if FDragImages <> Nil then
+    FDragImages.Free;
+  inherited;
+end;
+
+function TUDockObject.GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor;
+begin
+  if Accepted then
+    Result := crNone
+  else
+    Result := crNoDrop;
+end;
+
+function TUDockObject.GetDragImages: TDragImageList;
+var
+  Bmp: Graphics.TBitmap;
+  P: TPoint;
+begin
+  //  Create images
+  if not Assigned(FDragImages) and (Control is TWinControl) then begin
+    Bmp := Graphics.TBitmap.Create;
+    try
+      Bmp.PixelFormat := pf32bit;
+      Bmp.Canvas.Brush.Color := clFuchsia;
+
+      // 2px margin at each side just to show image can have transparency.
+      Bmp.Width := Control.Width + 4;
+      Bmp.Height := Control.Height + 4;
+      Bmp.Canvas.Lock;
+      TWinControl(Control).PaintTo(Bmp.Canvas.Handle, 2, 2);
+      Bmp.Canvas.Unlock;
+
+      FDragImages := TDragImageList.Create(Nil);
+      FDragImages.Width := Bmp.Width;
+      FDragImages.Height := Bmp.Height;
+      P := Mouse.CursorPos;
+      MapWindowPoints(HWND_DESKTOP, TWinControl(Control).Handle, P, 1);
+      FDragImages.DragHotspot := P;
+      FDragImages.Masked := False;
+      FDragImages.AddMasked(Bmp, clFuchsia);
+    finally
+      Bmp.Free;
+    end;
+  end;
+
+  Result := FDragImages;
+end;
+
+{ TUCustomDockHandler }
+
+procedure TUCustomDockHandler.OnStartDock(Sender: TObject; var DragObject: TDragDockObject);
+begin
+  if (Sender = Nil) or not (Sender is TWinControl) then
+    Exit;
+
+  DockReorderObject := TUDockObject.Create(TWinControl(Sender));
+  DockReorderObject.AlwaysShowDragImages := True;
+  DragObject := DockReorderObject;
+end;
+
+procedure TUCustomDockHandler.OnDockOver(Sender: TObject; Source: TDragDockObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  Accept := True;
+end;
+
+procedure TUCustomDockHandler.OnDockDrop(Sender: TObject; Source: TDragDockObject; X, Y: Integer);
+var
+  Src, Dest: TControl;
+begin
+  if (Sender = Nil) or (Source = Nil) or not (Sender is TControl) or not (Source is TUDockObject) then
+    Exit;
+
+  Src := (Source as TUDockObject).Control;
+  Dest := Sender as TControl;
+  // do something to Dest
+  Dest.InsertComponent(Src);
+end;
+
+procedure TUCustomDockHandler.OnEndDock(Sender, Target: TObject; X, Y: Integer);
+begin
+  Control:=Nil;
+  MousePressed:=False;
+  DockReorderObject := Nil;
+end;
+
+procedure TUCustomDockHandler.OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Sender = Nil) or not (Sender is TControl) then
+    Exit;
+  //
+  if Button = mbLeft then begin
+    Control:=TControl(Sender);
+    MousePressed:=True;
+  end;
+end;
+
+procedure TUCustomDockHandler.OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Control <> Nil) and (Sender = Control) and MousePressed then begin
+    MousePressed:=False;
+    Control.BeginDrag(False);
+    ImageList_SetDragCursorImage(DockReorderObject.GetDragImages.Handle, 1, 0, 0);
+  end;
+end;
+
+procedure TUCustomDockHandler.OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (Control <> Nil) or MousePressed then begin
+    Control:=Nil;
+    MousePressed:=False;
+  end;
+end;
+
 initialization
   VertDragHandler := TUVerticalDragHandler.Create;
   HorzDragHandler := TUHorizontalDragHandler.Create;
+  DockHandler := TUDockHandler.Create;
 
 finalization
   VertDragHandler.Free;
   HorzDragHandler.Free;
+  DockHandler.Free;
 
 end.

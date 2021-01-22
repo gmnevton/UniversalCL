@@ -33,6 +33,9 @@ procedure PaintBlendBitmap(const Canvas: TCanvas; DestRect: TRect; const BlendBi
 // OS
 function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 
+// RTTI
+function IsPropAvailable(Instance: TObject; Name: String): Boolean;
+
 // Internal
 function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
 function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
@@ -40,7 +43,8 @@ function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
 implementation
 
 uses
-  Classes;
+  Classes,
+  TypInfo;
 
 // FORM
 
@@ -231,6 +235,24 @@ function CheckMaxWin32Version(AMajor: Integer; AMinor: Integer = 0): Boolean;
 begin
   Result := (Win32MajorVersion <= AMajor) or
             ((Win32MajorVersion = AMajor) and (Win32MinorVersion <= AMinor));
+end;
+
+function IsPropAvailable(Instance: TObject; Name: String): Boolean;
+var
+  x: TPropList;
+  i, j: Integer;
+begin
+  Result := False;
+  j:=GetPropList(PTypeInfo(Instance.ClassInfo),
+                 [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod,
+                  tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray,
+                  tkUString, tkUnicodeString, tkAnsiString, tkWideString, tkShortString, tkClassRef, tkPointer, tkProcedure],
+                 @x, False);
+  for i:=0 to j - 1 do begin
+    Result := AnsiSameText(String(TPropInfo(x[i]^).Name), Name);
+    if Result then
+      Exit;
+  end;
 end;
 
 // INTERNAL

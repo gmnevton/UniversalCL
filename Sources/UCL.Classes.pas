@@ -57,6 +57,16 @@ type
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
+    //
+    property OnStartDock;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    //
+    property OnStartDrag;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -90,10 +100,6 @@ type
     property OnConstrainedResize;
     property OnContextPopup;
     property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
     property OnGesture;
     property OnMouseActivate;
     property OnMouseDown;
@@ -102,8 +108,6 @@ type
     property OnMouseMove;
     property OnMouseUp;
     property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
   end;
 
   TUGraphicControl = class(TGraphicControl, IUThemedComponent, IUIDEAware)
@@ -142,6 +146,16 @@ type
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
+    //
+    property OnStartDock;
+    //property OnDockDrop;
+    //property OnDockOver;
+    property OnEndDock;
+    //
+    property OnStartDrag;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -175,10 +189,6 @@ type
     property OnConstrainedResize;
     property OnContextPopup;
     property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
     property OnGesture;
     property OnMouseActivate;
     property OnMouseDown;
@@ -187,8 +197,6 @@ type
     property OnMouseMove;
     property OnMouseUp;
     property OnResize;
-    property OnStartDock;
-    property OnStartDrag;
   end;
 
 //  TUCustomCheckBox = class(TCustomCheckBox, IUThemedComponent)
@@ -228,6 +236,16 @@ type
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
+    //
+    property OnStartDock;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    //
+    property OnStartDrag;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDrag;
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
@@ -284,10 +302,6 @@ type
     property OnClick;
     property OnContextPopup;
     property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
     property OnEnter;
     property OnExit;
     property OnGesture;
@@ -300,8 +314,6 @@ type
     property OnMouseLeave;
     property OnMouseMove;
     property OnMouseUp;
-    property OnStartDock;
-    property OnStartDrag;
   end;
 
   TUCustomPanel = class(TCustomPanel, IUThemedComponent, IUIDEAware)
@@ -342,9 +354,15 @@ type
   {$IFEND}
     //
     property Color;
+    //
+    property OnStartDock;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnEndDock;
+    //
+    property OnStartDrag;
     property OnDragDrop;
     property OnDragOver;
-    property OnStartDrag;
     property OnEndDrag;
 
   published
@@ -378,10 +396,7 @@ type
     property OnClick;
     property OnConstrainedResize;
     property OnContextPopup;
-//    property OnDockDrop;
-//    property OnDockOver;
     property OnDblClick;
-//    property OnEndDock;
     property OnEnter;
     property OnExit;
     property OnGesture;
@@ -393,7 +408,6 @@ type
     property OnMouseMove;
     property OnMouseUp;
     property OnResize;
-//    property OnStartDock;
 //    property OnUnDock;
   end;
 

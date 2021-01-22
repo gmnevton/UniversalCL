@@ -211,7 +211,8 @@ procedure TUScrollBox.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   if FScrollBarStyle = sbsMini then begin
-//    Params.ExStyle := Params.ExStyle or WS_CLIPCHILDREN;
+    if not IsDesigning then
+      Params.ExStyle := Params.ExStyle or WS_CLIPCHILDREN;
     Params.WindowClass.style := Params.WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
   end;
 end;

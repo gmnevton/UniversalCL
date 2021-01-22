@@ -527,7 +527,7 @@ begin
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
 
-    if Enabled and FMouseInClient then
+    if Enabled and FMouseInClient and not (csPaintCopy in ControlState) then
       DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
 
     //  Paint checkbox

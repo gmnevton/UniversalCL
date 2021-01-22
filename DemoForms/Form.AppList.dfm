@@ -29,6 +29,7 @@ object formAppList: TformAppList
     BevelEdges = []
     BevelInner = bvNone
     BevelOuter = bvNone
+    DockSite = True
     Color = 2039583
     ParentColor = False
     TabOrder = 0
@@ -267,7 +268,6 @@ object formAppList: TformAppList
     Width = 440
     Height = 478
     HorzScrollBar.Tracking = True
-    VertScrollBar.Position = 722
     VertScrollBar.Tracking = True
     Align = alClient
     BevelEdges = []
@@ -289,7 +289,7 @@ object formAppList: TformAppList
     BackColor.DarkColor = 2039583
     object UItemButton1: TUItemButton
       Left = 0
-      Top = 438
+      Top = 1160
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -311,7 +311,7 @@ object formAppList: TformAppList
     end
     object UItemButton2: TUItemButton
       Left = 0
-      Top = 358
+      Top = 1080
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -333,7 +333,7 @@ object formAppList: TformAppList
     end
     object UItemButton3: TUItemButton
       Left = 0
-      Top = 318
+      Top = 1040
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -355,7 +355,7 @@ object formAppList: TformAppList
     end
     object UItemButton4: TUItemButton
       Left = 0
-      Top = 278
+      Top = 1000
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -377,7 +377,7 @@ object formAppList: TformAppList
     end
     object UItemButton5: TUItemButton
       Left = 0
-      Top = 238
+      Top = 960
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -399,7 +399,7 @@ object formAppList: TformAppList
     end
     object UItemButton6: TUItemButton
       Left = 0
-      Top = 198
+      Top = 920
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -421,7 +421,7 @@ object formAppList: TformAppList
     end
     object UItemButton7: TUItemButton
       Left = 0
-      Top = 398
+      Top = 1120
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -443,7 +443,7 @@ object formAppList: TformAppList
     end
     object UItemButton8: TUItemButton
       Left = 0
-      Top = -42
+      Top = 680
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -465,7 +465,7 @@ object formAppList: TformAppList
     end
     object UItemButton9: TUItemButton
       Left = 0
-      Top = -2
+      Top = 720
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -487,7 +487,7 @@ object formAppList: TformAppList
     end
     object UItemButton10: TUItemButton
       Left = 0
-      Top = 38
+      Top = 760
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -509,7 +509,7 @@ object formAppList: TformAppList
     end
     object UItemButton11: TUItemButton
       Left = 0
-      Top = 78
+      Top = 800
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -531,7 +531,7 @@ object formAppList: TformAppList
     end
     object UItemButton12: TUItemButton
       Left = 0
-      Top = 118
+      Top = 840
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -553,7 +553,7 @@ object formAppList: TformAppList
     end
     object UItemButton13: TUItemButton
       Left = 0
-      Top = 158
+      Top = 880
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -575,7 +575,7 @@ object formAppList: TformAppList
     end
     object UItemButton14: TUItemButton
       Left = 0
-      Top = -282
+      Top = 440
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -597,7 +597,7 @@ object formAppList: TformAppList
     end
     object UItemButton15: TUItemButton
       Left = 0
-      Top = -242
+      Top = 480
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -619,7 +619,7 @@ object formAppList: TformAppList
     end
     object UItemButton16: TUItemButton
       Left = 0
-      Top = -202
+      Top = 520
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -641,7 +641,7 @@ object formAppList: TformAppList
     end
     object UItemButton17: TUItemButton
       Left = 0
-      Top = -162
+      Top = 560
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -663,7 +663,7 @@ object formAppList: TformAppList
     end
     object UItemButton18: TUItemButton
       Left = 0
-      Top = -122
+      Top = 600
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -685,7 +685,7 @@ object formAppList: TformAppList
     end
     object UItemButton19: TUItemButton
       Left = 0
-      Top = -82
+      Top = 640
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -707,7 +707,7 @@ object formAppList: TformAppList
     end
     object UItemButton20: TUItemButton
       Left = 0
-      Top = -522
+      Top = 200
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -729,7 +729,7 @@ object formAppList: TformAppList
     end
     object UItemButton21: TUItemButton
       Left = 0
-      Top = -482
+      Top = 240
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -751,7 +751,7 @@ object formAppList: TformAppList
     end
     object UItemButton22: TUItemButton
       Left = 0
-      Top = -442
+      Top = 280
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -773,7 +773,7 @@ object formAppList: TformAppList
     end
     object UItemButton23: TUItemButton
       Left = 0
-      Top = -402
+      Top = 320
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -795,7 +795,7 @@ object formAppList: TformAppList
     end
     object UItemButton24: TUItemButton
       Left = 0
-      Top = -362
+      Top = 360
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -817,7 +817,7 @@ object formAppList: TformAppList
     end
     object UItemButton25: TUItemButton
       Left = 0
-      Top = -322
+      Top = 400
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -839,7 +839,7 @@ object formAppList: TformAppList
     end
     object UItemButton26: TUItemButton
       Left = 0
-      Top = -722
+      Top = 0
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -861,7 +861,7 @@ object formAppList: TformAppList
     end
     object UItemButton27: TUItemButton
       Left = 0
-      Top = -682
+      Top = 40
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -883,7 +883,7 @@ object formAppList: TformAppList
     end
     object UItemButton28: TUItemButton
       Left = 0
-      Top = -642
+      Top = 80
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -905,7 +905,7 @@ object formAppList: TformAppList
     end
     object UItemButton29: TUItemButton
       Left = 0
-      Top = -602
+      Top = 120
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
@@ -927,7 +927,7 @@ object formAppList: TformAppList
     end
     object UItemButton30: TUItemButton
       Left = 0
-      Top = -562
+      Top = 160
       Width = 423
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET

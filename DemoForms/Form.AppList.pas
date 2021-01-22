@@ -83,6 +83,12 @@ procedure TformAppList.FormCreate(Sender: TObject);
 var
   i: Integer;
 begin
+  for i := 0 to boxHorizontal.ControlCount - 1 do
+    if boxHorizontal.Controls[i] is TUSymbolButton then begin
+      AssignDockHandler(boxHorizontal.Controls[i], TUSymbolButton);
+//      RemoveDockHandler(boxHorizontal.Controls[i]);
+    end;
+//
   for i := 0 to boxVertical.ControlCount - 1 do
     if boxVertical.Controls[i] is TUItemButton then begin
       AssignVertDragHandler(boxVertical.Controls[i]);
@@ -94,6 +100,12 @@ procedure TformAppList.FormDestroy(Sender: TObject);
 var
   i: Integer;
 begin
+  for i := 0 to boxHorizontal.ControlCount - 1 do
+    if boxHorizontal.Controls[i] is TUSymbolButton then begin
+//      AssignDockHandler(boxHorizontal.Controls[i]);
+      RemoveDockHandler(boxHorizontal.Controls[i]);
+    end;
+//
   for i := 0 to boxVertical.ControlCount - 1 do
     if boxVertical.Controls[i] is TUItemButton then begin
 //      AssignVertDragHandler(boxVertical.Controls[i]);
