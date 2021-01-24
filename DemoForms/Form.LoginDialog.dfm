@@ -51,7 +51,7 @@ object formLoginDialog: TformLoginDialog
       AlignWithMargins = True
       Left = 40
       Top = 50
-      Width = 330
+      Width = 137
       Height = 38
       Margins.Left = 0
       Margins.Top = 50
@@ -68,13 +68,12 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       TextKind = tkTitle
       UseAccentColor = True
-      ExplicitWidth = 137
     end
     object headingSignin: TUText
       AlignWithMargins = True
       Left = 40
       Top = 88
-      Width = 330
+      Width = 197
       Height = 28
       Margins.Left = 0
       Margins.Top = 0
@@ -90,12 +89,11 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
-      ExplicitWidth = 197
     end
     object entryPassword: TUText
       Left = 40
       Top = 208
-      Width = 330
+      Width = 58
       Height = 17
       Align = alTop
       Caption = 'Password'
@@ -106,12 +104,11 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 58
     end
     object entryEmail: TUText
       Left = 40
       Top = 136
-      Width = 330
+      Width = 32
       Height = 17
       Align = alTop
       Caption = 'Email'
@@ -122,13 +119,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 32
     end
     object textShowMoreOptions: TUText
       AlignWithMargins = True
       Left = 40
       Top = 352
-      Width = 330
+      Width = 103
       Height = 15
       Cursor = crHandPoint
       Margins.Left = 0
@@ -145,12 +141,11 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       OnClick = textShowMoreOptionsClick
       TextKind = tkDescription
-      ExplicitWidth = 103
     end
     object entryDescription: TUText
       Left = 40
       Top = 280
-      Width = 330
+      Width = 130
       Height = 17
       Align = alTop
       Caption = 'Description (optional)'
@@ -161,7 +156,6 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitWidth = 130
     end
     object panelMoreOptions: TUPanel
       Left = 40

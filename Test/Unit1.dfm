@@ -56,6 +56,7 @@ object Form1: TForm1
     BackColor.LightColor = 14342874
     BackColor.DarkColor = 3355443
     ScrollOrientation = oHorizontal
+    ExplicitTop = 38
   end
   object UThemeManager1: TUThemeManager
     Theme = ttDark

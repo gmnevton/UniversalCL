@@ -71,13 +71,15 @@ implementation
 {$R *.dfm}
 
 procedure TformLoginDialog.buttonAppThemeClick(Sender: TObject);
+var
+  TM: TUCustomThemeManager;
 begin
-//  if ThemeManager.Theme = ttLight then
-//    ThemeManager.CustomTheme := utDark
-//  else
-//    ThemeManager.CustomTheme := utLight;
-//  ThemeManager.UseSystemTheme := False;
-  ThemeManager.Reload;
+  TM := SelectThemeManager(Self);
+  if TM.Theme = ttLight then
+    TM.Theme := ttDark
+  else
+    TM.Theme := ttLight;
+  TM.Reload;
 end;
 
 procedure TformLoginDialog.buttonCancelClick(Sender: TObject);

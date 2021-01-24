@@ -511,6 +511,8 @@ var
   P: TPoint;
 begin
 //  inherited;
+//  if csPaintCopy in ControlState then
+//    UpdateColors;
   TM:=SelectThemeManager(Self);
   bmp := TBitmap.Create;
   try
@@ -528,7 +530,8 @@ begin
     P:=ScreenToClient(P);
 
     if Enabled and FMouseInClient and not (csPaintCopy in ControlState) then
-      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
+//      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
+      DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
     //  Paint checkbox
     if iokCheckBox in ObjectsVisible then begin
@@ -634,6 +637,10 @@ procedure TUItemButton.WMLButtonUp(var Msg: TWMLButtonUp);
 var
   OldState: Boolean;
 begin
+  if csPrintClient in ControlState then begin
+    inherited;
+    Exit;
+  end;
   if Enabled then begin
 //      if Msg.XPos < CheckBoxWidth then
 //        FObjectSelected := iokCheckBox

@@ -6,7 +6,8 @@ uses
   SysUtils,
   Types,
   Windows,
-  Graphics, 
+  Controls,
+  Graphics,
   GraphUtil,
   Themes,
   UCL.Classes,
@@ -39,12 +40,15 @@ function IsPropAvailable(Instance: TObject; Name: String): Boolean;
 // Internal
 function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
 function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
+procedure IncludeControlState(const Control: TControl; State: Integer);
+procedure ExcludeControlState(const Control: TControl; State: Integer);
 
 implementation
 
 uses
   Classes,
-  TypInfo;
+  TypInfo,
+  RTTI;
 
 // FORM
 
@@ -239,20 +243,11 @@ end;
 
 function IsPropAvailable(Instance: TObject; Name: String): Boolean;
 var
-  x: TPropList;
-  i, j: Integer;
+  Ctx: TRttiContext;
+  Prop: TRttiProperty;
 begin
-  Result := False;
-  j:=GetPropList(PTypeInfo(Instance.ClassInfo),
-                 [tkUnknown, tkInteger, tkChar, tkEnumeration, tkFloat, tkString, tkSet, tkClass, tkMethod,
-                  tkWChar, tkLString, tkWString, tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray,
-                  tkUString, tkUnicodeString, tkAnsiString, tkWideString, tkShortString, tkClassRef, tkPointer, tkProcedure],
-                 @x, False);
-  for i:=0 to j - 1 do begin
-    Result := AnsiSameText(String(TPropInfo(x[i]^).Name), Name);
-    if Result then
-      Exit;
-  end;
+  Prop := Ctx.GetType(Instance.ClassType).GetProperty(Name);
+  Result := (Prop <> Nil) and (Prop.Visibility in [mvProtected, mvPublic, mvPublished]);
 end;
 
 // INTERNAL
@@ -289,6 +284,24 @@ begin
   except
     Result := False;
   end;
+end;
+
+procedure IncludeControlState(const Control: TControl; State: Integer);
+var
+  cState: TControlState;
+begin
+  cState:=Control.ControlState;
+  cState:=cState + State;
+  Control.ControlState:=cState;
+end;
+
+procedure ExcludeControlState(const Control: TControl; State: Integer);
+var
+  cState: TControlState;
+begin
+  cState:=Control.ControlState;
+  cState:=cState - State;
+  Control.ControlState:=cState;
 end;
 
 end.

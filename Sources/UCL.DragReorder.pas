@@ -64,6 +64,7 @@ type
   protected
     function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
     function GetDragImages: TDragImageList; override;
+    function GetFrameWidth: Integer; override;
 
   public
     destructor Destroy; override;
@@ -108,6 +109,7 @@ procedure RemoveDockHandler(const Control: TControl);
 implementation
 
 uses
+//  TypInfo,
   UCL.ThemeManager,
   UCL.Utils;
 
@@ -120,6 +122,7 @@ type
 function IsDraggingSupported(const Control: TControl): Boolean;
 begin
   Result := TUCustomThemeManager.IsThemingAvailable(Control) and
+//            IsPublishedProp(Control, 'OnStartDrag') and
             IsPropAvailable(Control, 'OnStartDrag') and
             IsPropAvailable(Control, 'OnDragOver') and
             IsPropAvailable(Control, 'OnDragDrop') and
@@ -251,7 +254,7 @@ end;
 function TUDragObject.GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor;
 begin
   if Accepted then
-    Result := crNone
+    Result := crDefault
   else
     Result := crNoDrop;
 end;
@@ -330,7 +333,9 @@ procedure TUCustomDragHandler.OnMouseMove(Sender: TObject; Shift: TShiftState; X
 begin
   if (Control <> Nil) and (Sender = Control) and MousePressed then begin
     MousePressed:=False;
+    IncludeControlState(Control, csPrintClient);
     Control.BeginDrag(False);
+    ExcludeControlState(Control, csPrintClient);
     ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
   end;
 end;
@@ -389,7 +394,7 @@ end;
 function TUDockObject.GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor;
 begin
   if Accepted then
-    Result := crNone
+    Result := crDefault
   else
     Result := crNoDrop;
 end;
@@ -419,7 +424,7 @@ begin
       P := Mouse.CursorPos;
       MapWindowPoints(HWND_DESKTOP, TWinControl(Control).Handle, P, 1);
       FDragImages.DragHotspot := P;
-      FDragImages.Masked := False;
+      FDragImages.Masked := True;
       FDragImages.AddMasked(Bmp, clFuchsia);
     finally
       Bmp.Free;
@@ -427,6 +432,11 @@ begin
   end;
 
   Result := FDragImages;
+end;
+
+function TUDockObject.GetFrameWidth: Integer;
+begin
+  Result := 0;
 end;
 
 { TUCustomDockHandler }
@@ -482,7 +492,7 @@ begin
   if (Control <> Nil) and (Sender = Control) and MousePressed then begin
     MousePressed:=False;
     Control.BeginDrag(False);
-    ImageList_SetDragCursorImage(DockReorderObject.GetDragImages.Handle, 1, 0, 0);
+    ImageList_SetDragCursorImage(DockReorderObject.GetDragImages.Handle, 0, 0, 0);
   end;
 end;
 
