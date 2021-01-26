@@ -40,8 +40,8 @@ function IsPropAvailable(Instance: TObject; Name: String): Boolean;
 // Internal
 function LoadResourceFontByName(const ResourceName: String; ResType: PChar): Boolean;
 function LoadResourceFontByID(ResourceID: Integer; ResType: PChar): Boolean;
-procedure IncludeControlState(const Control: TControl; State: Integer);
-procedure ExcludeControlState(const Control: TControl; State: Integer);
+procedure IncludeControlState(const Control: TControl; const State: TControlState); inline;
+procedure ExcludeControlState(const Control: TControl; const State: TControlState); inline;
 
 implementation
 
@@ -286,22 +286,26 @@ begin
   end;
 end;
 
-procedure IncludeControlState(const Control: TControl; State: Integer);
+procedure IncludeControlState(const Control: TControl; const State: TControlState);
 var
   cState: TControlState;
 begin
-  cState:=Control.ControlState;
-  cState:=cState + State;
-  Control.ControlState:=cState;
+  if Control <> Nil then begin
+    cState:=Control.ControlState;
+    cState:=cState + State;
+    Control.ControlState:=cState;
+  end;
 end;
 
-procedure ExcludeControlState(const Control: TControl; State: Integer);
+procedure ExcludeControlState(const Control: TControl; const State: TControlState);
 var
   cState: TControlState;
 begin
-  cState:=Control.ControlState;
-  cState:=cState - State;
-  Control.ControlState:=cState;
+  if Control <> Nil then begin
+    cState:=Control.ControlState;
+    cState:=cState - State;
+    Control.ControlState:=cState;
+  end;
 end;
 
 end.

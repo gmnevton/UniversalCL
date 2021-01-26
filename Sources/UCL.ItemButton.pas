@@ -75,6 +75,9 @@ type
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
 
+    FOrgPosition: TPoint;
+    FDragFloating: Boolean;
+
     //  Internal
     procedure UpdateColors;
     procedure UpdateRects;
@@ -125,6 +128,11 @@ type
 
     // IUThemedComponent
     procedure UpdateTheme; override;
+    //
+    procedure StoreOrgPosition;
+    procedure DragFloat(X, Y: Integer);
+    procedure RestoreOrgPosition;
+    property DragFloating: Boolean read FDragFloating;
     //
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
@@ -253,6 +261,22 @@ begin
   Repaint;
 end;
 
+procedure TUItemButton.StoreOrgPosition;
+begin
+  if FOrgPosition = EmptyPoint then
+
+end;
+
+procedure TUItemButton.DragFloat(X, Y: Integer);
+begin
+
+end;
+
+procedure TUItemButton.RestoreOrgPosition;
+begin
+
+end;
+
 //  INTERNAL
 
 procedure TUItemButton.UpdateColors;
@@ -270,6 +294,11 @@ begin
   end
   //  Highlight enabled
   else if (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
+    BackColor := TM.AccentColor;
+    TextColor := GetTextColorFromBackground(BackColor);
+    DetailColor := clSilver;
+  end
+  else if (ButtonState = csPress) and (csPrintClient in ControlState) then begin
     BackColor := TM.AccentColor;
     TextColor := GetTextColorFromBackground(BackColor);
     DetailColor := clSilver;
@@ -511,8 +540,8 @@ var
   P: TPoint;
 begin
 //  inherited;
-//  if csPaintCopy in ControlState then
-//    UpdateColors;
+  if csPaintCopy in ControlState then
+    UpdateColors;
   TM:=SelectThemeManager(Self);
   bmp := TBitmap.Create;
   try

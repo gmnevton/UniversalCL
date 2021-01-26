@@ -49,6 +49,7 @@ type
 
   TUVerticalDragHandler = class(TUCustomDragHandler)
   public
+    procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
   end;
 
@@ -333,9 +334,9 @@ procedure TUCustomDragHandler.OnMouseMove(Sender: TObject; Shift: TShiftState; X
 begin
   if (Control <> Nil) and (Sender = Control) and MousePressed then begin
     MousePressed:=False;
-    IncludeControlState(Control, csPrintClient);
+    IncludeControlState(Control, [csPrintClient]);
     Control.BeginDrag(False);
-    ExcludeControlState(Control, csPrintClient);
+    ExcludeControlState(DragReorderObject.Control, [csPrintClient]);
     ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
   end;
 end;
@@ -349,6 +350,24 @@ begin
 end;
 
 { TUVerticalDragHandler }
+
+procedure TUVerticalDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+var
+  Dest: TControl;
+  P: TPoint;
+begin
+  Accept:=True;
+  if (Sender = Nil) or not (Sender is TControl) then
+    Exit;
+
+  Dest := Sender as TControl;
+  P := Point(X, Y);
+  P := Dest.ScreenToClient(P);
+
+//  if Dest.Top < P.Y then
+//    Dest.t
+
+end;
 
 procedure TUVerticalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
 var
