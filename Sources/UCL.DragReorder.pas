@@ -101,6 +101,8 @@ function IsDraggingSupported(const Control: TControl): Boolean; inline;
 procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure RemoveDragHandler(const Control: TControl);
+//
+function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
 
 // Docking
 function IsDockingSupported(const Control: TControl): Boolean; inline;
@@ -196,6 +198,11 @@ begin
   TControlAccess(Control).OnMouseDown := Nil;
   TControlAccess(Control).OnMouseMove := Nil;
   TControlAccess(Control).OnMouseUp   := Nil;
+end;
+
+function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
+begin
+  Result := Supports(Comp, IUDragReorderControl) and IsPropAvailable(Comp, 'DragFloating');
 end;
 
 procedure AssignDockHandler(const Control: TControl; const DockSiteClass: TWinControlClass; Handler: TUCustomDockHandler = Nil);
@@ -357,14 +364,16 @@ var
   P: TPoint;
 begin
   Accept:=True;
-  if (Sender = Nil) or not (Sender is TControl) then
+  if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(Sender) then
     Exit;
 
   Dest := Sender as TControl;
   P := Point(X, Y);
   P := Dest.ScreenToClient(P);
 
-//  if Dest.Top < P.Y then
+  (Dest as IUDragReorderControl).
+
+  if Dest.Top < P.Y then
 //    Dest.t
 
 end;

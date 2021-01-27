@@ -6,11 +6,11 @@ interface
   {$LEGACYIFEND ON}
 {$IFEND}
 
-{$REGION 'Older Delphi versions'}
-{$IF CompilerVersion <= 30}
 uses
   Types;
 
+{$REGION 'Older Delphi versions'}
+{$IF CompilerVersion <= 30}
 const
   {$EXTERNALSYM WM_DPICHANGED}
   WM_DPICHANGED       = $02E0;
@@ -84,6 +84,10 @@ type
   end;
 {$IFEND}
 {$ENDREGION}
+
+const
+  EmptyPoint: TPoint = (X: 0; Y: 0);
+  EmptyRect: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
 type
   TUOrientation = (oHorizontal, oVertical);

@@ -24,7 +24,7 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
-  TUItemButton = class(TUCustomControl)
+  TUItemButton = class(TUCustomControl, IUDragReorderControl)
   private const
     ICON_CHECKED = '';
     ICON_UNCHECKED = '';
@@ -128,11 +128,12 @@ type
 
     // IUThemedComponent
     procedure UpdateTheme; override;
-    //
+    // IUDragReorderControl
+    function GetDragFloating: Boolean;
     procedure StoreOrgPosition;
     procedure DragFloat(X, Y: Integer);
     procedure RestoreOrgPosition;
-    property DragFloating: Boolean read FDragFloating;
+    property DragFloating: Boolean read GetDragFloating;
     //
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
@@ -261,20 +262,32 @@ begin
   Repaint;
 end;
 
+function TUItemButton.GetDragFloating: Boolean;
+begin
+  Result := FDragFloating;
+end;
+
 procedure TUItemButton.StoreOrgPosition;
 begin
   if FOrgPosition = EmptyPoint then
-
+    FOrgPosition:=Point(Left, Top);
 end;
 
 procedure TUItemButton.DragFloat(X, Y: Integer);
 begin
-
+  FDragFloating:=True;
+  Left:=X;
+  Top:=Y;
 end;
 
 procedure TUItemButton.RestoreOrgPosition;
 begin
-
+  if FOrgPosition <> EmptyPoint then begin
+    Left:=FOrgPosition.X;
+    Top:=FOrgPosition.Y;
+    FOrgPosition:=EmptyPoint;
+    FDragFloating:=False;
+  end;
 end;
 
 //  INTERNAL

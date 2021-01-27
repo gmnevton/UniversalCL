@@ -24,6 +24,14 @@ type
     function IsDesigning: Boolean;
   end;
 
+  IUDragReorderControl = interface ['{B9828BC2-CA4A-437E-866C-CBB5015F1412}']
+    function GetDragFloating: Boolean;
+    procedure StoreOrgPosition;
+    procedure DragFloat(X, Y: Integer);
+    procedure RestoreOrgPosition;
+    property DragFloating: Boolean read GetDragFloating;
+  end;
+
   TUCustomControl = class(TCustomControl, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;
