@@ -360,22 +360,78 @@ end;
 
 procedure TUVerticalDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 var
-  Dest: TControl;
+  Src, Dest: TControl;
   P: TPoint;
+  i, NewTop: Integer;
+  LControl: TControl;
+  IDest: IUDragReorderControl;
 begin
   Accept:=True;
-  if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(Sender) then
-    Exit;
+  if State = dsDragEnter then begin
+//    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
+//      Exit;
+//
+//    //Src := (Source as TUDragObject).Control;
+//    Dest := Sender as TControl;
+//    if Dest.Parent = Nil then
+//      Exit;
+//
+//    for i:=0 to Dest.Parent.ControlCount - 1 do begin
+//      LControl:=Dest.Parent.Controls[i];
+//      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
+//        IDest := LControl as IUDragReorderControl;
+//        IDest.StoreAlign;
+//      end;
+//    end;
+  end
+  else if State = dsDragMove then begin
+    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
+      Exit;
 
-  Dest := Sender as TControl;
-  P := Point(X, Y);
-  P := Dest.ScreenToClient(P);
+    Src := (Source as TUDragObject).Control;
+    Dest := Sender as TControl;
+    if (Dest = Src) or (Dest.Parent = Nil) then
+      Exit;
 
-  (Dest as IUDragReorderControl).
+    for i:=0 to Dest.Parent.ControlCount - 1 do begin
+      LControl:=Dest.Parent.Controls[i];
+      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
+        IDest := LControl as IUDragReorderControl;
+        if IDest.DragFloating then begin
+          IDest.RestoreAlign;
+          IDest.RestorePosition;
+        end;
+      end;
+    end;
 
-  if Dest.Top < P.Y then
-//    Dest.t
+    P := Point(X, Y);
+  //  P := Dest.ScreenToClient(P);
 
+    IDest := Dest as IUDragReorderControl;
+    NewTop:=Dest.Top - Src.Height;
+    if not IDest.DragFloating and (NewTop <= P.Y) then begin
+      IDest.StorePosition;
+      IDest.StoreAlign;
+      IDest.DragFloat(Dest.Left, Dest.Top + Dest.Height + 1);
+    end;
+  end
+  else if State = dsDragLeave then begin
+//    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
+//      Exit;
+//
+//    //Src := (Source as TUDragObject).Control;
+//    Dest := Sender as TControl;
+//    if Dest.Parent = Nil then
+//      Exit;
+//
+//    for i:=0 to Dest.Parent.ControlCount - 1 do begin
+//      LControl:=Dest.Parent.Controls[i];
+//      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
+//        IDest := LControl as IUDragReorderControl;
+//        IDest.RestoreAlign;
+//      end;
+//    end;
+  end;
 end;
 
 procedure TUVerticalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);

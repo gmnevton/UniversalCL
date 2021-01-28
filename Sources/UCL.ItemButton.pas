@@ -75,6 +75,7 @@ type
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
 
+    FOrgAlign: TAlign;
     FOrgPosition: TPoint;
     FDragFloating: Boolean;
 
@@ -130,9 +131,11 @@ type
     procedure UpdateTheme; override;
     // IUDragReorderControl
     function GetDragFloating: Boolean;
-    procedure StoreOrgPosition;
+    procedure StoreAlign;
+    procedure StorePosition;
     procedure DragFloat(X, Y: Integer);
-    procedure RestoreOrgPosition;
+    procedure RestoreAlign;
+    procedure RestorePosition;
     property DragFloating: Boolean read GetDragFloating;
     //
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
@@ -267,7 +270,13 @@ begin
   Result := FDragFloating;
 end;
 
-procedure TUItemButton.StoreOrgPosition;
+procedure TUItemButton.StoreAlign;
+begin
+  FOrgAlign:=Align;
+  Align:=alNone;
+end;
+
+procedure TUItemButton.StorePosition;
 begin
   if FOrgPosition = EmptyPoint then
     FOrgPosition:=Point(Left, Top);
@@ -280,7 +289,15 @@ begin
   Top:=Y;
 end;
 
-procedure TUItemButton.RestoreOrgPosition;
+procedure TUItemButton.RestoreAlign;
+begin
+  if FOrgAlign <> alNone then begin
+    Align:=FOrgAlign;
+    FOrgAlign:=alNone;
+  end;
+end;
+
+procedure TUItemButton.RestorePosition;
 begin
   if FOrgPosition <> EmptyPoint then begin
     Left:=FOrgPosition.X;

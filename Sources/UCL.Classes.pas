@@ -26,9 +26,11 @@ type
 
   IUDragReorderControl = interface ['{B9828BC2-CA4A-437E-866C-CBB5015F1412}']
     function GetDragFloating: Boolean;
-    procedure StoreOrgPosition;
+    procedure StoreAlign;
+    procedure StorePosition;
     procedure DragFloat(X, Y: Integer);
-    procedure RestoreOrgPosition;
+    procedure RestoreAlign;
+    procedure RestorePosition;
     property DragFloating: Boolean read GetDragFloating;
   end;
 
