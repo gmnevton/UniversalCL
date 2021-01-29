@@ -13,6 +13,8 @@ uses
   Variants,
   StdCtrls,
   ExtCtrls,
+  Generics.Defaults,
+  Generics.Collections,
   UCL.Classes;
 
 type
@@ -48,6 +50,8 @@ type
   end;
 
   TUVerticalDragHandler = class(TUCustomDragHandler)
+  private
+    FSortedControls: TList<TControl>;
   public
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
