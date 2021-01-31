@@ -13,8 +13,6 @@ uses
   Variants,
   StdCtrls,
   ExtCtrls,
-  Generics.Defaults,
-  Generics.Collections,
   UCL.Classes;
 
 type
@@ -38,6 +36,10 @@ type
   private
     Control: TControl;
     MousePressed: Boolean;
+  protected
+    FSortedControls: TList;
+    FLastDragOverControl: TControl;
+    function AddToList(ParentControl: TWinControl; AddClass: TClass): TList; virtual;
   public
     procedure OnStartDrag(Sender: TObject; var DragObject: TDragObject); virtual;
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
@@ -50,8 +52,6 @@ type
   end;
 
   TUVerticalDragHandler = class(TUCustomDragHandler)
-  private
-    FSortedControls: TList<TControl>;
   public
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
@@ -116,6 +116,7 @@ procedure RemoveDockHandler(const Control: TControl);
 implementation
 
 uses
+  Forms,
 //  TypInfo,
   UCL.ThemeManager,
   UCL.Utils;
@@ -308,6 +309,34 @@ end;
 
 { TUCustomDragHandler }
 
+function ControlsSortTopBottom(Item1, Item2: Pointer): Integer;
+begin
+  Result:=0;
+  if TControl(Item1).Top > TControl(Item2).Top then
+    Result:=1
+  else if TControl(Item1).Top < TControl(Item2).Top then
+    Result:=-1;
+end;
+
+function TUCustomDragHandler.AddToList(ParentControl: TWinControl; AddClass: TClass): TList;
+var
+  i: Integer;
+  ctrl: TControl;
+begin
+  Result:=Tlist.Create;
+
+  if (ParentControl = Nil) or (AddClass = Nil) then
+    Exit;
+
+  for i:=0 to ParentControl.ControlCount - 1 do begin
+    ctrl:=ParentControl.Controls[i];
+    if (ctrl is AddClass) and ctrl.Visible then
+      Result.Add(ctrl);
+  end;
+
+  Result.Sort(ControlsSortTopBottom);
+end;
+
 procedure TUCustomDragHandler.OnStartDrag(Sender: TObject; var DragObject: TDragObject);
 begin
   if (Sender = Nil) or not (Sender is TWinControl) then
@@ -316,6 +345,8 @@ begin
   DragReorderObject := TUDragObject.Create(TWinControl(Sender));
   DragReorderObject.AlwaysShowDragImages := True;
   DragObject := DragReorderObject;
+
+  FSortedControls:=AddToList(TWinControl(Sender).Parent, Sender.ClassType);
 end;
 
 procedure TUCustomDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
@@ -325,6 +356,8 @@ end;
 
 procedure TUCustomDragHandler.OnEndDrag(Sender, Target: TObject; X, Y: Integer);
 begin
+  FSortedControls.Free;
+  FSortedControls:=Nil;
   Control:=Nil;
   MousePressed:=False;
   DragReorderObject := Nil;
@@ -366,7 +399,7 @@ procedure TUVerticalDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Intege
 var
   Src, Dest: TControl;
   P: TPoint;
-  i, NewTop: Integer;
+  i, NewTop, TargetIndex, StartPosition: Integer;
   LControl: TControl;
   IDest: IUDragReorderControl;
 begin
@@ -377,8 +410,10 @@ begin
 //
 //    //Src := (Source as TUDragObject).Control;
 //    Dest := Sender as TControl;
-//    if Dest.Parent = Nil then
+//    if Dest.Parent = Nil then begin
+//      Accept:=False;
 //      Exit;
+//    end;
 //
 //    for i:=0 to Dest.Parent.ControlCount - 1 do begin
 //      LControl:=Dest.Parent.Controls[i];
@@ -387,6 +422,7 @@ begin
 //        IDest.StoreAlign;
 //      end;
 //    end;
+    FLastDragOverControl:=TControl(Sender);
   end
   else if State = dsDragMove then begin
     if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
@@ -397,44 +433,74 @@ begin
     if (Dest = Src) or (Dest.Parent = Nil) then
       Exit;
 
-    for i:=0 to Dest.Parent.ControlCount - 1 do begin
-      LControl:=Dest.Parent.Controls[i];
-      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
-        IDest := LControl as IUDragReorderControl;
-        if IDest.DragFloating then begin
-          IDest.RestoreAlign;
-          IDest.RestorePosition;
-        end;
-      end;
-    end;
-
-    P := Point(X, Y);
-  //  P := Dest.ScreenToClient(P);
-
-    IDest := Dest as IUDragReorderControl;
-    NewTop:=Dest.Top - Src.Height;
-    if not IDest.DragFloating and (NewTop <= P.Y) then begin
-      IDest.StorePosition;
-      IDest.StoreAlign;
-      IDest.DragFloat(Dest.Left, Dest.Top + Dest.Height + 1);
-    end;
-  end
-  else if State = dsDragLeave then begin
-//    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
-//      Exit;
-//
-//    //Src := (Source as TUDragObject).Control;
-//    Dest := Sender as TControl;
-//    if Dest.Parent = Nil then
-//      Exit;
-//
 //    for i:=0 to Dest.Parent.ControlCount - 1 do begin
 //      LControl:=Dest.Parent.Controls[i];
 //      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
 //        IDest := LControl as IUDragReorderControl;
-//        IDest.RestoreAlign;
+//        if IDest.DragFloating then begin
+//          IDest.RestoreAlign;
+//          IDest.RestorePosition;
+//        end;
 //      end;
 //    end;
+
+    P := Point(X, Y);
+  //  P := Dest.ScreenToClient(P);
+
+    if FSortedControls = Nil then
+      Exit;
+
+    StartPosition:=Dest.Top + Dest.Height; // (Dest.Height shl 1);
+    TargetIndex:=FSortedControls.IndexOf(Dest);
+    if TargetIndex > -1 then begin
+      for i:=TargetIndex to FSortedControls.Count - 1 do begin
+        LControl:=TControl(FSortedControls.Items[i]);
+        IDest := LControl as IUDragReorderControl;
+//        if IsDragReorderAvailable(TComponent(LControl)) then begin
+        if not IDest.DragFloating then begin
+          IDest.StorePosition;
+          IDest.StoreAlign;
+          IDest.DragFloat(LControl.Left, StartPosition);
+          LControl.Update;
+          Inc(StartPosition, LControl.Height);
+        end;
+      end;
+    end;
+
+//    IDest := Dest as IUDragReorderControl;
+//    NewTop:=Dest.Top - Src.Height;
+//    if not IDest.DragFloating and (NewTop <= P.Y) then begin
+//      IDest.StorePosition;
+//      IDest.StoreAlign;
+//      IDest.DragFloat(Dest.Left, Dest.Top + Dest.Height);
+//    end;
+  end
+  else if State = dsDragLeave then begin
+    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
+      Exit;
+
+    //Src := (Source as TUDragObject).Control;
+    Dest := Sender as TControl;
+    if Dest.Parent = Nil then
+      Exit;
+
+    if FLastDragOverControl <> Dest then begin
+      TargetIndex:=FSortedControls.IndexOf(Dest);
+      if TargetIndex > -1 then begin
+        for i:=TargetIndex to FSortedControls.Count - 1 do begin
+  //    for i:=0 to Dest.Parent.ControlCount - 1 do begin
+  //        LControl:=Dest.Parent.Controls[i];
+          LControl:=TControl(FSortedControls.Items[i]);
+  //        if IsDragReorderAvailable(TComponent(LControl)) then begin
+            IDest := LControl as IUDragReorderControl;
+            if IDest.DragFloating then begin
+              IDest.RestoreAlign;
+              IDest.RestorePosition;
+            end;
+  //        end;
+        end;
+      end;
+    end;
   end;
 end;
 

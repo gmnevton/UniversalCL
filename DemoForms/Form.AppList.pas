@@ -65,6 +65,7 @@ type
     //
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure boxVerticalDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
   private
   public
   end;
@@ -111,6 +112,11 @@ begin
 //      AssignVertDragHandler(boxVertical.Controls[i]);
       RemoveDragHandler(boxVertical.Controls[i]);
     end;
+end;
+
+procedure TformAppList.boxVerticalDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  Accept:=True;
 end;
 
 end.

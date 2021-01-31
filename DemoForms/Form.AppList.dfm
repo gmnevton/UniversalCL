@@ -277,6 +277,7 @@ object formAppList: TformAppList
     ParentColor = False
     TabOrder = 2
     StyleElements = []
+    OnDragOver = boxVerticalDragOver
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
@@ -290,8 +291,9 @@ object formAppList: TformAppList
     object UItemButton1: TUItemButton
       Left = 0
       Top = 1160
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -312,8 +314,9 @@ object formAppList: TformAppList
     object UItemButton2: TUItemButton
       Left = 0
       Top = 1080
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -334,8 +337,9 @@ object formAppList: TformAppList
     object UItemButton3: TUItemButton
       Left = 0
       Top = 1040
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -356,8 +360,9 @@ object formAppList: TformAppList
     object UItemButton4: TUItemButton
       Left = 0
       Top = 1000
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -378,8 +383,9 @@ object formAppList: TformAppList
     object UItemButton5: TUItemButton
       Left = 0
       Top = 960
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -400,8 +406,9 @@ object formAppList: TformAppList
     object UItemButton6: TUItemButton
       Left = 0
       Top = 920
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -422,8 +429,9 @@ object formAppList: TformAppList
     object UItemButton7: TUItemButton
       Left = 0
       Top = 1120
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -444,8 +452,9 @@ object formAppList: TformAppList
     object UItemButton8: TUItemButton
       Left = 0
       Top = 680
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -466,8 +475,9 @@ object formAppList: TformAppList
     object UItemButton9: TUItemButton
       Left = 0
       Top = 720
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -488,8 +498,9 @@ object formAppList: TformAppList
     object UItemButton10: TUItemButton
       Left = 0
       Top = 760
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -510,8 +521,9 @@ object formAppList: TformAppList
     object UItemButton11: TUItemButton
       Left = 0
       Top = 800
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -532,8 +544,9 @@ object formAppList: TformAppList
     object UItemButton12: TUItemButton
       Left = 0
       Top = 840
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -554,8 +567,9 @@ object formAppList: TformAppList
     object UItemButton13: TUItemButton
       Left = 0
       Top = 880
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -576,8 +590,9 @@ object formAppList: TformAppList
     object UItemButton14: TUItemButton
       Left = 0
       Top = 440
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -598,8 +613,9 @@ object formAppList: TformAppList
     object UItemButton15: TUItemButton
       Left = 0
       Top = 480
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -620,8 +636,9 @@ object formAppList: TformAppList
     object UItemButton16: TUItemButton
       Left = 0
       Top = 520
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -642,8 +659,9 @@ object formAppList: TformAppList
     object UItemButton17: TUItemButton
       Left = 0
       Top = 560
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -664,8 +682,9 @@ object formAppList: TformAppList
     object UItemButton18: TUItemButton
       Left = 0
       Top = 600
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -686,8 +705,9 @@ object formAppList: TformAppList
     object UItemButton19: TUItemButton
       Left = 0
       Top = 640
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -708,8 +728,9 @@ object formAppList: TformAppList
     object UItemButton20: TUItemButton
       Left = 0
       Top = 200
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -730,8 +751,9 @@ object formAppList: TformAppList
     object UItemButton21: TUItemButton
       Left = 0
       Top = 240
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -752,8 +774,9 @@ object formAppList: TformAppList
     object UItemButton22: TUItemButton
       Left = 0
       Top = 280
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -774,8 +797,9 @@ object formAppList: TformAppList
     object UItemButton23: TUItemButton
       Left = 0
       Top = 320
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -796,8 +820,9 @@ object formAppList: TformAppList
     object UItemButton24: TUItemButton
       Left = 0
       Top = 360
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -818,8 +843,9 @@ object formAppList: TformAppList
     object UItemButton25: TUItemButton
       Left = 0
       Top = 400
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -840,7 +866,7 @@ object formAppList: TformAppList
     object UItemButton26: TUItemButton
       Left = 0
       Top = 0
-      Width = 423
+      Width = 440
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -862,7 +888,7 @@ object formAppList: TformAppList
     object UItemButton27: TUItemButton
       Left = 0
       Top = 40
-      Width = 423
+      Width = 440
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -884,7 +910,7 @@ object formAppList: TformAppList
     object UItemButton28: TUItemButton
       Left = 0
       Top = 80
-      Width = 423
+      Width = 440
       Align = alTop
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -906,8 +932,9 @@ object formAppList: TformAppList
     object UItemButton29: TUItemButton
       Left = 0
       Top = 120
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -928,8 +955,9 @@ object formAppList: TformAppList
     object UItemButton30: TUItemButton
       Left = 0
       Top = 160
-      Width = 423
+      Width = 440
       Align = alTop
+      Visible = False
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20

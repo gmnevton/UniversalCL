@@ -5,8 +5,6 @@ program Demo;
 {$IFEND}
 
 uses
-  madListHardware,
-  madListProcesses,
   madExcept,
   madLinkDisAsm,
   madListModules,
