@@ -277,7 +277,6 @@ object formAppList: TformAppList
     ParentColor = False
     TabOrder = 2
     StyleElements = []
-    OnDragOver = boxVerticalDragOver
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
     AniSet.DelayStartTime = 0
@@ -291,9 +290,9 @@ object formAppList: TformAppList
     object UItemButton1: TUItemButton
       Left = 0
       Top = 1160
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -310,13 +309,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton2: TUItemButton
       Left = 0
       Top = 1080
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -333,13 +333,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton3: TUItemButton
       Left = 0
       Top = 1040
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -356,13 +357,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton4: TUItemButton
       Left = 0
       Top = 1000
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -379,13 +381,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton5: TUItemButton
       Left = 0
       Top = 960
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -402,13 +405,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton6: TUItemButton
       Left = 0
       Top = 920
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -425,13 +429,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton7: TUItemButton
       Left = 0
       Top = 1120
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -448,13 +453,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton8: TUItemButton
       Left = 0
       Top = 680
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -471,13 +477,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton9: TUItemButton
       Left = 0
       Top = 720
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -494,13 +501,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton10: TUItemButton
       Left = 0
       Top = 760
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -517,13 +525,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton11: TUItemButton
       Left = 0
       Top = 800
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -540,13 +549,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton12: TUItemButton
       Left = 0
       Top = 840
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -563,13 +573,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton13: TUItemButton
       Left = 0
       Top = 880
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -586,13 +597,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton14: TUItemButton
       Left = 0
       Top = 440
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -609,13 +621,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton15: TUItemButton
       Left = 0
       Top = 480
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -632,13 +645,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton16: TUItemButton
       Left = 0
       Top = 520
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -655,13 +669,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton17: TUItemButton
       Left = 0
       Top = 560
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -678,13 +693,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton18: TUItemButton
       Left = 0
       Top = 600
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -701,13 +717,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton19: TUItemButton
       Left = 0
       Top = 640
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -724,13 +741,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton20: TUItemButton
       Left = 0
       Top = 200
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -747,13 +765,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton21: TUItemButton
       Left = 0
       Top = 240
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -770,13 +789,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton22: TUItemButton
       Left = 0
       Top = 280
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -793,13 +813,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton23: TUItemButton
       Left = 0
       Top = 320
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -816,13 +837,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton24: TUItemButton
       Left = 0
       Top = 360
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -839,13 +861,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton25: TUItemButton
       Left = 0
       Top = 400
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -862,12 +885,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton26: TUItemButton
       Left = 0
       Top = 0
-      Width = 440
+      Width = 423
       Align = alTop
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -884,12 +909,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton27: TUItemButton
       Left = 0
       Top = 40
-      Width = 440
+      Width = 423
       Align = alTop
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -906,12 +933,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton28: TUItemButton
       Left = 0
       Top = 80
-      Width = 440
+      Width = 423
       Align = alTop
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -928,13 +957,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton29: TUItemButton
       Left = 0
       Top = 120
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -951,13 +981,14 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
     object UItemButton30: TUItemButton
       Left = 0
       Top = 160
-      Width = 440
+      Width = 423
       Align = alTop
-      Visible = False
+      DragCursor = crDefault
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -974,6 +1005,7 @@ object formAppList: TformAppList
       Detail = 'Detail'
       RightIcon = #57345
       CustomActiveColor = 14120960
+      ExplicitWidth = 440
     end
   end
 end

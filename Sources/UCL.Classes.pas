@@ -23,7 +23,7 @@ type
     function IsLoading: Boolean;
     function IsDesigning: Boolean;
   end;
-
+(*
   IUDragReorderControl = interface ['{B9828BC2-CA4A-437E-866C-CBB5015F1412}']
     function GetDragFloating: Boolean;
     procedure StoreAlign;
@@ -33,7 +33,7 @@ type
     procedure RestorePosition;
     property DragFloating: Boolean read GetDragFloating;
   end;
-
+*)
   TUCustomControl = class(TCustomControl, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;

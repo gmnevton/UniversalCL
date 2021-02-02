@@ -16,35 +16,28 @@ uses
   UCL.Classes;
 
 type
-  TUDragObject = class(TDragObjectEx)
+  TUDragObject = class(TDragControlObjectEx)
   private
     FDragImages: TDragImageList;
-    FControl: TWinControl;
 
   protected
-    function GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor; override;
     function GetDragImages: TDragImageList; override;
 
   public
-    constructor Create(AControl: TWinControl);
     destructor Destroy; override;
-
-    property Control: TWinControl read FControl write FControl;
   end;
 
   TUCustomDragHandler = class
   private
     Control: TControl;
     MousePressed: Boolean;
-  protected
-    FSortedControls: TList;
-    FLastDragOverControl: TControl;
-    function AddToList(ParentControl: TWinControl; AddClass: TClass): TList; virtual;
   public
     procedure OnStartDrag(Sender: TObject; var DragObject: TDragObject); virtual;
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); virtual; abstract;
     procedure OnEndDrag(Sender, Target: TObject; X, Y: Integer); virtual;
+    procedure OnParentDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); virtual;
+    procedure OnParentDragDrop(Sender, Source: TObject; X, Y: Integer); virtual; abstract;
     //
     procedure OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
     procedure OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer); virtual;
@@ -55,11 +48,14 @@ type
   public
     procedure OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
+    procedure OnParentDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean); override;
+    procedure OnParentDragDrop(Sender, Source: TObject; X, Y: Integer); override;
   end;
 
   TUHorizontalDragHandler = class(TUCustomDragHandler)
   public
     procedure OnDragDrop(Sender, Source: TObject; X, Y: Integer); override;
+    procedure OnParentDragDrop(Sender, Source: TObject; X, Y: Integer); override;
   end;
 
   TUDockObject = class(TDragDockObjectEx)
@@ -93,7 +89,6 @@ type
   TUDockHandler = class(TUCustomDockHandler);
 
 var
-  DragReorderObject: TUDragObject;
   VertDragHandler: TUVerticalDragHandler;
   HorzDragHandler: TUHorizontalDragHandler;
   //
@@ -103,10 +98,13 @@ var
 // Dragging
 function IsDraggingSupported(const Control: TControl): Boolean; inline;
 procedure AssignVertDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+procedure AssignVertDragHandlerParent(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+procedure AssignHorzDragHandlerParent(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 procedure RemoveDragHandler(const Control: TControl);
+procedure RemoveDragHandlerParent(const Control: TControl);
 //
-function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
+//function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
 
 // Docking
 function IsDockingSupported(const Control: TControl): Boolean; inline;
@@ -171,6 +169,19 @@ begin
   TControlAccess(Control).OnMouseUp   := Handler.OnMouseUp;
 end;
 
+procedure AssignVertDragHandlerParent(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+begin
+  if not IsDraggingSupported(Control) then
+    Exit;
+  //
+  if Handler = Nil then
+    Handler := VertDragHandler;
+  //
+  TControlAccess(Control).DragKind    := dkDrag;
+  TControlAccess(Control).OnDragOver  := Handler.OnParentDragOver;
+  TControlAccess(Control).OnDragDrop  := Handler.OnParentDragDrop;
+end;
+
 procedure AssignHorzDragHandler(const Control: TControl; Handler: TUCustomDragHandler = Nil);
 begin
   if not IsDraggingSupported(Control) then
@@ -190,6 +201,19 @@ begin
   TControlAccess(Control).OnMouseUp   := Handler.OnMouseUp;
 end;
 
+procedure AssignHorzDragHandlerParent(const Control: TControl; Handler: TUCustomDragHandler = Nil);
+begin
+  if not IsDraggingSupported(Control) then
+    Exit;
+  //
+  if Handler = Nil then
+    Handler := HorzDragHandler;
+  //
+  TControlAccess(Control).DragKind    := dkDrag;
+  TControlAccess(Control).OnDragOver  := Handler.OnParentDragOver;
+  TControlAccess(Control).OnDragDrop  := Handler.OnParentDragDrop;
+end;
+
 procedure RemoveDragHandler(const Control: TControl);
 begin
   if not IsDraggingSupported(Control) then
@@ -205,10 +229,20 @@ begin
   TControlAccess(Control).OnMouseUp   := Nil;
 end;
 
-function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
+procedure RemoveDragHandlerParent(const Control: TControl);
 begin
-  Result := Supports(Comp, IUDragReorderControl) and IsPropAvailable(Comp, 'DragFloating');
+  if not IsDraggingSupported(Control) then
+    Exit;
+  //
+  TControlAccess(Control).DragKind    := dkDrag;
+  TControlAccess(Control).OnDragOver  := Nil;
+  TControlAccess(Control).OnDragDrop  := Nil;
 end;
+
+//function IsDragReorderAvailable(const Comp: TComponent): Boolean; inline;
+//begin
+//  Result := Supports(Comp, IUDragReorderControl) and IsPropAvailable(Comp, 'DragFloating');
+//end;
 
 procedure AssignDockHandler(const Control: TControl; const DockSiteClass: TWinControlClass; Handler: TUCustomDockHandler = Nil);
 begin
@@ -249,12 +283,6 @@ end;
 
 //  MAIN CLASS
 
-constructor TUDragObject.Create(AControl: TWinControl);
-begin
-  inherited Create;
-  FControl := AControl;
-end;
-
 destructor TUDragObject.Destroy;
 begin
   if FDragImages <> Nil then
@@ -262,53 +290,20 @@ begin
   inherited;
 end;
 
-//  CUSTOM METHODS
-
-function TUDragObject.GetDragCursor(Accepted: Boolean; X, Y: Integer): TCursor;
-begin
-  if Accepted then
-    Result := crDefault
-  else
-    Result := crNoDrop;
-end;
-
 function TUDragObject.GetDragImages: TDragImageList;
-var
-  Bmp: Graphics.TBitmap;
-  P: TPoint;
 begin
   //  Create images
   if not Assigned(FDragImages) then begin
-    Bmp := Graphics.TBitmap.Create;
-    try
-      Bmp.PixelFormat := pf32bit;
-      Bmp.Canvas.Brush.Color := clFuchsia;
-
-      // 2px margin at each side just to show image can have transparency.
-      Bmp.Width := FControl.Width + 4;
-      Bmp.Height := FControl.Height + 4;
-      Bmp.Canvas.Lock;
-      FControl.PaintTo(Bmp.Canvas.Handle, 2, 2);
-      Bmp.Canvas.Unlock;
-
-      FDragImages := TDragImageList.Create(Nil);
-      FDragImages.Width := Bmp.Width;
-      FDragImages.Height := Bmp.Height;
-      P := Mouse.CursorPos;
-      MapWindowPoints(HWND_DESKTOP, FControl.Handle, P, 1);
-      FDragImages.DragHotspot := P;
-      FDragImages.Masked := True;
-      FDragImages.AddMasked(Bmp, clFuchsia);
-    finally
-      Bmp.Free;
-    end;
-  end;
-
-  Result := FDragImages;
+    FDragImages := inherited GetDragImages;
+    Result := FDragImages;
+    ImageList_SetDragCursorImage(Result.Handle, 1, 0, 0);
+  end
+  else
+    Result := FDragImages;
 end;
 
 { TUCustomDragHandler }
-
+{
 function ControlsSortTopBottom(Item1, Item2: Pointer): Integer;
 begin
   Result:=0;
@@ -336,31 +331,30 @@ begin
 
   Result.Sort(ControlsSortTopBottom);
 end;
-
+}
 procedure TUCustomDragHandler.OnStartDrag(Sender: TObject; var DragObject: TDragObject);
 begin
-  if (Sender = Nil) or not (Sender is TWinControl) then
+  if (Sender = Nil) or not (Sender is TControl) then
     Exit;
 
-  DragReorderObject := TUDragObject.Create(TWinControl(Sender));
-  DragReorderObject.AlwaysShowDragImages := True;
-  DragObject := DragReorderObject;
-
-  FSortedControls:=AddToList(TWinControl(Sender).Parent, Sender.ClassType);
+  DragObject := TUDragObject.Create(TControl(Sender));
+  DragObject.AlwaysShowDragImages := True;
 end;
 
 procedure TUCustomDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
 begin
-  Accept := True;
+  Accept := False;
 end;
 
 procedure TUCustomDragHandler.OnEndDrag(Sender, Target: TObject; X, Y: Integer);
 begin
-  FSortedControls.Free;
-  FSortedControls:=Nil;
   Control:=Nil;
   MousePressed:=False;
-  DragReorderObject := Nil;
+end;
+
+procedure TUCustomDragHandler.OnParentDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  Accept := False;
 end;
 
 procedure TUCustomDragHandler.OnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -380,15 +374,14 @@ begin
     MousePressed:=False;
     IncludeControlState(Control, [csPrintClient]);
     Control.BeginDrag(False);
-    ExcludeControlState(DragReorderObject.Control, [csPrintClient]);
-    ImageList_SetDragCursorImage(DragReorderObject.GetDragImages.Handle, 1, 0, 0);
+    ExcludeControlState(Control, [csPrintClient]);
   end;
 end;
 
 procedure TUCustomDragHandler.OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if (Control <> Nil) or MousePressed then begin
-    Control:=Nil;
+    //Control:=Nil;
     MousePressed:=False;
   end;
 end;
@@ -396,112 +389,10 @@ end;
 { TUVerticalDragHandler }
 
 procedure TUVerticalDragHandler.OnDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
-var
-  Src, Dest: TControl;
-  P: TPoint;
-  i, NewTop, TargetIndex, StartPosition: Integer;
-  LControl: TControl;
-  IDest: IUDragReorderControl;
 begin
-  Accept:=True;
-  if State = dsDragEnter then begin
-//    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
-//      Exit;
-//
-//    //Src := (Source as TUDragObject).Control;
-//    Dest := Sender as TControl;
-//    if Dest.Parent = Nil then begin
-//      Accept:=False;
-//      Exit;
-//    end;
-//
-//    for i:=0 to Dest.Parent.ControlCount - 1 do begin
-//      LControl:=Dest.Parent.Controls[i];
-//      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
-//        IDest := LControl as IUDragReorderControl;
-//        IDest.StoreAlign;
-//      end;
-//    end;
-    FLastDragOverControl:=TControl(Sender);
-  end
-  else if State = dsDragMove then begin
-    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
-      Exit;
-
-    Src := (Source as TUDragObject).Control;
-    Dest := Sender as TControl;
-    if (Dest = Src) or (Dest.Parent = Nil) then
-      Exit;
-
-//    for i:=0 to Dest.Parent.ControlCount - 1 do begin
-//      LControl:=Dest.Parent.Controls[i];
-//      if (LControl <> Dest) and IsDragReorderAvailable(TComponent(LControl)) then begin
-//        IDest := LControl as IUDragReorderControl;
-//        if IDest.DragFloating then begin
-//          IDest.RestoreAlign;
-//          IDest.RestorePosition;
-//        end;
-//      end;
-//    end;
-
-    P := Point(X, Y);
-  //  P := Dest.ScreenToClient(P);
-
-    if FSortedControls = Nil then
-      Exit;
-
-    StartPosition:=Dest.Top + Dest.Height; // (Dest.Height shl 1);
-    TargetIndex:=FSortedControls.IndexOf(Dest);
-    if TargetIndex > -1 then begin
-      for i:=TargetIndex to FSortedControls.Count - 1 do begin
-        LControl:=TControl(FSortedControls.Items[i]);
-        IDest := LControl as IUDragReorderControl;
-//        if IsDragReorderAvailable(TComponent(LControl)) then begin
-        if not IDest.DragFloating then begin
-          IDest.StorePosition;
-          IDest.StoreAlign;
-          IDest.DragFloat(LControl.Left, StartPosition);
-          LControl.Update;
-          Inc(StartPosition, LControl.Height);
-        end;
-      end;
-    end;
-
-//    IDest := Dest as IUDragReorderControl;
-//    NewTop:=Dest.Top - Src.Height;
-//    if not IDest.DragFloating and (NewTop <= P.Y) then begin
-//      IDest.StorePosition;
-//      IDest.StoreAlign;
-//      IDest.DragFloat(Dest.Left, Dest.Top + Dest.Height);
-//    end;
-  end
-  else if State = dsDragLeave then begin
-    if (Sender = Nil) or not (Sender is TControl) or not IsDragReorderAvailable(TComponent(Sender)) then
-      Exit;
-
-    //Src := (Source as TUDragObject).Control;
-    Dest := Sender as TControl;
-    if Dest.Parent = Nil then
-      Exit;
-
-    if FLastDragOverControl <> Dest then begin
-      TargetIndex:=FSortedControls.IndexOf(Dest);
-      if TargetIndex > -1 then begin
-        for i:=TargetIndex to FSortedControls.Count - 1 do begin
-  //    for i:=0 to Dest.Parent.ControlCount - 1 do begin
-  //        LControl:=Dest.Parent.Controls[i];
-          LControl:=TControl(FSortedControls.Items[i]);
-  //        if IsDragReorderAvailable(TComponent(LControl)) then begin
-            IDest := LControl as IUDragReorderControl;
-            if IDest.DragFloating then begin
-              IDest.RestoreAlign;
-              IDest.RestorePosition;
-            end;
-  //        end;
-        end;
-      end;
-    end;
-  end;
+  Accept:=False;
+  if IsDragObject(Source) and (Control <> Nil) and (Source is TUDragObject) then
+    Accept:=TUDragObject(Source).Control is Control.ClassType;
 end;
 
 procedure TUVerticalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -519,6 +410,36 @@ begin
     Src.Top := Dest.Top + Dest.Height;
 end;
 
+procedure TUVerticalDragHandler.OnParentDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; var Accept: Boolean);
+begin
+  Accept:=False;
+  if IsDragObject(Source) and (Control <> Nil) and (Source is TUDragObject) then
+    Accept:=TUDragObject(Source).Control is Control.ClassType;
+end;
+
+procedure TUVerticalDragHandler.OnParentDragDrop(Sender, Source: TObject; X, Y: Integer);
+var
+  Src,{ Dest,} ctrl: TControl;
+  i, last_child_pos: Integer;
+begin
+  if (Sender = Nil) or (Source = Nil) or not (Sender is TControl) or not (Source is TUDragObject) then
+    Exit;
+
+  Src := (Source as TUDragObject).Control;
+  if Src.Parent = Nil then
+    Exit;
+  //
+  last_child_pos:=0;
+  for i:=0 to Src.Parent.ControlCount - 1 do begin
+    ctrl:=Src.Parent.Controls[i];
+    if {(ctrl <> Src) and} (ctrl is Src.ClassType) and ctrl.Visible then
+      Inc(last_child_pos, ctrl.Height);
+  end;
+  //
+//  Dest := Sender as TControl;
+  Src.Top := last_child_pos;
+end;
+
 { TUHorizontalDragHandler }
 
 procedure TUHorizontalDragHandler.OnDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -534,6 +455,11 @@ begin
     Src.Left := Dest.Left
   else
     Src.Left := Dest.Left + Dest.Width;
+end;
+
+procedure TUHorizontalDragHandler.OnParentDragDrop(Sender, Source: TObject; X, Y: Integer);
+begin
+
 end;
 
 { TUDockObject }
@@ -653,7 +579,7 @@ end;
 procedure TUCustomDockHandler.OnMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if (Control <> Nil) or MousePressed then begin
-    Control:=Nil;
+    //Control:=Nil;
     MousePressed:=False;
   end;
 end;

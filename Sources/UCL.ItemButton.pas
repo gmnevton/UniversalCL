@@ -24,7 +24,7 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
-  TUItemButton = class(TUCustomControl, IUDragReorderControl)
+  TUItemButton = class(TUCustomControl{, IUDragReorderControl})
   private const
     ICON_CHECKED = '';
     ICON_UNCHECKED = '';
@@ -75,9 +75,9 @@ type
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
 
-    FOrgAlign: TAlign;
-    FOrgPosition: TPoint;
-    FDragFloating: Boolean;
+//    FOrgAlign: TAlign;
+//    FOrgPosition: TPoint;
+//    FDragFloating: Boolean;
 
     //  Internal
     procedure UpdateColors;
@@ -122,6 +122,7 @@ type
     procedure Resize; override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
     procedure DoChangeScale(M, D: Integer); override;
+    function GetDragImages: TDragImageList; override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -130,13 +131,13 @@ type
     // IUThemedComponent
     procedure UpdateTheme; override;
     // IUDragReorderControl
-    function GetDragFloating: Boolean;
+{    function GetDragFloating: Boolean;
     procedure StoreAlign;
     procedure StorePosition;
     procedure DragFloat(X, Y: Integer);
     procedure RestoreAlign;
     procedure RestorePosition;
-    property DragFloating: Boolean read GetDragFloating;
+    property DragFloating: Boolean read GetDragFloating;}
     //
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
@@ -201,6 +202,7 @@ uses
 constructor TUItemButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  DragCursor:=crDefault;
 
   FObjectSelected := iokNone;
   FButtonState := csNone;
@@ -264,7 +266,7 @@ begin
   UpdateRects;
   Repaint;
 end;
-
+{
 function TUItemButton.GetDragFloating: Boolean;
 begin
   Result := FDragFloating;
@@ -306,7 +308,7 @@ begin
     FDragFloating:=False;
   end;
 end;
-
+}
 //  INTERNAL
 
 procedure TUItemButton.UpdateColors;
@@ -406,6 +408,39 @@ procedure TUItemButton.DoToggle;
 begin
   if Assigned(FToggleEvent) then
     FToggleEvent(Self, FIsToggled);
+end;
+
+function TUItemButton.GetDragImages: TDragImageList;
+var
+  Bmp: Graphics.TBitmap;
+  P: TPoint;
+begin
+  Result := TDragImageList.Create(Nil);
+  //
+  Bmp := Graphics.TBitmap.Create;
+  try
+    Bmp.PixelFormat := pf32bit;
+    Bmp.Canvas.Brush.Color := clFuchsia;
+
+    // 2px margin at each side just to show image can have transparency.
+    Bmp.Width := Width + 1;
+    Bmp.Height := Height + 1;
+    Bmp.Canvas.Lock;
+    Self.PaintTo(Bmp.Canvas.Handle, 1, 1);
+    Bmp.Canvas.Unlock;
+
+    Result.Width := Bmp.Width;
+    Result.Height := Bmp.Height;
+    P := Mouse.CursorPos;
+    MapWindowPoints(HWND_DESKTOP, Self.Handle, P, 1);
+    Result.DragHotspot := P;
+    Result.Masked := True;
+    Result.AddMasked(Bmp, clFuchsia);
+    //BmpIdx:=Result.AddMasked(Bmp, clFuchsia);
+    //Result.SetDragImage(BmpIdx, 0, 0);
+  finally
+    Bmp.Free;
+  end;
 end;
 
 //  SETTERS
