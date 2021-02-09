@@ -13,6 +13,7 @@ const
   UF_CHECKBOX_CHECKED = #$E005;
   UF_RADIO_OUTLINE = #$EA3A;
   UF_RADIO_SMALL = #$E915;
+  UF_CHECKMARK = #$E73E;
 
   //  Common icons
   UF_SEARCH = #$E11A;

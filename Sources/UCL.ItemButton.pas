@@ -24,11 +24,6 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
-  TUItemButton = class(TUCustomControl{, IUDragReorderControl})
-  private const
-    ICON_CHECKED = '';
-    ICON_UNCHECKED = '';
-
 //    DefBackColor: TDefColor = (
 //      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
 //      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535));
@@ -36,6 +31,7 @@ type
 //      ($00000000, $00000000, $00000000, $00666666, $00000000),
 //      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF));
 
+  TUItemButton = class(TUCustomControl)
   private var
     BackColor, TextColor, DetailColor, ActiveColor: TColor;
     CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
@@ -74,10 +70,6 @@ type
     FMouseInClient: Boolean;
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
-
-//    FOrgAlign: TAlign;
-//    FOrgPosition: TPoint;
-//    FDragFloating: Boolean;
 
     //  Internal
     procedure UpdateColors;
@@ -193,7 +185,8 @@ implementation
 uses
   SysUtils,
   UCL.ThemeManager,
-  UCL.Colors;
+  UCL.Colors,
+  UCL.FontIcons;
 
 { TUItemButton }
 
@@ -225,11 +218,11 @@ begin
 
   FObjectsVisible := [iokNone, iokLeftIcon, iokText, iokDetail];
 
-  FIsChecked := false;
-  FLeftIcon := '';
+  FIsChecked := False;
+  FLeftIcon := UF_CHECKBOX_OUTLINE;
   FText := 'Text';
   FDetail := 'Detail';
-  FRightIcon := '';
+  FRightIcon := UF_CHECKMARK;
 
   FCheckBoxWidth := 40;
   FLeftIconWidth := 40;
@@ -237,11 +230,11 @@ begin
 
   FAlignSpace := 5;
   FCustomActiveColor := $D77800;
-  FTransparent := false;
+  FTransparent := False;
   FLeftIconKind := ikFontIcon;
   FRightIconKind := ikFontIcon;
-  FIsToggleButton := false;
-  FIsToggled := false;
+  FIsToggleButton := False;
+  FIsToggled := False;
 
   //  Common properties
   TabStop := True;
@@ -631,11 +624,11 @@ begin
     if iokCheckBox in ObjectsVisible then begin
       if IsChecked then begin
         bmp.Canvas.Font.Color := ActiveColor;
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_CHECKED, false);
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_CHECKED, False);
       end
       else begin
         bmp.Canvas.Font.Color := TextColor;
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, ICON_UNCHECKED, false);
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_OUTLINE, False);
       end;
     end;
 
