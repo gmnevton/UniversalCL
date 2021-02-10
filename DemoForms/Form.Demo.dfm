@@ -750,7 +750,6 @@ object formDemo: TformDemo
     Top = 190
     Width = 150
     Alignment = taLeftJustify
-    AllowFocus = False
     Caption = 'Button no focus'
   end
   object buttonCanFocus: TUButton
@@ -769,10 +768,10 @@ object formDemo: TformDemo
     Caption = 'Custom button'
   end
   object buttonReloadSettings: TUSymbolButton
-    Left = 216
-    Top = 273
+    Left = 220
+    Top = 270
     Width = 150
-    Height = 31
+    Height = 30
     OnClick = buttonReloadSettingsClick
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
@@ -793,7 +792,7 @@ object formDemo: TformDemo
   end
   object buttonHighlight: TUButton
     Tag = 6
-    Left = 220
+    Left = 221
     Top = 230
     Width = 150
     OnClick = buttonHighlightClick
@@ -811,7 +810,7 @@ object formDemo: TformDemo
   end
   object buttonToggled: TUButton
     Tag = 5
-    Left = 216
+    Left = 220
     Top = 310
     Width = 150
     IsToggleButton = True
@@ -822,6 +821,7 @@ object formDemo: TformDemo
     Top = 460
     Width = 311
     Height = 41
+    DragCursor = crDefault
     OnClick = itembuttonImageClick
     ImageRightIndex = 3
     IconFont.Charset = DEFAULT_CHARSET
@@ -847,6 +847,7 @@ object formDemo: TformDemo
     Top = 510
     Width = 311
     Height = 41
+    DragCursor = crDefault
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
