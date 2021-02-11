@@ -134,10 +134,12 @@ begin
 
 
   FBorderColors := TUThemeButtonStateColorSet.Create;
-  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+//  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FBorderColors.Assign(BUTTON_BORDER);
 
   FTextColors := TUThemeButtonStateColorSet.Create;
   FTextColors.SetColors(utLight, clBlack, clBlack, clBlack, clGray, clBlack);
+  FTextColors.SetColors(utDark, clWhite, clWhite, clWhite, clGray, clWhite);
 
   FBackColors.OnChange := BackColorChange;
   FBorderColors.OnChange := BorderColorChange;
@@ -206,6 +208,13 @@ begin
         BorderColor := BrightenColor(BackColor, -32)
       else
         BorderColor := BackColor;
+    end
+    // Focused
+    else if AllowFocus and Focused and (ButtonState = csFocused) then begin
+      BackColor   := BackColors.GetColor(TM.ThemeUsed, ButtonState);
+      BorderColor := BorderColors.GetColor(TM.ThemeUsed, ButtonState);
+      TextColor   := TextColors.GetColor(TM.ThemeUsed, ButtonState);
+      Exit;
     end
     // Transparent
     else if (ButtonState = csNone) and Transparent then begin
@@ -384,6 +393,8 @@ end;
 procedure TUButton.WMSetFocus(var Msg: TWMSetFocus);
 begin
   if Enabled and AllowFocus then begin
+    if CanFocus and not Focused then
+      SetFocus;
     ButtonState := csFocused;
     inherited;
   end;

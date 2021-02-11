@@ -99,6 +99,8 @@ type
     property ParentShowHint;
     property PopupMenu;
     property ShowHint;
+    property TabOrder;
+    property TabStop;
     property Touch;
     property Visible;
     {$IF CompilerVersion > 29}

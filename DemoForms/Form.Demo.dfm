@@ -164,6 +164,7 @@ object formDemo: TformDemo
     Top = 340
     Width = 134
     AutoSize = True
+    TabOrder = 23
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -173,13 +174,13 @@ object formDemo: TformDemo
     TextOnGlass = True
     State = cbsChecked
     Caption = '2-state checkbox'
-    TabOrder = 12
   end
   object check3State: TUCheckBox
     Left = 390
     Top = 368
     Width = 134
     AutoSize = True
+    TabOrder = 24
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -189,7 +190,6 @@ object formDemo: TformDemo
     TextOnGlass = True
     State = cbsGrayed
     Caption = '3-state checkbox'
-    TabOrder = 13
   end
   object radioA1: TURadioButton
     Left = 390
@@ -200,6 +200,7 @@ object formDemo: TformDemo
     Margins.Right = 0
     Margins.Bottom = 0
     AutoSize = True
+    TabOrder = 20
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -208,7 +209,6 @@ object formDemo: TformDemo
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A1'
-    TabOrder = 9
   end
   object radioA2: TURadioButton
     Left = 390
@@ -219,6 +219,7 @@ object formDemo: TformDemo
     Margins.Right = 0
     Margins.Bottom = 0
     AutoSize = True
+    TabOrder = 21
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -227,7 +228,6 @@ object formDemo: TformDemo
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A2'
-    TabOrder = 10
   end
   object radioA3: TURadioButton
     Left = 390
@@ -239,6 +239,7 @@ object formDemo: TformDemo
     Margins.Bottom = 0
     AutoSize = True
     Enabled = False
+    TabOrder = 22
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -247,7 +248,6 @@ object formDemo: TformDemo
     Group = 'GroupA'
     TextOnGlass = True
     Caption = 'Radio A3'
-    TabOrder = 11
   end
   object radioB1: TURadioButton
     Left = 540
@@ -258,6 +258,7 @@ object formDemo: TformDemo
     Margins.Right = 0
     Margins.Bottom = 0
     AutoSize = True
+    TabOrder = 28
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -266,7 +267,6 @@ object formDemo: TformDemo
     Group = 'GroupB'
     TextOnGlass = True
     Caption = 'Radio B1'
-    TabOrder = 15
   end
   object radioB2: TURadioButton
     Left = 540
@@ -277,6 +277,7 @@ object formDemo: TformDemo
     Margins.Right = 0
     Margins.Bottom = 0
     AutoSize = True
+    TabOrder = 29
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -285,7 +286,6 @@ object formDemo: TformDemo
     Group = 'GroupB'
     TextOnGlass = True
     Caption = 'Radio B2'
-    TabOrder = 19
   end
   object progressVert: TUProgressBar
     Left = 660
@@ -293,6 +293,7 @@ object formDemo: TformDemo
     Width = 5
     Height = 70
     ParentColor = False
+    TabOrder = 30
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -306,6 +307,7 @@ object formDemo: TformDemo
     Top = 420
     Width = 250
     ParentColor = False
+    TabOrder = 25
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -319,6 +321,7 @@ object formDemo: TformDemo
     Top = 440
     Width = 250
     ParentColor = False
+    TabOrder = 26
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
@@ -338,7 +341,7 @@ object formDemo: TformDemo
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 14
+    TabOrder = 0
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
@@ -505,7 +508,7 @@ object formDemo: TformDemo
     BevelOuter = bvNone
     Color = 3355443
     ParentColor = False
-    TabOrder = 4
+    TabOrder = 1
     StyleElements = []
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
@@ -538,6 +541,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
+      TabOrder = 1
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -556,7 +560,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 1
     end
     object buttonGoHome: TUSymbolButton
       Left = 60
@@ -564,6 +567,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
+      TabOrder = 2
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -582,7 +586,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 2
     end
     object buttonNewDoc: TUSymbolButton
       Left = 140
@@ -590,6 +593,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
+      TabOrder = 3
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -608,7 +612,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 3
     end
     object buttonOpenDoc: TUSymbolButton
       Left = 200
@@ -616,6 +619,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
+      TabOrder = 4
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -634,7 +638,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 4
     end
     object buttonLoginForm: TUSymbolButton
       Left = 340
@@ -642,6 +645,7 @@ object formDemo: TformDemo
       Width = 80
       Height = 60
       Align = alLeft
+      TabOrder = 5
       OnClick = buttonLoginFormClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -661,7 +665,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 5
     end
     object buttonSaveDoc: TUSymbolButton
       Left = 260
@@ -669,6 +672,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
+      TabOrder = 6
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -687,7 +691,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 6
     end
     object buttonImageForm: TUSymbolButton
       Left = 420
@@ -695,6 +698,7 @@ object formDemo: TformDemo
       Width = 80
       Height = 60
       Align = alLeft
+      TabOrder = 7
       OnClick = buttonImageFormClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -714,7 +718,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 7
     end
     object buttonAppListForm: TUSymbolButton
       Left = 500
@@ -722,6 +725,7 @@ object formDemo: TformDemo
       Width = 80
       Height = 60
       Align = alLeft
+      TabOrder = 8
       OnClick = buttonAppListFormClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -741,7 +745,6 @@ object formDemo: TformDemo
       ShowDetail = False
       Transparent = True
       KeepOrginalColor = False
-      TabOrder = 8
     end
   end
   object buttonNoFocus: TUButton
@@ -749,6 +752,7 @@ object formDemo: TformDemo
     Left = 60
     Top = 190
     Width = 150
+    TabOrder = 7
     Alignment = taLeftJustify
     Caption = 'Button no focus'
   end
@@ -757,6 +761,7 @@ object formDemo: TformDemo
     Left = 60
     Top = 230
     Width = 150
+    TabOrder = 9
     Caption = 'Button can focus'
   end
   object buttonCustomColor: TUButton
@@ -764,6 +769,7 @@ object formDemo: TformDemo
     Left = 60
     Top = 270
     Width = 150
+    TabOrder = 11
     Alignment = taRightJustify
     Caption = 'Custom button'
   end
@@ -772,6 +778,7 @@ object formDemo: TformDemo
     Top = 270
     Width = 150
     Height = 30
+    TabOrder = 12
     OnClick = buttonReloadSettingsClick
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
@@ -788,13 +795,13 @@ object formDemo: TformDemo
     Detail = 'Detail'
     ShowDetail = False
     KeepOrginalColor = False
-    TabOrder = 5
   end
   object buttonHighlight: TUButton
     Tag = 6
     Left = 221
     Top = 230
     Width = 150
+    TabOrder = 10
     OnClick = buttonHighlightClick
     Highlight = True
     Caption = 'Highlight button'
@@ -805,6 +812,7 @@ object formDemo: TformDemo
     Top = 190
     Width = 150
     Enabled = False
+    TabOrder = 8
     ButtonState = csDisabled
     Caption = 'Button disabled'
   end
@@ -813,6 +821,7 @@ object formDemo: TformDemo
     Left = 220
     Top = 310
     Width = 150
+    TabOrder = 14
     IsToggleButton = True
     Caption = 'Toggle button'
   end
@@ -822,6 +831,7 @@ object formDemo: TformDemo
     Width = 311
     Height = 41
     DragCursor = crDefault
+    TabOrder = 18
     OnClick = itembuttonImageClick
     ImageRightIndex = 3
     IconFont.Charset = DEFAULT_CHARSET
@@ -848,6 +858,7 @@ object formDemo: TformDemo
     Width = 311
     Height = 41
     DragCursor = crDefault
+    TabOrder = 19
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
     IconFont.Height = -20
@@ -871,6 +882,7 @@ object formDemo: TformDemo
     Width = 241
     Height = 41
     Enabled = False
+    TabOrder = 16
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
     SymbolFont.Height = -16
@@ -886,13 +898,13 @@ object formDemo: TformDemo
     Text = 'Open file (disabled)'
     Detail = 'Ctrl+O'
     KeepOrginalColor = False
-    TabOrder = 7
   end
   object symbolbuttonSaveHorz: TUSymbolButton
     Left = 130
     Top = 400
     Width = 241
     Height = 41
+    TabOrder = 17
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
     SymbolFont.Height = -16
@@ -908,13 +920,13 @@ object formDemo: TformDemo
     Detail = 'Ctrl+S'
     IsToggleButton = True
     KeepOrginalColor = False
-    TabOrder = 8
   end
   object symbolbuttonSaveVert: TUSymbolButton
     Left = 60
     Top = 350
     Width = 61
     Height = 91
+    TabOrder = 15
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
     SymbolFont.Height = -16
@@ -930,7 +942,6 @@ object formDemo: TformDemo
     Text = 'New'
     Detail = 'Ctrl+N'
     KeepOrginalColor = False
-    TabOrder = 6
   end
   object buttonRandomProgress: TUButton
     Tag = 5
@@ -941,6 +952,7 @@ object formDemo: TformDemo
     Hint = 'This is tooltip'
     ParentShowHint = False
     ShowHint = True
+    TabOrder = 27
     OnClick = buttonRandomProgressClick
     Caption = 'Random progress value'
   end
@@ -951,7 +963,7 @@ object formDemo: TformDemo
     Height = 25
     Hint = 'ABC'
     Caption = 'Here we go'
-    TabOrder = 0
+    TabOrder = 4
   end
   object buttonAniToRight: TButton
     Left = 60
@@ -959,7 +971,7 @@ object formDemo: TformDemo
     Width = 151
     Height = 31
     Caption = 'Start animation'
-    TabOrder = 1
+    TabOrder = 5
     OnClick = buttonAniToRightClick
   end
   object buttonAniToLeft: TButton
@@ -969,7 +981,7 @@ object formDemo: TformDemo
     Height = 31
     Caption = 'Reserve animation'
     ImageIndex = 0
-    TabOrder = 2
+    TabOrder = 6
     OnClick = buttonAniToLeftClick
   end
   object buttonWithImage: TUButton
@@ -977,6 +989,7 @@ object formDemo: TformDemo
     Left = 60
     Top = 310
     Width = 150
+    TabOrder = 13
     Caption = 'Button with image'
   end
   object drawerNavigation: TUPanel
@@ -992,7 +1005,7 @@ object formDemo: TformDemo
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
     BackColor.Enabled = False
     BackColor.Color = clWhite
     BackColor.LightColor = 15132390
@@ -1004,6 +1017,7 @@ object formDemo: TformDemo
       Height = 45
       Align = alTop
       Constraints.MaxWidth = 45
+      TabOrder = 0
       OnClick = buttonOpenMenuClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -1021,7 +1035,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 0
     end
     object buttonMenuSettings: TUSymbolButton
       Left = 0
@@ -1029,6 +1042,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
+      TabOrder = 1
       OnClick = buttonMenuSettingsClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -1046,7 +1060,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 1
     end
     object buttonMenuProfile: TUSymbolButton
       Left = 0
@@ -1054,6 +1067,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
+      TabOrder = 2
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1070,7 +1084,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 2
     end
     object buttonMenuSave: TUSymbolButton
       Left = 0
@@ -1078,6 +1091,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
+      TabOrder = 3
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1094,7 +1108,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 3
     end
     object buttonMenuOpen: TUSymbolButton
       Left = 0
@@ -1102,6 +1115,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
+      TabOrder = 4
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1118,7 +1132,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 4
     end
     object buttonMenuRate: TUSymbolButton
       Left = 0
@@ -1126,6 +1139,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
+      TabOrder = 5
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1142,7 +1156,6 @@ object formDemo: TformDemo
       Detail = 'Detail'
       ShowDetail = False
       KeepOrginalColor = False
-      TabOrder = 5
     end
   end
   object boxSettings: TUScrollBox
@@ -1162,7 +1175,7 @@ object formDemo: TformDemo
     Padding.Right = 15
     Padding.Bottom = 15
     ParentColor = False
-    TabOrder = 30
+    TabOrder = 3
     StyleElements = []
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkCubic
@@ -1540,13 +1553,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       Enabled = False
+      TabOrder = 4
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Color on window border'
-      TabOrder = 4
     end
     object checkAutoSync: TUCheckBox
       AlignWithMargins = True
@@ -1558,45 +1571,46 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 0
       Align = alTop
+      TabOrder = 6
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Auto synchronize'
-      TabOrder = 6
     end
     object checkKeepEmailPrivate: TUCheckBox
       Left = 15
       Top = 434
       Width = 203
       Align = alTop
+      TabOrder = 8
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Keep my email in private'
-      TabOrder = 8
     end
     object checkSendEmail: TUCheckBox
       Left = 15
       Top = 404
       Width = 203
       Align = alTop
+      TabOrder = 7
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Caption = 'Send me emails'
-      TabOrder = 7
     end
     object radioSystemTheme: TURadioButton
       Left = 15
       Top = 65
       Width = 203
       Align = alTop
+      TabOrder = 0
       OnClick = radioSystemThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -1605,13 +1619,13 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AppTheme'
       Caption = 'Use system setting'
-      TabOrder = 0
     end
     object radioLightTheme: TURadioButton
       Left = 15
       Top = 95
       Width = 203
       Align = alTop
+      TabOrder = 1
       OnClick = radioLightThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -1620,13 +1634,13 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AppTheme'
       Caption = 'Light'
-      TabOrder = 1
     end
     object radioDarkTheme: TURadioButton
       Left = 15
       Top = 125
       Width = 203
       Align = alTop
+      TabOrder = 2
       OnClick = radioDarkThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
@@ -1635,13 +1649,13 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AppTheme'
       Caption = 'Dark'
-      TabOrder = 2
     end
     object radioFreeAccount: TURadioButton
       Left = 15
       Top = 501
       Width = 203
       Align = alTop
+      TabOrder = 9
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1649,13 +1663,13 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AccountType'
       Caption = 'Free user'
-      TabOrder = 9
     end
     object radioProAccount: TURadioButton
       Left = 15
       Top = 531
       Width = 203
       Align = alTop
+      TabOrder = 10
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1663,13 +1677,13 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AccountType'
       Caption = 'Professional user'
-      TabOrder = 10
     end
     object radioDevAccount: TURadioButton
       Left = 15
       Top = 561
       Width = 203
       Align = alTop
+      TabOrder = 11
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -1677,7 +1691,6 @@ object formDemo: TformDemo
       IconFont.Style = []
       Group = 'AccountType'
       Caption = 'Developer'
-      TabOrder = 11
     end
     object panelSelectAccentColor: TUPanel
       AlignWithMargins = True
@@ -1715,6 +1728,7 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 10
       Align = alTop
+      TabOrder = 13
       Caption = 'Delete my account'
     end
     object buttonUpgradeAccount: TUButton
@@ -1728,6 +1742,7 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 10
       Align = alTop
+      TabOrder = 14
       Caption = 'Upgrade account'
     end
     object progressStorageUsed: TUProgressBar
@@ -1740,6 +1755,7 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 10
       Align = alTop
+      TabOrder = 15
       AniSet.AniKind = akOut
       AniSet.AniFunctionKind = afkQuartic
       AniSet.DelayStartTime = 0
@@ -1759,6 +1775,7 @@ object formDemo: TformDemo
       Margins.Right = 0
       Margins.Bottom = 10
       Align = alTop
+      TabOrder = 16
       Caption = 'Check for update'
     end
     object editAccountName: TUEdit
