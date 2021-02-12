@@ -72,8 +72,8 @@ begin
 
   //  Objects
   FBackColor := TUThemeControlColorSet.Create;
-  FBackColor.OnChange := BackColor_OnChange;
   FBackColor.Assign(PANEL_BACK);
+  FBackColor.OnChange := BackColor_OnChange;
 end;
 
 destructor TUPanel.Destroy;

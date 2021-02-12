@@ -342,6 +342,12 @@ object formDemo: TformDemo
     Font.Style = []
     ParentFont = False
     TabOrder = 0
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 15921906
+    BackColors.DarkColor = 2829099
+    BackColors.FocusedLightColor = 14120960
+    BackColors.FocusedDarkColor = clBlue
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
@@ -352,7 +358,7 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
-      ButtonStyle = sbsHighlight
+      ButtonStyle = qbsHighlight
       LightColor = 14120960
       DarkColor = 14120960
       Caption = #57510
@@ -370,7 +376,7 @@ object formDemo: TformDemo
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      ButtonStyle = sbsQuit
+      ButtonStyle = qbsQuit
       LightColor = 2298344
       DarkColor = 2298344
       PressBrightnessDelta = 32
@@ -389,7 +395,7 @@ object formDemo: TformDemo
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      ButtonStyle = sbsMax
+      ButtonStyle = qbsMax
       LightColor = 13619151
       DarkColor = 3947580
       PressBrightnessDelta = -32
@@ -408,7 +414,7 @@ object formDemo: TformDemo
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      ButtonStyle = sbsMin
+      ButtonStyle = qbsMin
       LightColor = 13619151
       DarkColor = 3947580
       PressBrightnessDelta = -32
@@ -425,7 +431,6 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       OnClick = buttonBlurFormClick
-      ButtonStyle = sbsSysButton
       LightColor = 13619151
       DarkColor = 3947580
       PressBrightnessDelta = -32
@@ -751,7 +756,7 @@ object formDemo: TformDemo
     Tag = 14
     Left = 60
     Top = 190
-    Width = 150
+    Width = 151
     TabOrder = 7
     Alignment = taLeftJustify
     Caption = 'Button no focus'
@@ -760,7 +765,7 @@ object formDemo: TformDemo
     Tag = 9
     Left = 60
     Top = 230
-    Width = 150
+    Width = 151
     TabOrder = 9
     Caption = 'Button can focus'
   end
@@ -768,7 +773,7 @@ object formDemo: TformDemo
     Tag = 17
     Left = 60
     Top = 270
-    Width = 150
+    Width = 151
     TabOrder = 11
     Alignment = taRightJustify
     Caption = 'Custom button'
@@ -776,7 +781,7 @@ object formDemo: TformDemo
   object buttonReloadSettings: TUSymbolButton
     Left = 220
     Top = 270
-    Width = 150
+    Width = 151
     Height = 30
     TabOrder = 12
     OnClick = buttonReloadSettingsClick
@@ -798,9 +803,9 @@ object formDemo: TformDemo
   end
   object buttonHighlight: TUButton
     Tag = 6
-    Left = 221
+    Left = 220
     Top = 230
-    Width = 150
+    Width = 151
     TabOrder = 10
     OnClick = buttonHighlightClick
     Highlight = True
@@ -810,7 +815,7 @@ object formDemo: TformDemo
     Tag = 7
     Left = 220
     Top = 190
-    Width = 150
+    Width = 151
     Enabled = False
     TabOrder = 8
     ButtonState = csDisabled
@@ -820,7 +825,7 @@ object formDemo: TformDemo
     Tag = 5
     Left = 220
     Top = 310
-    Width = 150
+    Width = 151
     TabOrder = 14
     IsToggleButton = True
     Caption = 'Toggle button'
@@ -988,7 +993,7 @@ object formDemo: TformDemo
     Tag = 6
     Left = 60
     Top = 310
-    Width = 150
+    Width = 151
     TabOrder = 13
     Caption = 'Button with image'
   end

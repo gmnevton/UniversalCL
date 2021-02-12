@@ -24,13 +24,6 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
-//    DefBackColor: TDefColor = (
-//      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
-//      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535));
-//    DefTextColor: TDefColor = (
-//      ($00000000, $00000000, $00000000, $00666666, $00000000),
-//      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF));
-
   TUItemButton = class(TUCustomControl)
   private var
     BackColor, TextColor, DetailColor, ActiveColor: TColor;
@@ -67,7 +60,6 @@ type
     FTransparent: Boolean;
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
-    FMouseInClient: Boolean;
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
 
@@ -616,7 +608,7 @@ begin
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
 
-    if Enabled and FMouseInClient and not (csPaintCopy in ControlState) then
+    if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
 //      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
       DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
@@ -768,7 +760,10 @@ begin
     if IsToggleButton and (FObjectSelected <> iokCheckBox) and DoCanToggle then
       FIsToggled := not FIsToggled;
 
-    ButtonState := csHover;
+    if MouseInClient then
+      ButtonState := csHover
+    else
+      ButtonState := csNone;
     inherited;
     if IsToggleButton and (FObjectSelected <> iokCheckBox) and (FIsToggled <> OldState) then
       DoToggle;
@@ -800,7 +795,6 @@ end;
 
 procedure TUItemButton.CMMouseEnter(var Msg: TMessage);
 begin
-  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -809,7 +803,6 @@ end;
 
 procedure TUItemButton.CMMouseLeave(var Msg: TMessage);
 begin
-  FMouseInClient := False;
   if Enabled then begin
     ButtonState := csNone;
     inherited;

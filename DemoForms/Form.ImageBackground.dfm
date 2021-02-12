@@ -14528,7 +14528,7 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
-    ButtonStyle = sbsQuit
+    ButtonStyle = qbsQuit
     LightColor = 2298344
     DarkColor = 2298344
     PressBrightnessDelta = 32
@@ -14548,7 +14548,7 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
-    ButtonStyle = sbsMin
+    ButtonStyle = qbsMin
     LightColor = 13619151
     DarkColor = 3947580
     PressBrightnessDelta = -32

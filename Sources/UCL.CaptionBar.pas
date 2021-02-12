@@ -25,13 +25,13 @@ type
     FCollapsed: Boolean;
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
-    FCustomColor: TColor;
     FUseSystemCaptionColor: Boolean;
 
     // Internal
     procedure UpdateColors;
 
     // Setters
+    procedure SetBackColors(Value: TUThemeCaptionBarColorSet);
     procedure SetCollapsed(const Value: Boolean);
     procedure SetUseSystemCaptionColor(const Value: Boolean);
 
@@ -60,12 +60,11 @@ type
     procedure UpdateChildControls(const Root: TControl);
 
   published
-    property BackColors: TUThemeCaptionBarColorSet read FBackColors;
+    property BackColors: TUThemeCaptionBarColorSet read FBackColors write SetBackColors;
 
     property Collapsed: Boolean read FCollapsed write SetCollapsed default False;
     property DragMovement: Boolean read FDragMovement write FDragMovement default True;
     property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default True;
-    property CustomColor: TColor read FCustomColor write FCustomColor default clNone;
     property UseSystemCaptionColor: Boolean read FUseSystemCaptionColor write SetUseSystemCaptionColor default False;
 
     property Align default alTop;
@@ -99,8 +98,11 @@ begin
   FCollapsed := False;
   FDragMovement := True;
   FSystemMenuEnabled := True;
-  FCustomColor := clNone; // $D77800;
   FUseSystemCaptionColor := False;
+
+  FBackColors := TUThemeCaptionBarColorSet.Create;
+  FBackColors.Assign(CAPTIONBAR_BACK);
+  FBackColors.OnChange := BackColor_OnChange;
 
   Align := alTop;
   Alignment := taLeftJustify;
@@ -111,10 +113,6 @@ begin
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 9;
 //  FullRepaint := True;
-
-  FBackColors := TUThemeCaptionBarColorSet.Create;
-  FBackColors.Assign(CAPTIONBAR_BACK);
-  FBackColors.OnChange := BackColor_OnChange;
 end;
 
 destructor TUCaptionBar.Destroy;
@@ -138,26 +136,23 @@ begin
       if ParentForm.Active then
         BackColor := GetAccentColor
       else begin
-//          Color := ParentForm.Color;
-        if not BackColors.Enabled then
-          ColorSet := CAPTIONBAR_BACK
-        else
+        if BackColors.Enabled then
+          BackColor := BackColors.Color
+        else begin
           ColorSet := BackColors;
 
-        BackColor := ColorSet.GetColor(TM, False);
+          BackColor := ColorSet.GetColor(TM, False);
+        end;
       end;
     end
     else
       BackColor := GetAccentColor;
   end
   else begin
-    if CustomColor <> clNone then
-      BackColor := CustomColor
+    if BackColors.Enabled then
+      BackColor := BackColors.Color
     else begin
-      if BackColors.Enabled then
-        ColorSet := BackColors
-      else
-        ColorSet := CAPTIONBAR_BACK;
+      ColorSet := BackColors;
 
       if (ParentForm <> Nil) and (ParentForm is TForm) then
         BackColor := ColorSet.GetColor(TM, ParentForm.Active)
@@ -170,6 +165,11 @@ begin
 
   //  Update Color for container (let children using ParentColor)
   Color := BackColor;
+end;
+
+procedure TUCaptionBar.SetBackColors(Value: TUThemeCaptionBarColorSet);
+begin
+  FBackColors.Assign(Value);
 end;
 
 procedure TUCaptionBar.SetCollapsed(const Value: Boolean);

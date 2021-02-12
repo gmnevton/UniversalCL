@@ -42,7 +42,6 @@ type
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
     FTransparent: Boolean;
-    FMouseInClient: Boolean;
 
     // Internal
     procedure UpdateColors;
@@ -63,7 +62,6 @@ type
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
 
-    //procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
@@ -75,9 +73,7 @@ type
     procedure CMTextChanged(var Msg: TMessage); message CM_TEXTCHANGED;
 
     // Childs property change events
-    procedure BackColorChange(Sender: TObject);
-    procedure BorderColorChange(Sender: TObject);
-    procedure TextColorChange(Sender: TObject);
+    procedure ColorsChange(Sender: TObject);
 
   protected
     procedure Paint; override;
@@ -141,9 +137,9 @@ begin
   FTextColors.SetColors(utLight, clBlack, clBlack, clBlack, clGray, clBlack);
   FTextColors.SetColors(utDark, clWhite, clWhite, clWhite, clGray, clWhite);
 
-  FBackColors.OnChange := BackColorChange;
-  FBorderColors.OnChange := BorderColorChange;
-  FTextColors.OnChange := TextColorChange;
+  FBackColors.OnChange   := ColorsChange;
+  FBorderColors.OnChange := ColorsChange;
+  FTextColors.OnChange   := ColorsChange;
 
   FButtonState := csNone;
   FAlignment := taCenter;
@@ -193,7 +189,8 @@ begin
   // Disabled
   if not Enabled then begin
     BackColor   := BackColors.GetColor(TM.ThemeUsed, csDisabled);
-    BorderColor := BorderColors.GetColor(TM.ThemeUsed, csDisabled);
+    //BorderColor := BorderColors.GetColor(TM.ThemeUsed, csDisabled);
+    BorderColor := BackColor;
     TextColor   := TextColors.GetColor(TM.ThemeUsed, csDisabled);
     Exit;
   end
@@ -350,8 +347,8 @@ begin
     //  Draw border
     DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
 
-    if Enabled and FMouseInClient and not (csPaintCopy in ControlState) then
-      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
+    if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
+      DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
     //  Paint image
     if (Images <> Nil) and (ImageIndex >= 0) then begin
@@ -408,16 +405,6 @@ begin
   end;
 end;
 
-{
-procedure TUButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
-begin
-  if Enabled then begin
-    ButtonState := csPress;
-    inherited;
-  end;
-end;
-}
-
 procedure TUButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
@@ -436,7 +423,10 @@ begin
     MousePoint := ScreenToClient(Mouse.CursorPos);
     if IsToggleButton and PtInRect(GetClientRect, MousePoint) then
       FIsToggled := not FIsToggled;
-    ButtonState := csHover;
+    if MouseInClient then
+      ButtonState := csHover
+    else
+      ButtonState := csNone;
     inherited;
   end;
 end;
@@ -450,7 +440,6 @@ end;
 
 procedure TUButton.CMMouseEnter(var Msg: TMessage);
 begin
-  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -459,17 +448,16 @@ end;
 
 procedure TUButton.CMMouseLeave(var Msg: TMessage);
 begin
-  FMouseInClient := False;
   if Enabled then begin
     //  Dont allow focus
     if not AllowFocus then
-      ButtonState := csNone //  No keep border
+      ButtonState := csNone // No border
 
     //  Allow focus
     else if not Focused then
-      ButtonState := csNone //  No focus, no border
+      ButtonState := csNone // No focus, no border
     else
-      ButtonState := csFocused; //  Keep focus border
+      ButtonState := csFocused; // Keep focus border
 
     inherited;
   end;
@@ -502,19 +490,7 @@ begin
   Invalidate;
 end;
 
-procedure TUButton.BackColorChange(Sender: TObject);
-begin
-  UpdateColors;
-  Invalidate;
-end;
-
-procedure TUButton.BorderColorChange(Sender: TObject);
-begin
-  UpdateColors;
-  Invalidate;
-end;
-
-procedure TUButton.TextColorChange(Sender: TObject);
+procedure TUButton.ColorsChange(Sender: TObject);
 begin
   UpdateColors;
   Invalidate;

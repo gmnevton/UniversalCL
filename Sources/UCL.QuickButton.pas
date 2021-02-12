@@ -15,7 +15,7 @@ uses
   UCL.Graphics;
 
 type
-  TUQuickButtonStyle = (sbsNone, sbsQuit, sbsMax, sbsMin, sbsSysButton, sbsHighlight);
+  TUQuickButtonStyle = (qbsNone, qbsQuit, qbsMax, qbsMin, qbsSysButton, qbsHighlight);
 
   TUQuickButton = class(TUGraphicControl)
   private var
@@ -58,7 +58,7 @@ type
 
   published
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-    property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default sbsNone;
+    property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default qbsSysButton;
 
     property LightColor: TColor read FLightColor write FLightColor default $E6E6E6;
     property DarkColor: TColor read FDarkColor write FDarkColor default $191919;
@@ -75,8 +75,11 @@ implementation
 
 uses
   SysUtils,
+  Windows,
   UCL.ThemeManager,
-  UCL.Colors;
+  UCL.Colors,
+  UCL.FontIcons,
+  UCL.Form;
 
 { TUQuickButton }
 
@@ -85,9 +88,11 @@ uses
 constructor TUQuickButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle - [csDoubleClicks];
 
   //  New props
   FButtonState := csNone;
+  FButtonStyle := qbsSysButton;
   FLightColor := $E6E6E6;
   FDarkColor := $191919;
   FCustomAccentColor := $D77800;
@@ -95,7 +100,7 @@ begin
   FTransparent := False;
 
   //  Old props
-  Caption := ''; //  Back icon
+  Caption := UF_HOME; // Back icon
   Font.Name := 'Segoe MDL2 Assets';
   Font.Size := 10;
   Height := 32;
@@ -191,36 +196,36 @@ begin
     FButtonStyle := Value;
 
     case FButtonStyle of
-      sbsNone: begin
+      qbsNone: begin
         FLightColor := $CFCFCF;
         FDarkColor := $3C3C3C;
       end;
-      sbsQuit: begin
+      qbsQuit: begin
         FLightColor := $002311E8;
         FDarkColor := $002311E8;
         FPressBrightnessDelta := 32;
-        Caption := ''; //  Close icon
+        Caption := UF_CLOSE; // Close icon
       end;
-      sbsSysButton,
-      sbsMax,
-      sbsMin: begin
+      qbsSysButton,
+      qbsMax,
+      qbsMin: begin
         FLightColor := $CFCFCF;
         FDarkColor := $3C3C3C;
         FPressBrightnessDelta := -32;
         case FButtonStyle of
-          sbsMax      : Caption := '';
-          sbsMin      : Caption := '';
-          sbsSysButton: Caption := '';
+          qbsMax      : Caption := UF_MAXIMIZE;
+          qbsMin      : Caption := UF_MINIMIZE;
+          qbsSysButton: Caption := UF_HOME;
         end;
       end;
-      sbsHighlight: begin
+      qbsHighlight: begin
         if not TM.UseSystemAccentColor then
           FLightColor := FCustomAccentColor
         else
           FLightColor := TM.AccentColor;
         FDarkColor := FLightColor;
         FPressBrightnessDelta := 25;
-        Caption := '';
+        //Caption := UF_BACK;
       end;
     end;
 
@@ -281,37 +286,48 @@ end;
 procedure TUQuickButton.WMLButtonUp(var Msg: TWMLButtonUp);
 var
   ParentForm: TCustomForm;
+  FullScreen: Boolean;
+  MousePoint: TPoint;
 begin
-  if Enabled then begin
-    ButtonState := csHover;
+  if not Enabled then
+    Exit;
+  //
+  ParentForm := GetParentForm(Self, True);
+  MousePoint := ScreenToClient(Mouse.CursorPos);
+  if PtInRect(GetClientRect, MousePoint) then begin
+    //  Default actions for Quit, Max, Min sysbutton
+    if ButtonStyle in [qbsQuit, qbsMax, qbsMin] then begin
+      if ParentForm is TUForm then
+        FullScreen := (ParentForm as TUForm).FullScreen
+      else
+        FullScreen := False;
+      //
+      case ButtonStyle of
+        qbsQuit: begin
+          if ParentForm <> Nil then
+            ParentForm.Close;
+        end;
 
-    case ButtonStyle of
-      sbsQuit: begin
-        ParentForm := GetParentForm(Self, True);
-        if ParentForm = Nil then
-          Exit;
-        ParentForm.Close;
-      end;
+        qbsMax: begin
+          if (ParentForm <> Nil) and not FullScreen then begin
+            ReleaseCapture;
+            if ParentForm.WindowState <> wsNormal then
+              SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)
+            else
+              SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+          end;
+        end;
 
-      sbsMax: begin
-        ParentForm := GetParentForm(Self, True);
-        if ParentForm = Nil then
-          Exit;
-        if ParentForm.WindowState = wsMaximized then
-          ParentForm.WindowState := wsNormal
-        else
-          ParentForm.WindowState := wsMaximized;
-      end;
-
-      sbsMin: begin
-        ParentForm := GetParentForm(Self, True);
-        if ParentForm = Nil then
-          Exit;
-        ParentForm.WindowState := wsMinimized;
+        qbsMin: begin
+          if ParentForm <> Nil then
+            ParentForm.WindowState := wsMinimized;
+        end;
       end;
     end;
-    inherited;
   end;
+
+  ButtonState := csHover;
+  inherited;
 end;
 
 procedure TUQuickButton.CMMouseEnter(var Msg: TMessage);

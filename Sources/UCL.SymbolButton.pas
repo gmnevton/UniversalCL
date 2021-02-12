@@ -20,16 +20,6 @@ type
   TUSymbolButtonToggleEvent = procedure (Sender: TObject; State: Boolean) of object;
 
   TUSymbolButton = class(TUCustomControl)
-//  private const
-//    DefBackColor: TDefColor = (
-//      ($00E6E6E6, $00CFCFCF, $00B8B8B8, $00CCCCCC, $00CFCFCF),
-//      ($001F1F1F, $00353535, $004C4C4C, $00333333, $00353535)
-//    );
-//    DefTextColor: TDefColor = (
-//      ($00000000, $00000000, $00000000, $00666666, $00000000),
-//      ($00FFFFFF, $00FFFFFF, $00FFFFFF, $00666666, $00FFFFFF)
-//    );
-
   private var
     BackColor, TextColor, DetailColor: TColor;
     IconRect, TextRect, DetailRect: TRect;
@@ -55,16 +45,15 @@ type
     FTransparent: Boolean;
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
-    FMouseInClient: Boolean;
     FKeepOrginalColor: Boolean;
     FToggleEvent: TUSymbolButtonToggleEvent;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
     procedure DoToggle;
 
-    //  Setters
+    // Setters
     procedure SetButtonState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetSymbolChar(const Value: string);
@@ -80,8 +69,7 @@ type
     procedure SetImageKind(const Value: TUImageKind);
     procedure SetKeepOrginalColor(const Value: Boolean);
 
-    //  Messages
-    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+    // Messages
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
@@ -145,7 +133,8 @@ uses
   Forms,
   UCL.ThemeManager,
   UCL.Colors,
-  UCL.CaptionBar;
+  UCL.CaptionBar,
+  UCL.FontIcons;
 
 { TUSymbolButton }
 
@@ -170,7 +159,7 @@ begin
 
   FButtonState := csNone;
   FOrientation := oHorizontal;
-  FSymbolChar := '';
+  FSymbolChar := UF_HOME;
   FText := 'Some text';
   FTextOffset := 40;
   FDetail := 'Detail';
@@ -214,7 +203,14 @@ begin
   TM:=SelectThemeManager(Self);
   ParentControl:=Self.Parent;
 
-  if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
+  // Disabled
+  if not Enabled then begin
+    BackColor := BUTTON_BACK.GetColor(TM.ThemeUsed, csDisabled);
+    TextColor := clGray;
+    DetailColor := clGray;
+    Exit;
+  end
+  else if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
     ParentColor := False;
     BackColor := Color;
     TextColor := GetTextColorFromBackground(Color);
@@ -227,20 +223,20 @@ begin
     end;
   end
   else begin
-    //  Transparent enabled
+    // Transparent enabled
     if (ButtonState = csNone) and Transparent then begin
       ParentColor := True;
       BackColor := Color;
       TextColor := GetTextColorFromBackground(Color);
       DetailColor := $808080;
     end
-    //  Highlight enabled
+    // Highlight enabled
     else if (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
       BackColor := TM.AccentColor;
       TextColor := GetTextColorFromBackground(BackColor);
       DetailColor := clSilver;
     end
-    //  Default colors
+    // Default colors
     else begin
       if (ParentControl <> Nil) and (ParentControl is TUCaptionBar) then begin
         BackColor := TUCaptionBar(ParentControl).Color;
@@ -459,8 +455,8 @@ begin
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
 
-    if Enabled and FMouseInClient and not (csPaintCopy in ControlState) then
-      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
+    if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
+      DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
     //  Paint icon
     if ImageKind = ikFontIcon then begin
@@ -529,18 +525,6 @@ end;
 
 //  MESSAGES
 
-procedure TUSymbolButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
-begin
-  if Enabled then begin
-    if IsToggleButton then
-      FIsToggled := not FIsToggled;
-    ButtonState := csPress;
-    inherited;
-    if IsToggleButton then
-      DoToggle;
-  end;
-end;
-
 procedure TUSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
@@ -554,7 +538,10 @@ begin
   if Enabled then begin
     if IsToggleButton then
       FIsToggled := not FIsToggled;
-    ButtonState := csHover;
+    if MouseInClient then
+      ButtonState := csHover
+    else
+      ButtonState := csNone;
     inherited;
     if IsToggleButton then
       DoToggle;
@@ -593,7 +580,6 @@ end;
 
 procedure TUSymbolButton.CMMouseEnter(var Msg: TMessage);
 begin
-  FMouseInClient := True;
   if Enabled then begin
     ButtonState := csHover;
     inherited;
@@ -602,7 +588,6 @@ end;
 
 procedure TUSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
-  FMouseInClient := False;
   if Enabled then begin
     ButtonState := csNone;
     Repaint;
