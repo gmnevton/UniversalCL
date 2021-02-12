@@ -48,6 +48,7 @@ type
     FFullScreen: Boolean;
 
     // Setters
+    procedure SetBackColor(Value: TUThemeControlColorSet);
     procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetFullScreen(const Value: Boolean);
     procedure SetOverlayType(const Value: TUOverlayType);
@@ -113,7 +114,7 @@ type
 
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
-    property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeControlColorSet read FBackColor write SetBackColor;
     property CaptionBar: TControl read FCaptionBar write FCaptionBar;
 
     property PPI: Integer read FPPI write FPPI default 96;
@@ -348,6 +349,11 @@ end;
 {$ENDREGION}
 
 //  SETTERS
+
+procedure TUForm.SetBackColor(Value: TUThemeControlColorSet);
+begin
+  FBackColor.Assign(Value);
+end;
 
 procedure TUForm.SetFullScreen(const Value: Boolean);
 begin

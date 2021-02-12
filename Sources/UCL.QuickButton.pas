@@ -40,7 +40,6 @@ type
     procedure SetTransparent(const Value: Boolean);
 
     //  Messages
-    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
@@ -266,14 +265,6 @@ begin
 end;
 
 //  MESSAGES
-
-procedure TUQuickButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
-begin
-  if Enabled then begin
-    ButtonState := csPress;
-    inherited;
-  end;
-end;
 
 procedure TUQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin

@@ -14499,6 +14499,28 @@ object formImageBackground: TformImageBackground
     Top = 60
     Width = 181
     Height = 41
+    BackColor.Enabled = False
+    BackColor.LightColor = 10066329
+    BackColor.LightHover = 6710886
+    BackColor.LightPress = 10066329
+    BackColor.LightDisabled = 10066329
+    BackColor.LightFocused = 6710886
+    BackColor.DarkColor = 6710886
+    BackColor.DarkHover = 10066329
+    BackColor.DarkPress = 6710886
+    BackColor.DarkDisabled = 6710886
+    BackColor.DarkFocused = 10066329
+    CurColor.Enabled = False
+    CurColor.LightColor = 14120960
+    CurColor.LightHover = 1513239
+    CurColor.LightPress = 13421772
+    CurColor.LightDisabled = 14120960
+    CurColor.LightFocused = 1513239
+    CurColor.DarkColor = 14120960
+    CurColor.DarkHover = 15921906
+    CurColor.DarkPress = 7763574
+    CurColor.DarkDisabled = 14120960
+    CurColor.DarkFocused = 15921906
     Value = 45
   end
   object entryChooseTheme: TUText
@@ -14536,7 +14558,7 @@ object formImageBackground: TformImageBackground
     Caption = #57606
   end
   object buttonAppMinimized: TUQuickButton
-    Left = 521
+    Left = 526
     Top = 1
     Hint = 'Minimize'
     Anchors = [akTop, akRight]
@@ -14575,6 +14597,7 @@ object formImageBackground: TformImageBackground
     Top = 60
     Width = 151
     AutoSize = True
+    TabOrder = 0
     OnClick = radioSystemThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14586,13 +14609,13 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Use system settings'
-    TabOrder = 0
   end
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
     Width = 64
     AutoSize = True
+    TabOrder = 1
     OnClick = radioLightThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14603,13 +14626,13 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Light'
-    TabOrder = 1
   end
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
     Width = 63
     AutoSize = True
+    TabOrder = 2
     OnClick = radioDarkThemeClick
     IconFont.Charset = DEFAULT_CHARSET
     IconFont.Color = clWindowText
@@ -14620,18 +14643,26 @@ object formImageBackground: TformImageBackground
     CustomActiveColor = 14120960
     TextOnGlass = True
     Caption = 'Dark'
-    TabOrder = 2
   end
   object progressMain: TUProgressBar
     Left = 240
     Top = 110
     Width = 181
     Height = 11
+    TabOrder = 5
     AniSet.AniKind = akOut
     AniSet.AniFunctionKind = afkQuartic
     AniSet.DelayStartTime = 0
     AniSet.Duration = 250
     AniSet.Step = 25
+    BackColor.Enabled = False
+    BackColor.Color = 15132390
+    BackColor.LightColor = 13421772
+    BackColor.DarkColor = 3355443
+    FillColor.Enabled = False
+    FillColor.Color = 15132390
+    FillColor.LightColor = 13421772
+    FillColor.DarkColor = 3355443
     Value = 45
     Orientation = oHorizontal
   end
@@ -14641,6 +14672,7 @@ object formImageBackground: TformImageBackground
     Width = 81
     Height = 90
     Anchors = [akTop, akRight]
+    TabOrder = 3
     SymbolFont.Charset = DEFAULT_CHARSET
     SymbolFont.Color = clWindowText
     SymbolFont.Height = -16
@@ -14657,7 +14689,6 @@ object formImageBackground: TformImageBackground
     Detail = 'F1'
     IsToggleButton = True
     KeepOrginalColor = False
-    TabOrder = 3
   end
   object panelBottom: TUPanel
     Left = 0
@@ -14687,6 +14718,40 @@ object formImageBackground: TformImageBackground
       Top = 14
       Width = 131
       Align = alRight
+      TabOrder = 0
+      BackColors.Enabled = False
+      BackColors.LightColor = 13421772
+      BackColors.LightHover = 13421772
+      BackColors.LightPress = 10066329
+      BackColors.LightDisabled = 13421772
+      BackColors.LightFocused = 13421772
+      BackColors.DarkColor = 3355443
+      BackColors.DarkHover = 3355443
+      BackColors.DarkPress = 6710886
+      BackColors.DarkDisabled = 3355443
+      BackColors.DarkFocused = 3355443
+      BorderColors.Enabled = False
+      BorderColors.LightColor = 13421772
+      BorderColors.LightHover = 8026746
+      BorderColors.LightPress = 10066329
+      BorderColors.LightDisabled = 8026746
+      BorderColors.LightFocused = 8026746
+      BorderColors.DarkColor = 3355443
+      BorderColors.DarkHover = 8750469
+      BorderColors.DarkPress = 6710886
+      BorderColors.DarkDisabled = 8750469
+      BorderColors.DarkFocused = 8750469
+      TextColors.Enabled = False
+      TextColors.LightColor = clBlack
+      TextColors.LightHover = clBlack
+      TextColors.LightPress = clBlack
+      TextColors.LightDisabled = clGray
+      TextColors.LightFocused = clBlack
+      TextColors.DarkColor = clWhite
+      TextColors.DarkHover = clWhite
+      TextColors.DarkPress = clWhite
+      TextColors.DarkDisabled = clGray
+      TextColors.DarkFocused = clWhite
       Highlight = True
       Caption = 'OK'
     end
@@ -14700,6 +14765,40 @@ object formImageBackground: TformImageBackground
       Margins.Right = 14
       Margins.Bottom = 0
       Align = alRight
+      TabOrder = 1
+      BackColors.Enabled = False
+      BackColors.LightColor = 13421772
+      BackColors.LightHover = 13421772
+      BackColors.LightPress = 10066329
+      BackColors.LightDisabled = 13421772
+      BackColors.LightFocused = 13421772
+      BackColors.DarkColor = 3355443
+      BackColors.DarkHover = 3355443
+      BackColors.DarkPress = 6710886
+      BackColors.DarkDisabled = 3355443
+      BackColors.DarkFocused = 3355443
+      BorderColors.Enabled = False
+      BorderColors.LightColor = 13421772
+      BorderColors.LightHover = 8026746
+      BorderColors.LightPress = 10066329
+      BorderColors.LightDisabled = 8026746
+      BorderColors.LightFocused = 8026746
+      BorderColors.DarkColor = 3355443
+      BorderColors.DarkHover = 8750469
+      BorderColors.DarkPress = 6710886
+      BorderColors.DarkDisabled = 8750469
+      BorderColors.DarkFocused = 8750469
+      TextColors.Enabled = False
+      TextColors.LightColor = clBlack
+      TextColors.LightHover = clBlack
+      TextColors.LightPress = clBlack
+      TextColors.LightDisabled = clGray
+      TextColors.LightFocused = clBlack
+      TextColors.DarkColor = clWhite
+      TextColors.DarkHover = clWhite
+      TextColors.DarkPress = clWhite
+      TextColors.DarkDisabled = clGray
+      TextColors.DarkFocused = clWhite
       Caption = 'Cancel'
     end
     object editEmail: TUEdit
@@ -14713,6 +14812,18 @@ object formImageBackground: TformImageBackground
       Color = clBlack
       TabOrder = 2
       BorderThickness = 2
+      BackColor.Enabled = False
+      BackColor.Color = clWhite
+      BackColor.LightColor = clWhite
+      BackColor.DarkColor = clBlack
+      BackColor.FocusedLightColor = clBlack
+      BackColor.FocusedDarkColor = clBlack
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = 10066329
+      BorderColor.DarkColor = 6710886
+      BorderColor.FocusedLightColor = 14120960
+      BorderColor.FocusedDarkColor = 14120960
     end
   end
 end

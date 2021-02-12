@@ -63,13 +63,13 @@ type
     FCanToggleEvent: TUItemButtonCanToggleEvent;
     FToggleEvent: TUItemButtonToggleEvent;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
     function  DoCanToggle: Boolean;
     procedure DoToggle;
 
-    //  Setters
+    // Setters
     procedure SetButtonState(const Value: TUControlState);
     procedure SetImageLeftIndex(const Value: Integer);
     procedure SetImageRightIndex(const Value: Integer);
@@ -90,7 +90,7 @@ type
     procedure SetRightIconKind(const Value: TUImageKind);
     procedure SetIsToggled(const Value: Boolean);
 
-    //  Messages
+    // Messages
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
@@ -128,32 +128,32 @@ type
   published
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
 
-    //  Image
+    // Image
     property Images: TCustomImageList read FImages write FImages;
     property ImageLeftIndex: Integer read FImageLeftIndex write SetImageLeftIndex default -1;
     property ImageRightIndex: Integer read FImageRightIndex write SetImageRightIndex default -1;
 
-    //  Font
+    // Font
     property IconFont: TFont read FIconFont write FIconFont;
     property DetailFont: TFont read FDetailFont write FDetailFont;
 
-    //  Object visible
+    // Object visible
     property ObjectsVisible: TUItemButtonObjects read FObjectsVisible write SetObjectsVisible
       default [iokNone, iokLeftIcon, iokText, iokDetail];
 
-    //  Objects property
+    // Objects property
     property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
     property LeftIcon: string read FLeftIcon write SetLeftIcon;
     property Text: string read FText write SetText;
     property Detail: string read FDetail write SetDetail;
     property RightIcon: string read FRightIcon write SetRightIcon;
 
-    //  Objects size
+    // Objects size
     property CheckBoxWidth: Integer index 0 read FCheckBoxWidth write SetObjectWidth default 40;
     property LeftIconWidth: Integer index 1 read FLeftIconWidth write SetObjectWidth default 40;
     property RightIconWidth: Integer index 2 read FRightIconWidth write SetObjectWidth default 40;
 
-    //  Additional
+    // Additional
     property AlignSpace: Integer read FAlignSpace write SetAlignSpace default 5;
     property CustomActiveColor: TColor read FCustomActiveColor write SetCustomActiveColor;
     property Transparent: Boolean read FTransparent write SetTransparent default false;

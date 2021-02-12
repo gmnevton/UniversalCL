@@ -20,10 +20,12 @@ type
   private
     FBackColor: TUThemeControlColorSet;
 
-    //  Child events
-    procedure BackColor_OnChange(Sender: TObject);
+    procedure SetBackColor(Value: TUThemeControlColorSet);
 
-    //  Messages
+    // Child events
+    procedure ColorsChange(Sender: TObject);
+
+    // Messages
     procedure WMNCHitTest(var Msg: TWMNCHitTest); message WM_NCHITTEST;
 
   protected
@@ -37,7 +39,7 @@ type
     procedure UpdateTheme; override;
 
   published
-    property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeControlColorSet read FBackColor write SetBackColor;
 
     property BevelOuter default bvNone;
     property ParentColor default False;
@@ -73,13 +75,18 @@ begin
   //  Objects
   FBackColor := TUThemeControlColorSet.Create;
   FBackColor.Assign(PANEL_BACK);
-  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.OnChange := ColorsChange;
 end;
 
 destructor TUPanel.Destroy;
 begin
   FBackColor.Free;
   inherited;
+end;
+
+procedure TUPanel.SetBackColor(Value: TUThemeControlColorSet);
+begin
+  FBackColor.Assign(Value);
 end;
 
 //  THEME
@@ -149,7 +156,7 @@ end;
 
 //  CHILD EVENTS
 
-procedure TUPanel.BackColor_OnChange(Sender: TObject);
+procedure TUPanel.ColorsChange(Sender: TObject);
 begin
   UpdateTheme;
 end;

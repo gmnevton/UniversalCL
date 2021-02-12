@@ -14,7 +14,6 @@ uses
   UCL.Colors;
 
 type
-  TUSlider = class(TUGraphicControl)
 //  private const
 //    DefActiveColor: TDefColor = (
 //      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
@@ -26,6 +25,7 @@ type
 //      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
 //      ($D77800, $F2F2F2, $767676, $333333, $D77800));
 
+  TUSlider = class(TUGraphicControl)
   private var
     LCurWidth: Integer;
     LCurHeight: Integer;
@@ -44,21 +44,23 @@ type
     FMax: Integer;
     FValue: Integer;
 
-    //  Events
+    // Events
     FOnChange: TNotifyEvent;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
 
-    //  Setters
+    // Setters
+    procedure SetBackColor(Value: TUThemeFocusableControlStateColors);
+    procedure SetCurColor(Value: TUThemeFocusableControlStateColors);
     procedure SetControlState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
     procedure SetMin(const Value: Integer);
     procedure SetMax(const Value: Integer);
     procedure SetValue(const Value: Integer);
 
-    //  Messages
+    // Messages
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
@@ -67,8 +69,7 @@ type
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
 
-    procedure BackColor_OnChange(Sender: TObject);
-    procedure CurColor_OnChange(Sender: TObject);
+    procedure ColorsChange(Sender: TObject);
 
   protected
     procedure Paint; override;
@@ -85,15 +86,15 @@ type
     procedure UpdateTheme; override;
 
   published
-    property BackColor: TUThemeFocusableControlStateColors read FBackColor;
-    property CurColor: TUThemeFocusableControlStateColors read FCurColor;
+    property BackColor: TUThemeFocusableControlStateColors read FBackColor write SetBackColor;
+    property CurColor: TUThemeFocusableControlStateColors read FCurColor write SetCurColor;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
     property Orientation: TUOrientation read FOrientation write SetOrientation default oHorizontal;
     property Min: Integer read FMin write SetMin default 0;
     property Max: Integer read FMax write SetMax default 100;
     property Value: Integer read FValue write SetValue default 0;
 
-    //  Events
+    // Events
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
 
     property Height default 25;
@@ -132,10 +133,10 @@ begin
 
   FBackColor := TUThemeFocusableControlStateColors.Create;
   FBackColor.Assign(SLIDER_BACK);
-  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.OnChange := ColorsChange;
   FCurColor := TUThemeFocusableControlStateColors.Create;
   FCurColor.Assign(SLIDER_CURSOR);
-  FCurColor.OnChange := CurColor_OnChange;
+  FCurColor.OnChange := ColorsChange;
 
   //  Common properties
   Height := 25;
@@ -223,6 +224,16 @@ begin
 end;
 
 //  SETTERS
+
+procedure TUSlider.SetBackColor(Value: TUThemeFocusableControlStateColors);
+begin
+  FBackColor.Assign(Value);
+end;
+
+procedure TUSlider.SetCurColor(Value: TUThemeFocusableControlStateColors);
+begin
+  FCurColor.Assign(Value);
+end;
 
 procedure TUSlider.SetControlState(const Value: TUControlState);
 begin
@@ -410,12 +421,7 @@ begin
   inherited;
 end;
 
-procedure TUSlider.BackColor_OnChange(Sender: TObject);
-begin
-  UpdateTheme;
-end;
-
-procedure TUSlider.CurColor_OnChange(Sender: TObject);
+procedure TUSlider.ColorsChange(Sender: TObject);
 begin
   UpdateTheme;
 end;

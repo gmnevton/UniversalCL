@@ -22,8 +22,8 @@ type
 
   TUProgressBar = class(TUCustomControl)
   private var
-    FFillColor: TUThemeControlColorSet;
     FBackColor: TUThemeControlColorSet;
+    FFillColor: TUThemeControlColorSet;
     Fill_Color: TColor;
     Back_Color: TColor;
     FillRect: TRect;
@@ -40,18 +40,19 @@ type
     FOnWaterMarkPosition: TUWaterMarkPositionEvent;
     FOnPaint: TUProgressBarPaintEvent;
 
-    //  Internal
+    // Internal
     procedure UpdateColors;
     procedure UpdateRects;
 
-    //  Setters
+    // Setters
+    procedure SetBackColor(Value: TUThemeControlColorSet);
+    procedure SetFillColor(Value: TUThemeControlColorSet);
     procedure SetWaterMark(const Value: TPicture);
     procedure SetValue(const Value: Integer);
     procedure SetOrientation(const Value: TUOrientation);
 
-    //  Child events
-    procedure FillColor_OnChange(Sender: TObject);
-    procedure BackColor_OnChange(Sender: TObject);
+    // Child events
+    procedure ColorsChange(Sender: TObject);
 
   protected
     procedure Paint; override;
@@ -70,8 +71,8 @@ type
   published
     property AniSet: TIntAniSet read FAniSet write FAniSet;
 
-    property FillColor: TUThemeControlColorSet read FFillColor; // read only subcomponent declaration, but its internal properties can be modified
-    property BackColor: TUThemeControlColorSet read FBackColor; // read only subcomponent declaration, but its internal properties can be modified
+    property BackColor: TUThemeControlColorSet read FBackColor write SetBackColor;
+    property FillColor: TUThemeControlColorSet read FFillColor write SetFillColor;
     property Value: Integer read FValue write SetValue;
     property Orientation: TUOrientation read FOrientation write SetOrientation;
 
@@ -111,10 +112,10 @@ begin
   FValue := 0;
   FFillColor := TUThemeControlColorSet.Create;
   FFillColor.Assign(PROGRESSBAR_BACK);
-  FFillColor.OnChange := FillColor_OnChange;
+  FFillColor.OnChange := ColorsChange;
   FBackColor := TUThemeControlColorSet.Create;
   FBackColor.Assign(PROGRESSBAR_BACK);
-  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.OnChange := ColorsChange;
 
   //  Custom AniSet
   FAniSet := TIntAniSet.Create;
@@ -185,6 +186,16 @@ end;
 
 //  SETTERS
 
+procedure TUProgressBar.SetBackColor(Value: TUThemeControlColorSet);
+begin
+  FBackColor.Assign(Value);
+end;
+
+procedure TUProgressBar.SetFillColor(Value: TUThemeControlColorSet);
+begin
+  FFillColor.Assign(Value);
+end;
+
 procedure TUProgressBar.SetWaterMark(const Value: TPicture);
 begin
   FWaterMark.Assign(Value);
@@ -210,12 +221,7 @@ begin
   end;
 end;
 
-procedure TUProgressBar.FillColor_OnChange(Sender: TObject);
-begin
-  UpdateTheme;
-end;
-
-procedure TUProgressBar.BackColor_OnChange(Sender: TObject);
+procedure TUProgressBar.ColorsChange(Sender: TObject);
 begin
   UpdateTheme;
 end;

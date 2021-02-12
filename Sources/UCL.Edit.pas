@@ -18,12 +18,12 @@ uses
   UCL.Utils;
 
 type
-  TUEdit = class(TUCustomEdit)
 //  private const
 //    DefBorderColor: TDefColor = (
 //      ($999999, $666666, $D77800, $CCCCCC, $D77800),
 //      ($666666, $999999, $D77800, $CCCCCC, $D77800));
 
+  TUEdit = class(TUCustomEdit)
   private
     LBorderColor: TColor;
     LBackColor: TColor;
@@ -31,8 +31,8 @@ type
 
   private
     FBorderThickness: Byte;
-    FBorderColor: TUThemeControlWithFocusColorSet;
     FBackColor: TUThemeControlWithFocusColorSet;
+    FBorderColor: TUThemeControlWithFocusColorSet;
     FControlState: TUControlState;
     //
     FTransparent: Boolean;
@@ -41,13 +41,14 @@ type
     procedure UpdateColors;
 
     // Setters
+    procedure SetBackColor(Value: TUThemeControlWithFocusColorSet);
+    procedure SetBorderColor(Value: TUThemeControlWithFocusColorSet);
     procedure SetBorderThickness(const Value: Byte);
     procedure SetControlState(const Value: TUControlState);
     procedure SetTransparent(const Value: Boolean);
 
     // Child events
-    procedure BorderColor_OnChange(Sender: TObject);
-    procedure BackColor_OnChange(Sender: TObject);
+    procedure ColorsChange(Sender: TObject);
 
     // Messages
     procedure WMNCPaint(var Msg: TWMNCPaint); message WM_NCPAINT;
@@ -78,8 +79,8 @@ type
 
   published
     property BorderThickness: Byte read FBorderThickness write SetBorderThickness;
-    property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor;
-    property BackColor: TUThemeControlWithFocusColorSet read FBackColor;
+    property BackColor: TUThemeControlWithFocusColorSet read FBackColor write SetBackColor;
+    property BorderColor: TUThemeControlWithFocusColorSet read FBorderColor write SetBorderColor;
     //property Edit: TUSubEdit read FEdit write FEdit;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
@@ -119,11 +120,11 @@ begin
 
   FBackColor := TUThemeControlWithFocusColorSet.Create;
   FBackColor.Assign(EDIT_BACK);
-  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.OnChange := ColorsChange;
 
   FBorderColor := TUThemeControlWithFocusColorSet.Create;
   FBorderColor.Assign(EDIT_BORDER);
-  FBorderColor.OnChange := BorderColor_OnChange;
+  FBorderColor.OnChange := ColorsChange;
 
   UpdateColors;
 end;
@@ -214,6 +215,16 @@ end;
 
 //  SETTERS
 
+procedure TUEdit.SetBackColor(Value: TUThemeControlWithFocusColorSet);
+begin
+  FBackColor.Assign(Value);
+end;
+
+procedure TUEdit.SetBorderColor(Value: TUThemeControlWithFocusColorSet);
+begin
+  FBorderColor.Assign(Value);
+end;
+
 procedure TUEdit.SetBorderThickness(const Value: Byte);
 begin
   if FBorderThickness <> Value then begin
@@ -238,12 +249,7 @@ begin
   end;
 end;
 
-procedure TUEdit.BorderColor_OnChange(Sender: TObject);
-begin
-  UpdateTheme;
-end;
-
-procedure TUEdit.BackColor_OnChange(Sender: TObject);
+procedure TUEdit.ColorsChange(Sender: TObject);
 begin
   UpdateTheme;
 end;

@@ -51,7 +51,7 @@ object formLoginDialog: TformLoginDialog
       AlignWithMargins = True
       Left = 40
       Top = 50
-      Width = 137
+      Width = 330
       Height = 38
       Margins.Left = 0
       Margins.Top = 50
@@ -68,12 +68,13 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       TextKind = tkTitle
       UseAccentColor = True
+      ExplicitWidth = 137
     end
     object headingSignin: TUText
       AlignWithMargins = True
       Left = 40
       Top = 88
-      Width = 197
+      Width = 330
       Height = 28
       Margins.Left = 0
       Margins.Top = 0
@@ -89,11 +90,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
+      ExplicitWidth = 197
     end
     object entryPassword: TUText
       Left = 40
       Top = 208
-      Width = 58
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Password'
@@ -104,11 +106,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 58
     end
     object entryEmail: TUText
       Left = 40
       Top = 136
-      Width = 32
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Email'
@@ -119,12 +122,13 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 32
     end
     object textShowMoreOptions: TUText
       AlignWithMargins = True
       Left = 40
       Top = 352
-      Width = 103
+      Width = 330
       Height = 15
       Cursor = crHandPoint
       Margins.Left = 0
@@ -141,11 +145,12 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       OnClick = textShowMoreOptionsClick
       TextKind = tkDescription
+      ExplicitWidth = 103
     end
     object entryDescription: TUText
       Left = 40
       Top = 280
-      Width = 130
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Description (optional)'
@@ -156,6 +161,7 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 130
     end
     object panelMoreOptions: TUPanel
       Left = 40
@@ -181,20 +187,20 @@ object formLoginDialog: TformLoginDialog
         Top = 30
         Width = 330
         Align = alTop
+        TabOrder = 1
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
         IconFont.Name = 'Segoe MDL2 Assets'
         IconFont.Style = []
         Caption = 'Send me news about offers'
-        TabOrder = 1
-        ExplicitTop = 36
       end
       object checkKeepLogin: TUCheckBox
         Left = 0
         Top = 0
         Width = 330
         Align = alTop
+        TabOrder = 0
         IconFont.Charset = DEFAULT_CHARSET
         IconFont.Color = clWindowText
         IconFont.Height = -20
@@ -203,7 +209,6 @@ object formLoginDialog: TformLoginDialog
         Checked = True
         State = cbsChecked
         Caption = 'Keep me logged in'
-        TabOrder = 0
       end
     end
     object editEmail: TUEdit
@@ -222,6 +227,18 @@ object formLoginDialog: TformLoginDialog
       Color = clBlack
       TabOrder = 0
       BorderThickness = 2
+      BackColor.Enabled = False
+      BackColor.Color = clWhite
+      BackColor.LightColor = clWhite
+      BackColor.DarkColor = clBlack
+      BackColor.FocusedLightColor = clBlack
+      BackColor.FocusedDarkColor = clBlack
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = 10066329
+      BorderColor.DarkColor = 6710886
+      BorderColor.FocusedLightColor = 14120960
+      BorderColor.FocusedDarkColor = 14120960
     end
     object editPassword: TUEdit
       AlignWithMargins = True
@@ -239,6 +256,18 @@ object formLoginDialog: TformLoginDialog
       Color = clBlack
       TabOrder = 1
       BorderThickness = 2
+      BackColor.Enabled = False
+      BackColor.Color = clWhite
+      BackColor.LightColor = clWhite
+      BackColor.DarkColor = clBlack
+      BackColor.FocusedLightColor = clBlack
+      BackColor.FocusedDarkColor = clBlack
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = 10066329
+      BorderColor.DarkColor = 6710886
+      BorderColor.FocusedLightColor = 14120960
+      BorderColor.FocusedDarkColor = 14120960
     end
     object editDescription: TUEdit
       AlignWithMargins = True
@@ -253,10 +282,22 @@ object formLoginDialog: TformLoginDialog
       BevelOuter = bvNone
       TabOrder = 2
       BorderThickness = 2
+      BackColor.Enabled = False
+      BackColor.Color = clWhite
+      BackColor.LightColor = clWhite
+      BackColor.DarkColor = clBlack
+      BackColor.FocusedLightColor = clBlack
+      BackColor.FocusedDarkColor = clBlack
+      BorderColor.Enabled = False
+      BorderColor.Color = clBlack
+      BorderColor.LightColor = 10066329
+      BorderColor.DarkColor = 6710886
+      BorderColor.FocusedLightColor = 14120960
+      BorderColor.FocusedDarkColor = 14120960
       Transparent = True
     end
   end
-  object captionbarMain: TUCaptionBar
+  object captionBarMain: TUCaptionBar
     Left = 0
     Top = 0
     Width = 410
@@ -268,6 +309,12 @@ object formLoginDialog: TformLoginDialog
     Font.Style = []
     ParentFont = False
     TabOrder = 1
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 15921906
+    BackColors.DarkColor = 2829099
+    BackColors.FocusedLightColor = 14120960
+    BackColors.FocusedDarkColor = clBlue
     object buttonAppQuit: TUQuickButton
       Left = 365
       Top = 0
@@ -320,7 +367,6 @@ object formLoginDialog: TformLoginDialog
       ParentShowHint = False
       ShowHint = True
       OnClick = buttonAppThemeClick
-      ButtonStyle = qbsSysButton
       LightColor = 13619151
       DarkColor = 3947580
       PressBrightnessDelta = -32
@@ -355,7 +401,41 @@ object formLoginDialog: TformLoginDialog
       Width = 130
       Height = 32
       Align = alRight
+      TabOrder = 0
       OnClick = buttonOkClick
+      BackColors.Enabled = False
+      BackColors.LightColor = 13421772
+      BackColors.LightHover = 13421772
+      BackColors.LightPress = 10066329
+      BackColors.LightDisabled = 13421772
+      BackColors.LightFocused = 13421772
+      BackColors.DarkColor = 3355443
+      BackColors.DarkHover = 3355443
+      BackColors.DarkPress = 6710886
+      BackColors.DarkDisabled = 3355443
+      BackColors.DarkFocused = 3355443
+      BorderColors.Enabled = False
+      BorderColors.LightColor = 13421772
+      BorderColors.LightHover = 8026746
+      BorderColors.LightPress = 10066329
+      BorderColors.LightDisabled = 8026746
+      BorderColors.LightFocused = 8026746
+      BorderColors.DarkColor = 3355443
+      BorderColors.DarkHover = 8750469
+      BorderColors.DarkPress = 6710886
+      BorderColors.DarkDisabled = 8750469
+      BorderColors.DarkFocused = 8750469
+      TextColors.Enabled = False
+      TextColors.LightColor = clBlack
+      TextColors.LightHover = clBlack
+      TextColors.LightPress = clBlack
+      TextColors.LightDisabled = clGray
+      TextColors.LightFocused = clBlack
+      TextColors.DarkColor = clWhite
+      TextColors.DarkHover = clWhite
+      TextColors.DarkPress = clWhite
+      TextColors.DarkDisabled = clGray
+      TextColors.DarkFocused = clWhite
       Highlight = True
       Caption = 'Ok'
     end
@@ -370,7 +450,41 @@ object formLoginDialog: TformLoginDialog
       Margins.Right = 10
       Margins.Bottom = 0
       Align = alRight
+      TabOrder = 1
       OnClick = buttonCancelClick
+      BackColors.Enabled = False
+      BackColors.LightColor = 13421772
+      BackColors.LightHover = 13421772
+      BackColors.LightPress = 10066329
+      BackColors.LightDisabled = 13421772
+      BackColors.LightFocused = 13421772
+      BackColors.DarkColor = 3355443
+      BackColors.DarkHover = 3355443
+      BackColors.DarkPress = 6710886
+      BackColors.DarkDisabled = 3355443
+      BackColors.DarkFocused = 3355443
+      BorderColors.Enabled = False
+      BorderColors.LightColor = 13421772
+      BorderColors.LightHover = 8026746
+      BorderColors.LightPress = 10066329
+      BorderColors.LightDisabled = 8026746
+      BorderColors.LightFocused = 8026746
+      BorderColors.DarkColor = 3355443
+      BorderColors.DarkHover = 8750469
+      BorderColors.DarkPress = 6710886
+      BorderColors.DarkDisabled = 8750469
+      BorderColors.DarkFocused = 8750469
+      TextColors.Enabled = False
+      TextColors.LightColor = clBlack
+      TextColors.LightHover = clBlack
+      TextColors.LightPress = clBlack
+      TextColors.LightDisabled = clGray
+      TextColors.LightFocused = clBlack
+      TextColors.DarkColor = clWhite
+      TextColors.DarkHover = clWhite
+      TextColors.DarkPress = clWhite
+      TextColors.DarkDisabled = clGray
+      TextColors.DarkFocused = clWhite
       Caption = 'Cancel'
     end
   end

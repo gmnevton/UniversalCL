@@ -21,7 +21,7 @@ uses
 type
   TformAppList = class(TUForm)
     boxHorizontal: TUScrollBox;
-    captionBar: TUCaptionBar;
+    captionBarMain: TUCaptionBar;
     buttonWinClose: TUQuickButton;
     buttonWinMin: TUQuickButton;
     boxVertical: TUScrollBox;
@@ -84,6 +84,8 @@ procedure TformAppList.FormCreate(Sender: TObject);
 var
   i: Integer;
 begin
+  CaptionBar := captionBarMain;
+
   for i := 0 to boxHorizontal.ControlCount - 1 do
     if boxHorizontal.Controls[i] is TUSymbolButton then begin
       AssignDockHandler(boxHorizontal.Controls[i], TUSymbolButton);

@@ -54,15 +54,16 @@ type
     FMouseInControl: Boolean;
     FScrollBarTimer: TTimer;
 
-    //  Setters
+    // Setters
+    procedure SetBackColor(Value: TUThemeControlColorSet);
     procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetScrollBarStyle(const Value: TUScrollBarStyle); // suppress default scrollbar blinking
 
-    //  Child events
-    procedure BackColor_OnChange(Sender: TObject);
+    // Child events
+    procedure ColorsChange(Sender: TObject);
     procedure ScrollBar_OnTimer(Sender: TObject);
 
-    //  Messages
+    // Messages
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
 //    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
@@ -100,7 +101,7 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property AniSet: TIntAniSet read FAniSet write FAniSet;
-    property BackColor: TUThemeControlColorSet read FBackColor write FBackColor;
+    property BackColor: TUThemeControlColorSet read FBackColor write SetBackColor;
 
     property ScrollCount: Integer read FScrollCount;
     property ScrollBarStyle: TUScrollBarStyle read FScrollBarStyle write SetScrollBarStyle default sbsMini;
@@ -194,7 +195,7 @@ begin
 
   FBackColor := TUThemeControlColorSet.Create;
   FBackColor.Assign(SCROLLBOX_BACK);
-  FBackColor.OnChange := BackColor_OnChange;
+  FBackColor.OnChange := ColorsChange;
 
   FScrollBarTimer := TTimer.Create(Nil);
   FScrollBarTimer.Enabled := False;
@@ -252,6 +253,11 @@ begin
 end;
 
 //  THEME
+
+procedure TUScrollBox.SetBackColor(Value: TUThemeControlColorSet);
+begin
+  FBackColor.Assign(Value);
+end;
 
 procedure TUScrollBox.SetThemeManager(const Value: TUThemeManager);
 begin
@@ -603,7 +609,7 @@ end;
 
 //  CHILD EVENTS
 
-procedure TUScrollBox.BackColor_OnChange(Sender: TObject);
+procedure TUScrollBox.ColorsChange(Sender: TObject);
 begin
   UpdateTheme;
 end;

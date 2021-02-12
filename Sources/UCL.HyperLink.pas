@@ -36,6 +36,7 @@ type
     FURL: string;
 
     //  Setters
+    procedure SetTextColors(Value: TUThemeFocusableControlStateColors);
     procedure SetThemeManager(const Value: TUThemeManager);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetEnabled(const Value: Boolean); reintroduce;
@@ -66,7 +67,7 @@ type
   published
     property ThemeManager: TUThemeManager read FThemeManager write SetThemeManager;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
-    property TextColors: TUThemeFocusableControlStateColors read FTextColors;
+    property TextColors: TUThemeFocusableControlStateColors read FTextColors write SetTextColors;
 
     property Enabled: Boolean read FEnabled write SetEnabled default true;
     property OpenLink: Boolean read FOpenLink write FOpenLink default true;
@@ -123,6 +124,11 @@ begin
 end;
 
 //  THEME
+
+procedure TUHyperLink.SetTextColors(Value: TUThemeFocusableControlStateColors);
+begin
+  FTextColors.Assign(Value);
+end;
 
 procedure TUHyperLink.SetThemeManager(const Value: TUThemeManager);
 begin

@@ -30,7 +30,7 @@ uses
 type
   TformLoginDialog = class(TUForm)
     boxMain: TUScrollBox;
-    captionbarMain: TUCaptionBar;
+    captionBarMain: TUCaptionBar;
     buttonOk: TUButton;
     buttonCancel: TUButton;
     titleSignin: TUText;
@@ -95,6 +95,7 @@ end;
 procedure TformLoginDialog.FormCreate(Sender: TObject);
 begin
 //  EnableBlur(Handle, 3);
+  CaptionBar := captionBarMain;
 end;
 
 procedure TformLoginDialog.popupEditItemClick(Sender: TObject; Index: Integer);

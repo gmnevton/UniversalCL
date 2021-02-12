@@ -21,7 +21,8 @@ type
 
   TUSymbolButton = class(TUCustomControl)
   private var
-    BackColor, TextColor, DetailColor: TColor;
+    BorderThickness: Integer;
+    BackColor, BorderColor, TextColor, DetailColor: TColor;
     IconRect, TextRect, DetailRect: TRect;
   
   private
@@ -145,6 +146,8 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
+  BorderThickness := 2;
+
   FImageIndex := -1;
   FImageKind := ikFontIcon;
 
@@ -206,6 +209,7 @@ begin
   // Disabled
   if not Enabled then begin
     BackColor := BUTTON_BACK.GetColor(TM.ThemeUsed, csDisabled);
+    BorderColor := BackColor;
     TextColor := clGray;
     DetailColor := clGray;
     Exit;
@@ -254,6 +258,10 @@ begin
       end;
     end;
   end;
+  //
+  BorderColor := BackColor;
+  if (ButtonState in [csHover, csFocused]) then
+    BorderColor := $AAAAAA;
   //
   if (ButtonState = csPress) then begin
     if TM.ThemeUsed = utLight then
@@ -447,10 +455,13 @@ begin
     bmp.SetSize(Width, Height);
     //bmp.Canvas.Assign(Canvas);
 
-    //  Paint background
+    // Paint background
     bmp.Canvas.Brush.Style := bsSolid;
     bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
     bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
+
+    // Draw border
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
 
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
@@ -458,7 +469,7 @@ begin
     if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
       DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
-    //  Paint icon
+    // Paint icon
     if ImageKind = ikFontIcon then begin
       if ShowIcon then begin
         bmp.Canvas.Font := SymbolFont;
@@ -473,7 +484,7 @@ begin
       end;
     end;
 
-    //  Paint detail
+    // Paint detail
     if ShowDetail then begin
       bmp.Canvas.Font := DetailFont;
       bmp.Canvas.Font.Color := DetailColor;
@@ -483,7 +494,7 @@ begin
         DrawTextRect(bmp.Canvas, taCenter, taAlignTop, DetailRect, Detail, False);
     end;
 
-    //  Paint text
+    // Paint text
     bmp.Canvas.Font := Font;
     bmp.Canvas.Font.Color := TextColor;
     if Orientation = oHorizontal then

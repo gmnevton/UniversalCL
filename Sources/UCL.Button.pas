@@ -25,7 +25,7 @@ type
   TUButton = class(TUCustomControl)
   private var
     BorderThickness: Integer;
-    BorderColor, BackColor, TextColor: TColor;
+    BackColor, BorderColor, TextColor: TColor;
     ImgRect, TextRect: TRect;
 
   private
@@ -48,6 +48,9 @@ type
     procedure UpdateRects;
 
     // Setters
+    procedure SetBackColors(Value: TUThemeButtonStateColorSet);
+    procedure SetBorderColors(Value: TUThemeButtonStateColorSet);
+    procedure SetTextColors(Value: TUThemeButtonStateColorSet);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetAlignment(const Value: TAlignment);
     procedure SetImages(const Value: TCustomImageList);
@@ -82,15 +85,15 @@ type
     procedure DoChangeScale(M, D: Integer); override;
 
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     // IUThemedComponent
     procedure UpdateTheme; override;
 
   published
-    property BackColors: TUThemeButtonStateColorSet read FBackColors;
-    property BorderColors: TUThemeButtonStateColorSet read FBorderColors;
-    property TextColors: TUThemeButtonStateColorSet read FTextColors;
+    property BackColors: TUThemeButtonStateColorSet read FBackColors write SetBackColors;
+    property BorderColors: TUThemeButtonStateColorSet read FBorderColors write SetBorderColors;
+    property TextColors: TUThemeButtonStateColorSet read FTextColors write SetTextColors;
 
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
@@ -116,9 +119,9 @@ uses
 
 { TUButton }
 
-constructor TUButton.Create(aOwner: TComponent);
+constructor TUButton.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
   BorderThickness := 2;
@@ -240,6 +243,21 @@ begin
   end
   else
     TextRect := Rect(0, 0, Width, Height);
+end;
+
+procedure TUButton.SetBackColors(Value: TUThemeButtonStateColorSet);
+begin
+  FBackColors.Assign(Value);
+end;
+
+procedure TUButton.SetBorderColors(Value: TUThemeButtonStateColorSet);
+begin
+  FBorderColors.Assign(Value);
+end;
+
+procedure TUButton.SetTextColors(Value: TUThemeButtonStateColorSet);
+begin
+  FTextColors.Assign(Value);
 end;
 
 procedure TUButton.SetButtonState(const Value: TUControlState);

@@ -57,6 +57,9 @@ uses
 constructor TUFormOverlay.CreateNew(AOwner: TComponent; Dummy: Integer);
 begin
   inherited CreateNew(AOwner, Dummy);
+{$IF CompilerVersion > 29}
+  StyleElements := [];
+{$IFEND}
 
   FOverlayType := otNone;
   FCaptionBarHeight := 32;
