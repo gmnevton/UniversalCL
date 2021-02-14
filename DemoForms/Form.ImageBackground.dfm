@@ -14667,7 +14667,7 @@ object formImageBackground: TformImageBackground
     Orientation = oHorizontal
   end
   object buttonSide: TUSymbolButton
-    Left = 530
+    Left = 529
     Top = 60
     Width = 81
     Height = 90
@@ -14811,7 +14811,7 @@ object formImageBackground: TformImageBackground
       BevelOuter = bvNone
       Color = clBlack
       TabOrder = 2
-      BorderThickness = 2
+      BorderThickness = 1
       BackColor.Enabled = False
       BackColor.Color = clWhite
       BackColor.LightColor = clWhite

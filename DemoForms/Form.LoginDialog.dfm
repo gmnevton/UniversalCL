@@ -226,7 +226,7 @@ object formLoginDialog: TformLoginDialog
       BevelOuter = bvNone
       Color = clBlack
       TabOrder = 0
-      BorderThickness = 2
+      BorderThickness = 1
       BackColor.Enabled = False
       BackColor.Color = clWhite
       BackColor.LightColor = clWhite
@@ -255,7 +255,7 @@ object formLoginDialog: TformLoginDialog
       BevelOuter = bvNone
       Color = clBlack
       TabOrder = 1
-      BorderThickness = 2
+      BorderThickness = 1
       BackColor.Enabled = False
       BackColor.Color = clWhite
       BackColor.LightColor = clWhite
@@ -279,9 +279,10 @@ object formLoginDialog: TformLoginDialog
       Margins.Right = 0
       Margins.Bottom = 20
       Align = alTop
+      ParentFont = False
       BevelOuter = bvNone
       TabOrder = 2
-      BorderThickness = 2
+      BorderThickness = 1
       BackColor.Enabled = False
       BackColor.Color = clWhite
       BackColor.LightColor = clWhite

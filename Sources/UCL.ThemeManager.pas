@@ -123,10 +123,9 @@ type
   TUThemeManager = class(TUCustomThemeManager);
 
 function GetCommonThemeManager: TUCustomThemeManager;
-function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload; inline;
-function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload; inline;
-function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor; inline;
-
+function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload; {$IFDEF RELEASE} inline; {$ENDIF}
+function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload; {$IFDEF RELEASE} inline; {$ENDIF}
+function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor; {$IFDEF RELEASE} inline; {$ENDIF}
 
 implementation
 
@@ -184,14 +183,27 @@ end;
 
 function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor;
 begin
-  if (TM = Nil) or ((CustomAccentColor <> clNone) and (CustomAccentColor <> clDefault))  then
-    Result := CustomAccentColor
-  else begin
+  if TM = Nil then begin
+    Result := CustomAccentColor;
+    Exit;
+  end;
+  //
+  if not TM.UseSytemColorOnBorder then begin
+    if (CustomAccentColor <> clNone) and (CustomAccentColor <> clDefault) then begin
+      Result := CustomAccentColor;
+      Exit;
+    end;
+    //
     if TM.UseSystemAccentColor then
       Result := TM.SystemAccentColor
     else
       Result := TM.AccentColor;
   end;
+  //
+  if TM.UseSystemAccentColor then
+    Result := TM.SystemAccentColor
+  else
+    Result := TM.AccentColor;
 end;
 
 { TUCustomThemeManager }
@@ -217,7 +229,8 @@ begin
   //  Default properties
   FTheme := ttSystem;
   FAutoUpdateControls := True;
-  FAccentColor := $D77800;
+//  FAccentColor := $D77800;
+  FAccentColor := ISystemAccentColor;
   FColorOnBorder := $000000;
   FUseSystemAccentColor := True;
   FUseSystemColorOnBorder := True;
@@ -303,6 +316,8 @@ procedure TUCustomThemeManager.SetUseSystemAccentColor(Value: Boolean);
 begin
   if FUseSystemAccentColor <> Value then begin
     FUseSystemAccentColor := Value;
+    if Value then
+      FAccentColor := ISystemAccentColor;
     Changed;
   end;
 end;
@@ -327,6 +342,9 @@ begin
     ISystemTheme := utDark;
   ISystemAccentColor := GetAccentColor;
   ISystemColorOnBorder := IsColorOnBorderEnabled;
+  if FUseSystemAccentColor then
+    FAccentColor := ISystemAccentColor;
+  //
   UpdateTheme;
 end;
 

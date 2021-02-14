@@ -26,7 +26,8 @@ type
 
   TUItemButton = class(TUCustomControl)
   private var
-    BackColor, TextColor, DetailColor, ActiveColor: TColor;
+    BorderThickness: Integer;
+    BackColor, BorderColor, TextColor, DetailColor, ActiveColor: TColor;
     CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
 
   private
@@ -91,7 +92,7 @@ type
     procedure SetIsToggled(const Value: Boolean);
 
     // Messages
-    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
+//    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
@@ -187,6 +188,10 @@ uses
 constructor TUItemButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle - [csDoubleClicks];
+
+  BorderThickness := 1;
+
   DragCursor:=crDefault;
 
   FObjectSelected := iokNone;
@@ -221,7 +226,8 @@ begin
   FRightIconWidth := 40;
 
   FAlignSpace := 5;
-  FCustomActiveColor := $D77800;
+//  FCustomActiveColor := $D77800;
+  FCustomActiveColor := clNone;
   FTransparent := False;
   FLeftIconKind := ikFontIcon;
   FRightIconKind := ikFontIcon;
@@ -330,9 +336,12 @@ begin
     TextColor := GetTextColorFromBackground(BackColor);
     DetailColor := $808080;
   end;
-
+  //
+  BorderColor := BackColor;
+  if (ButtonState in [csHover, csFocused]) then
+    BorderColor := $AAAAAA;
   //  Active color
-  if not TM.UseSystemAccentColor then
+  if not TM.UseSystemAccentColor and (CustomActiveColor <> clNone) then
     ActiveColor := CustomActiveColor
   else
     ActiveColor := TM.AccentColor;
@@ -368,7 +377,7 @@ begin
   Dec(RPos, RightIconRect.Width);
 
   if iokDetail in ObjectsVisible then begin
-    Canvas.Font := DetailFont;
+    Canvas.Font.Assign(DetailFont);
     TempWidth := Canvas.TextWidth(Detail);
     DetailRect := Rect(RPos - AlignSpace - TempWidth, 0, RPos, Height);
   end
@@ -598,15 +607,18 @@ begin
     bmp.SetSize(Width, Height);
     //bmp.Canvas.Assign(Canvas);
 
-    //  Paint background
+    // Paint background
     bmp.Canvas.Brush.Style := bsSolid;
     bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
     bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
 
-    bmp.Canvas.Font := IconFont;
+    bmp.Canvas.Font.Assign(IconFont);
 
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
+
+    // Draw border
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
 
     if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
 //      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
@@ -648,14 +660,14 @@ begin
 
     //  Paint detail
     if iokDetail in ObjectsVisible then begin
-      bmp.Canvas.Font := DetailFont;
+      bmp.Canvas.Font.Assign(DetailFont);
       bmp.Canvas.Font.Color := DetailColor;
       DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
     end;
 
     //  Paint text
     if iokText in ObjectsVisible then begin
-      bmp.Canvas.Font := Font;
+      bmp.Canvas.Font.Assign(Font);
       bmp.Canvas.Font.Color := TextColor;
       DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
     end;
@@ -695,7 +707,7 @@ begin
 end;
 
 //  MESSAGES
-
+{
 procedure TUItemButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 begin
   if Enabled then begin
@@ -703,7 +715,7 @@ begin
     inherited;
   end;
 end;
-
+}
 procedure TUItemButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin

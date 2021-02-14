@@ -669,7 +669,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
-      TabOrder = 1
+      TabOrder = 0
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -695,7 +695,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
-      TabOrder = 2
+      TabOrder = 1
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -721,7 +721,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
-      TabOrder = 3
+      TabOrder = 2
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -747,7 +747,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
-      TabOrder = 4
+      TabOrder = 3
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -800,7 +800,7 @@ object formDemo: TformDemo
       Width = 60
       Height = 60
       Align = alLeft
-      TabOrder = 6
+      TabOrder = 4
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -826,7 +826,7 @@ object formDemo: TformDemo
       Width = 80
       Height = 60
       Align = alLeft
-      TabOrder = 7
+      TabOrder = 6
       OnClick = buttonImageFormClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -853,7 +853,7 @@ object formDemo: TformDemo
       Width = 80
       Height = 60
       Align = alLeft
-      TabOrder = 8
+      TabOrder = 7
       OnClick = buttonAppListFormClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -1176,7 +1176,7 @@ object formDemo: TformDemo
     Detail = 'Nothing'
     RightIcon = #57345
     AlignSpace = 10
-    CustomActiveColor = 14120960
+    CustomActiveColor = clNone
   end
   object itembuttonFontIcon: TUItemButton
     Left = 60
@@ -1199,7 +1199,7 @@ object formDemo: TformDemo
     Text = 'Don'#39't combine'
     Detail = 'CheckBox and Toggled'
     RightIcon = #57345
-    CustomActiveColor = 14120960
+    CustomActiveColor = clNone
     IsToggleButton = True
   end
   object symbolButtonOpenDisabled: TUSymbolButton
@@ -1434,7 +1434,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
-      TabOrder = 1
+      TabOrder = 2
       OnClick = buttonMenuSettingsClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -1459,7 +1459,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
-      TabOrder = 2
+      TabOrder = 4
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1507,7 +1507,7 @@ object formDemo: TformDemo
       Width = 45
       Height = 45
       Align = alTop
-      TabOrder = 4
+      TabOrder = 1
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -1600,6 +1600,7 @@ object formDemo: TformDemo
       ParentFont = False
       Layout = tlCenter
       TextKind = tkHeading
+      ExplicitTop = 2
       ExplicitWidth = 71
     end
     object entryAppTheme: TUText
@@ -1622,6 +1623,7 @@ object formDemo: TformDemo
       ParentFont = False
       Layout = tlCenter
       TextKind = tkEntry
+      ExplicitTop = 40
       ExplicitWidth = 68
     end
     object entryUserProfile: TUText
@@ -1643,6 +1645,7 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitTop = 237
       ExplicitWidth = 69
     end
     object imgAvatar: TImage
@@ -1752,6 +1755,7 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitTop = 471
       ExplicitWidth = 50
     end
     object desAccountHint: TUText
@@ -1774,6 +1778,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
+      ExplicitTop = 670
       ExplicitWidth = 198
     end
     object entryStorage: TUText
@@ -1795,6 +1800,7 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitTop = 643
       ExplicitWidth = 76
     end
     object desStorageHint: TUText
@@ -1817,6 +1823,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
+      ExplicitTop = 765
       ExplicitWidth = 186
     end
     object headingAbout: TUText
@@ -1838,6 +1845,7 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
+      ExplicitTop = 825
       ExplicitWidth = 55
     end
     object desAppVersion: TUText
@@ -1860,6 +1868,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
+      ExplicitTop = 903
       ExplicitWidth = 84
     end
     object desFlashVersion: TUText
@@ -1882,6 +1891,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
+      ExplicitTop = 923
       ExplicitWidth = 119
     end
     object desChromiumVersion: TUText
@@ -1904,6 +1914,7 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
+      ExplicitTop = 943
       ExplicitWidth = 126
     end
     object linkEmbarcadero: TUHyperLink
@@ -1936,6 +1947,7 @@ object formDemo: TformDemo
       TextColors.DarkDisabled = clGray
       TextColors.DarkFocused = 14120960
       URL = 'https://example.com/'
+      ExplicitTop = 963
       ExplicitWidth = 104
     end
     object separatorLastBox: TUSeparator
@@ -2293,9 +2305,10 @@ object formDemo: TformDemo
       Top = 339
       Width = 203
       Align = alTop
+      ParentFont = False
       BevelOuter = bvNone
       TabOrder = 5
-      BorderThickness = 2
+      BorderThickness = 1
       BackColor.Enabled = False
       BackColor.Color = clWhite
       BackColor.LightColor = clWhite

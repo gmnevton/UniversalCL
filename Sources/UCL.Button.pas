@@ -124,7 +124,7 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
-  BorderThickness := 2;
+  BorderThickness := 1;
 
   //  New properties
   FBackColors := TUThemeButtonStateColorSet.Create;

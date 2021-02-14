@@ -146,7 +146,7 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
-  BorderThickness := 2;
+  BorderThickness := 1;
 
   FImageIndex := -1;
   FImageKind := ikFontIcon;

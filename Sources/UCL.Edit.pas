@@ -71,7 +71,7 @@ type
     procedure DoChangeScale(M, D: Integer); override;
 
   public
-    constructor Create(aOwner: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     // IUThemedComponent
@@ -84,7 +84,7 @@ type
     //property Edit: TUSubEdit read FEdit write FEdit;
     property ControlState: TUControlState read FControlState write SetControlState default csNone;
 
-    property Transparent: Boolean read FTransparent write SetTransparent default false;
+    property Transparent: Boolean read FTransparent write SetTransparent default False;
   end;
 
 implementation
@@ -98,11 +98,11 @@ uses
 
 //  MAIN CLASS
 
-constructor TUEdit.Create(aOwner: TComponent);
+constructor TUEdit.Create(AOwner: TComponent);
 begin
-  inherited Create(aOwner);
+  inherited Create(AOwner);
 
-  FBorderThickness := 2;
+  FBorderThickness := 1;
   FControlState := csNone;
   FTransparent := False;
 
@@ -170,7 +170,7 @@ begin
   TM:=SelectThemeManager(Self);
   AccentColor := SelectAccentColor(TM, $D77800);
   //
-  //  Disabled edit
+  // Disabled edit
   if ControlState = csDisabled then begin
     LBorderColor := $CCCCCC;
     LBackColor := $D8D8D8;
