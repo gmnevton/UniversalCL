@@ -57,6 +57,8 @@ type
     FUseSystemAccentColor: Boolean;
     FUseSystemColorOnBorder: Boolean;
     FUseColorOnBorder: Boolean;
+    FControlsBorderThickness: LongWord;
+    FUseControlsBorderThickness: Boolean;
 
     // Events
     FOnBeforeColorLoading: TNotifyEvent;
@@ -68,9 +70,11 @@ type
     procedure SetAutoUpdateControls(Value: Boolean);
     procedure SetAccentColor(Value: TColor);
     procedure SetColorOnBorder(Value: TColor);
+    procedure SetControlsBorderThickness(Value: LongWord);
     procedure SetUseSystemAccentColor(Value: Boolean);
     procedure SetUseSystemColorOnBorder(Value: Boolean);
     procedure SetUseColorOnBorder(Value: Boolean);
+    procedure SetUseControlsBorderThickness(Value: Boolean);
     //
     procedure Changed;
 
@@ -105,9 +109,11 @@ type
     property AutoUpdateControls: Boolean read FAutoUpdateControls write SetAutoUpdateControls default True;
     property AccentColor: TColor read FAccentColor write SetAccentColor default $D77800;
     property ColorOnBorder: TColor read FColorOnBorder write SetColorOnBorder default $000000;
+    property ControlsBorderThickness: LongWord read FControlsBorderThickness write SetControlsBorderThickness default 2;
     property UseSystemAccentColor: Boolean read FUseSystemAccentColor write SetUseSystemAccentColor default True;
     property UseSytemColorOnBorder: Boolean read FUseSystemColorOnBorder write SetUseSystemColorOnBorder default True;
     property UseColorOnBorder: Boolean read FUseColorOnBorder write SetUseColorOnBorder default True;
+    property UseControlsBorderThickness: Boolean read FUseControlsBorderThickness write SetUseControlsBorderThickness default True;
 
     // Events
     property OnBeforeColorLoading: TNotifyEvent read FOnBeforeColorLoading write FOnBeforeColorLoading;
@@ -126,6 +132,7 @@ function GetCommonThemeManager: TUCustomThemeManager;
 function SelectThemeManager(Control: TControl): TUCustomThemeManager; overload; {$IFDEF RELEASE} inline; {$ENDIF}
 function SelectThemeManager(Control: TMenu): TUCustomThemeManager; overload; {$IFDEF RELEASE} inline; {$ENDIF}
 function SelectAccentColor(const TM: TUCustomThemeManager; CustomAccentColor: TColor): TColor; {$IFDEF RELEASE} inline; {$ENDIF}
+function SelectControlBorderThickness(const TM: TUCustomThemeManager; BorderThickness: LongWord): LongWord; {$IFDEF RELEASE} inline; {$ENDIF}
 
 implementation
 
@@ -206,6 +213,19 @@ begin
     Result := TM.AccentColor;
 end;
 
+function SelectControlBorderThickness(const TM: TUCustomThemeManager; BorderThickness: LongWord): LongWord;
+begin
+  if TM = Nil then begin
+    Result := BorderThickness;
+    Exit;
+  end;
+  //
+  if TM.UseControlsBorderThickness then
+    Result := TM.ControlsBorderThickness
+  else
+    Result := BorderThickness;
+end;
+
 { TUCustomThemeManager }
 
 constructor TUCustomThemeManager.Create(AOwner: TComponent);
@@ -235,6 +255,8 @@ begin
   FUseSystemAccentColor := True;
   FUseSystemColorOnBorder := True;
   FUseColorOnBorder := True;
+  FControlsBorderThickness := 2;
+  FUseControlsBorderThickness := True;
 end;
 
 destructor TUCustomThemeManager.Destroy;
@@ -304,10 +326,26 @@ begin
   end;
 end;
 
+procedure TUCustomThemeManager.SetControlsBorderThickness(Value: LongWord);
+begin
+  if FControlsBorderThickness <> Value then begin
+    FControlsBorderThickness := Value;
+    Changed;
+  end;
+end;
+
 procedure TUCustomThemeManager.SetUseColorOnBorder(Value: Boolean);
 begin
   if FUseColorOnBorder <> Value then begin
     FUseColorOnBorder := Value;
+    Changed;
+  end;
+end;
+
+procedure TUCustomThemeManager.SetUseControlsBorderThickness(Value: Boolean);
+begin
+  if FUseControlsBorderThickness <> Value then begin
+    FUseControlsBorderThickness := Value;
     Changed;
   end;
 end;

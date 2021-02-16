@@ -25,6 +25,7 @@ type
   TUButton = class(TUCustomControl)
   private var
     BorderThickness: Integer;
+    mulScale: Integer;
     BackColor, BorderColor, TextColor: TColor;
     ImgRect, TextRect: TRect;
 
@@ -125,6 +126,7 @@ begin
   ControlStyle := ControlStyle - [csDoubleClicks];
 
   BorderThickness := 1;
+  mulScale:=1;
 
   //  New properties
   FBackColors := TUThemeButtonStateColorSet.Create;
@@ -355,26 +357,26 @@ begin
     bmp.SetSize(Width, Height);
     //bmp.Canvas.Assign(Canvas);
 
-    //  Paint background
+    // Paint background
     bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
     bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
 
     P:=Mouse.CursorPos;
     P:=ScreenToClient(P);
 
-    //  Draw border
-    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
+    // Draw border
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, SelectControlBorderThickness(TM, BorderThickness) * mulScale);
 
     if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
       DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
 
-    //  Paint image
+    // Paint image
     if (Images <> Nil) and (ImageIndex >= 0) then begin
       GetCenterPos(Images.Width, Images.Height, ImgRect, ImgX, ImgY);
       Images.Draw(bmp.Canvas, ImgX, ImgY, ImageIndex, Enabled);
     end;
 
-    //  Paint text
+    // Paint text
     bmp.Canvas.Font.Assign(Font);
     bmp.Canvas.Font.Color := TextColor;
     DrawTextRect(bmp.Canvas, Alignment, taVerticalCenter, TextRect, Caption, False);
@@ -401,7 +403,8 @@ end;
 
 procedure TUButton.DoChangeScale(M, D: Integer);
 begin
-  BorderThickness := MulDiv(BorderThickness, M, D);
+//  BorderThickness := MulDiv(BorderThickness, M, D);
+  mulScale := MulDiv(mulScale, M, D);
   UpdateRects;
 end;
 
