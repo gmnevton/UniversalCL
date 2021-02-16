@@ -186,7 +186,7 @@ begin
   else begin
     BackColorSet := BackColor;
     case ControlState of
-      csPress, csFocused: begin
+      csHover, csFocused: begin
         if BackColor.Enabled then
           LBackColor := BackColor.Color
         else
@@ -199,7 +199,7 @@ begin
   //
   BorderColorSet := BorderColor;
   case ControlState of
-    csPress, csFocused: begin
+    csHover, csFocused: begin
       if BorderColor.Enabled then
         LBorderColor := BorderColor.Color
       else
@@ -363,7 +363,7 @@ begin
   if not Enabled then
     Exit;
   //
-  ControlState := csFocused;
+  ControlState := csHover;
   inherited;
 end;
 
@@ -372,7 +372,10 @@ begin
   if not Enabled then
     Exit;
   //
-  ControlState := csNone;
+  if Focused then
+    ControlState := csFocused
+  else
+    ControlState := csNone;
   inherited;
 end;
 

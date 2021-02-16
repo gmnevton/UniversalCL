@@ -142,21 +142,51 @@ begin
     end;
 
     csHover: begin
-      if not TM.UseSystemAccentColor then
-        BackColor := CustomAccentColor
-      else if TM.ThemeUsed = utLight then
-        BackColor := LightColor
+      if CustomAccentColor = clDefault then
+        BackColor := SelectAccentColor(TM, CustomAccentColor)
+      else if CustomAccentColor = clNone then begin
+        case ButtonStyle of
+          qbsQuit: begin
+            //FLightColor := $002311E8;
+            //FDarkColor := $002311E8;
+            BackColor := $002311E8;
+          end;
+          qbsMax,
+          qbsMin,
+          qbsSysButton: begin
+            ParentColor := True;
+            BackColor := Color;
+            BackColor := BrightenColor(BackColor, PressBrightnessDelta);
+          end;
+          qbsHighlight: begin
+            if TM.UseSystemAccentColor then
+              BackColor := SelectAccentColor(TM, CustomAccentColor)
+            else begin
+              if TM.ThemeUsed = utLight then
+                BackColor := LightColor
+              else
+                BackColor := DarkColor;
+            end;
+          end;
+        else
+          if TM.ThemeUsed = utLight then
+            BackColor := LightColor
+          else
+            BackColor := DarkColor;
+        end;
+      end
       else
-        BackColor := DarkColor;
+        BackColor := CustomAccentColor;
     end;
 
     csPress: begin
-      if not TM.UseSystemAccentColor then
-        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
-      else if TM.ThemeUsed = utLight then
-        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
-      else
-        BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
+//      if not TM.UseSystemAccentColor then
+//        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
+//      else if TM.ThemeUsed = utLight then
+//        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
+//      else
+//        BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
+      BackColor := BrightenColor(BackColor, PressBrightnessDelta)
     end;
 
     csDisabled: begin
@@ -202,15 +232,18 @@ begin
       qbsQuit: begin
         FLightColor := $002311E8;
         FDarkColor := $002311E8;
+        FCustomAccentColor := clNone;
         FPressBrightnessDelta := 32;
         Caption := UF_CLOSE; // Close icon
       end;
       qbsSysButton,
       qbsMax,
       qbsMin: begin
-        FLightColor := $CFCFCF;
-        FDarkColor := $3C3C3C;
-        FPressBrightnessDelta := -32;
+        ParentColor := True;
+        FLightColor := Color;
+        FDarkColor := Color;
+        FCustomAccentColor := clNone;
+        FPressBrightnessDelta := 32;
         case FButtonStyle of
           qbsMax      : Caption := UF_MAXIMIZE;
           qbsMin      : Caption := UF_MINIMIZE;
@@ -218,11 +251,12 @@ begin
         end;
       end;
       qbsHighlight: begin
-        if not TM.UseSystemAccentColor then
-          FLightColor := FCustomAccentColor
+        if not TM.UseSystemAccentColor or ((CustomAccentColor <> clNone) and (CustomAccentColor <> clDefault)) then
+          FLightColor := CustomAccentColor
         else
           FLightColor := TM.AccentColor;
         FDarkColor := FLightColor;
+        FCustomAccentColor := clDefault;
         FPressBrightnessDelta := 25;
         //Caption := UF_BACK;
       end;

@@ -484,6 +484,7 @@ object formDemo: TformDemo
       ButtonStyle = qbsHighlight
       LightColor = 14120960
       DarkColor = 14120960
+      CustomAccentColor = clDefault
       Caption = #57510
     end
     object buttonWinClose: TUQuickButton
@@ -502,6 +503,7 @@ object formDemo: TformDemo
       ButtonStyle = qbsQuit
       LightColor = 2298344
       DarkColor = 2298344
+      CustomAccentColor = clNone
       PressBrightnessDelta = 32
       Caption = #57610
     end
@@ -521,7 +523,8 @@ object formDemo: TformDemo
       ButtonStyle = qbsMax
       LightColor = 13619151
       DarkColor = 3947580
-      PressBrightnessDelta = -32
+      CustomAccentColor = clNone
+      PressBrightnessDelta = 32
       Caption = #57347
     end
     object buttonWinMin: TUQuickButton
@@ -540,8 +543,11 @@ object formDemo: TformDemo
       ButtonStyle = qbsMin
       LightColor = 13619151
       DarkColor = 3947580
-      PressBrightnessDelta = -32
+      CustomAccentColor = clNone
+      PressBrightnessDelta = 32
       Caption = #57608
+      ExplicitLeft = 868
+      ExplicitTop = -6
     end
     object buttonBlurForm: TUQuickButton
       Left = 544
@@ -554,9 +560,10 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       OnClick = buttonBlurFormClick
-      LightColor = 13619151
-      DarkColor = 3947580
-      PressBrightnessDelta = -32
+      LightColor = 2829099
+      DarkColor = 2829099
+      CustomAccentColor = clNone
+      PressBrightnessDelta = 32
       Caption = #57615
       ExplicitLeft = 540
       ExplicitTop = 10
@@ -1600,7 +1607,6 @@ object formDemo: TformDemo
       ParentFont = False
       Layout = tlCenter
       TextKind = tkHeading
-      ExplicitTop = 2
       ExplicitWidth = 71
     end
     object entryAppTheme: TUText
@@ -1623,7 +1629,6 @@ object formDemo: TformDemo
       ParentFont = False
       Layout = tlCenter
       TextKind = tkEntry
-      ExplicitTop = 40
       ExplicitWidth = 68
     end
     object entryUserProfile: TUText
@@ -1645,7 +1650,6 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitTop = 237
       ExplicitWidth = 69
     end
     object imgAvatar: TImage
@@ -1755,7 +1759,6 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitTop = 471
       ExplicitWidth = 50
     end
     object desAccountHint: TUText
@@ -1778,7 +1781,6 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitTop = 670
       ExplicitWidth = 198
     end
     object entryStorage: TUText
@@ -1800,7 +1802,6 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
-      ExplicitTop = 643
       ExplicitWidth = 76
     end
     object desStorageHint: TUText
@@ -1823,7 +1824,6 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitTop = 765
       ExplicitWidth = 186
     end
     object headingAbout: TUText
@@ -1845,7 +1845,6 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
-      ExplicitTop = 825
       ExplicitWidth = 55
     end
     object desAppVersion: TUText
@@ -1868,7 +1867,6 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitTop = 903
       ExplicitWidth = 84
     end
     object desFlashVersion: TUText
@@ -1891,7 +1889,6 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitTop = 923
       ExplicitWidth = 119
     end
     object desChromiumVersion: TUText
@@ -1914,7 +1911,6 @@ object formDemo: TformDemo
       ParentFont = False
       WordWrap = True
       TextKind = tkDescription
-      ExplicitTop = 943
       ExplicitWidth = 126
     end
     object linkEmbarcadero: TUHyperLink
@@ -1947,7 +1943,6 @@ object formDemo: TformDemo
       TextColors.DarkDisabled = clGray
       TextColors.DarkFocused = 14120960
       URL = 'https://example.com/'
-      ExplicitTop = 963
       ExplicitWidth = 104
     end
     object separatorLastBox: TUSeparator
@@ -2305,7 +2300,6 @@ object formDemo: TformDemo
       Top = 339
       Width = 203
       Align = alTop
-      ParentFont = False
       BevelOuter = bvNone
       TabOrder = 5
       BorderThickness = 1
