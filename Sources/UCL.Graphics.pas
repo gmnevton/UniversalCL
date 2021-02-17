@@ -36,7 +36,7 @@ function PointInRect(const p: TPoint; const Rect: TRect): Boolean; overload;
 function PointInRect(const p: TSmallPoint; const Rect: TRect): Boolean; overload;
 procedure GetCenterPos(Width, Height: Integer; Rect: TRect; out X, Y: Integer);
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
-procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Byte);
+procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
 procedure InitBumpMap;
 procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer; Add: Boolean);
 
@@ -249,11 +249,12 @@ begin
   end;
 end;
 
-procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Byte);
+procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
 var
   TL, BR: Byte;
+  spm: TPenMode;
 begin
-  if Thickness <> 0 then begin
+  if Thickness > 0 then begin
     TL := Thickness div 2;
     if Thickness mod 2 = 0 then
       BR := TL - 1
@@ -262,7 +263,16 @@ begin
 
     Canvas.Pen.Color := Color;
     Canvas.Pen.Width := Thickness;
+    spm:=pmBlack; // satisfy compiler
+    if Overlay then begin
+      spm:=Canvas.Pen.Mode;
+      Canvas.Pen.Mode:=pmXor;
+    end;
+    //
     Canvas.Rectangle(Rect(TL, TL, R.Width - BR, R.Height - BR));
+    //
+    if Overlay then
+      Canvas.Pen.Mode:=spm;
   end;
 end;
 

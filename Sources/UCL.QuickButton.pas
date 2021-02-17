@@ -127,20 +127,64 @@ end;
 procedure TUQuickButton.UpdateColors;
 var
   TM: TUCustomThemeManager;
+  IsDark: Boolean;
+  BaseColor, AccentColor: TColor;
 begin
   TM := SelectThemeManager(Self);
-  case ButtonState of
-    csNone:  begin
-      if not Transparent then begin
+  IsDark := (TM <> Nil) and (TM.ThemeUsed = utDark);
+  AccentColor := SelectAccentColor(TM, CustomAccentColor);
+
+  if ButtonState = csNone then begin
+    if not Transparent then begin
+      ParentColor := True;
+      BackColor := Color;
+    end
+    else begin
+      TextColor := Font.Color;
+      Exit;
+    end;
+  end
+  else begin
+    BaseColor:=clNone; // satisfy compiler
+    // select base color
+    case ButtonStyle of
+      qbsNone: ;
+      qbsQuit: BaseColor := $002311E8;
+      qbsHighlight: BaseColor := AccentColor;
+      //qbsMax: ;
+      //qbsMin: ;
+      //qbsSysButton: ;
+    else
+      begin
         ParentColor := True;
-        BackColor := Color;
-      end
-      else begin
-        TextColor := Font.Color;
-        Exit;
+        BaseColor := Color;
       end;
     end;
-
+    //
+    // change BaseColor to BackColor
+    case ButtonState of
+      csHover: begin
+        if ButtonStyle in [qbsNone, qbsMax, qbsMin, qbsSysButton] then begin
+          BackColor := BrightenColor(BaseColor, PressBrightnessDelta);
+        end
+        else
+          BackColor := BaseColor;
+      end;
+      csPress: begin
+        if ButtonStyle in [qbsQuit, qbsHighlight] then begin
+          BackColor := BrightenColor(BaseColor, PressBrightnessDelta);
+        end
+        else begin
+          if IsDark then
+            BackColor := ColorChangeLightness(BaseColor, 180)
+          else
+            BackColor := ColorChangeLightness(BaseColor, 100);
+        end;
+      end;
+    end;
+  end;
+{
+  case ButtonState of
     csHover: begin
       if CustomAccentColor = clDefault then
         BackColor := SelectAccentColor(TM, CustomAccentColor)
@@ -202,6 +246,7 @@ begin
         BackColor := DarkColor;
     end;
   end;
+}
   TextColor := GetTextColorFromBackground(BackColor);
 end;
 

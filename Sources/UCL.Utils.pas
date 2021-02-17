@@ -21,9 +21,10 @@ function CreatePreMultipliedRGBQuad(Color: TColor; Alpha: Byte = $FF): TRGBQuad;
 function CreateSolidBrushWithAlpha(Color: TColor; Alpha: Byte = $FF): HBRUSH;
 
 // Color
-function BrightenColor(aColor: TColor; Delta: Integer): TColor;
+function BrightenColor(AColor: TColor; Delta: Integer): TColor;
+function ColorChangeLightness(AColor: TColor; Value: Integer): TColor;
 function GetTextColorFromBackground(BackColor: TColor): TColor;
-function MulColor(aColor: TColor; Base: Single): TColor;
+function MulColor(AColor: TColor; Base: Single): TColor;
 
 // Blend support
 function CreateBlendFunc(Alpha: Byte; Gradient: Boolean): BLENDFUNCTION;
@@ -122,6 +123,14 @@ begin
   ColorRGBToHLS(aColor, H, L, S);   //  VCL.GraphUtil
   L := L + Delta;
   Result := ColorHLSToRGB(H, L, S);
+end;
+
+function ColorChangeLightness(AColor: TColor; Value: Integer): TColor;
+var
+  H, S, L: Word;
+begin
+  ColorRGBToHLS(AColor, H, L, S);
+  Result := ColorHLSToRGB(H, Value, S);
 end;
 
 function GetTextColorFromBackground(BackColor: TColor): TColor;

@@ -24,8 +24,6 @@ uses
 type
   TUButton = class(TUCustomControl)
   private var
-    BorderThickness: Integer;
-    mulScale: Integer;
     BackColor, BorderColor, TextColor: TColor;
     ImgRect, TextRect: TRect;
 
@@ -34,6 +32,7 @@ type
     FBorderColors: TUThemeButtonStateColorSet;
     FTextColors: TUThemeButtonStateColorSet;
 
+    FBorderThickness: Integer;
     FButtonState: TUControlState;
     FAlignment: TAlignment;
     FImages: TCustomImageList;
@@ -52,6 +51,7 @@ type
     procedure SetBackColors(Value: TUThemeButtonStateColorSet);
     procedure SetBorderColors(Value: TUThemeButtonStateColorSet);
     procedure SetTextColors(Value: TUThemeButtonStateColorSet);
+    procedure SetBorderThickness(Value: Integer);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetAlignment(const Value: TAlignment);
     procedure SetImages(const Value: TCustomImageList);
@@ -96,6 +96,7 @@ type
     property BorderColors: TUThemeButtonStateColorSet read FBorderColors write SetBorderColors;
     property TextColors: TUThemeButtonStateColorSet read FTextColors write SetTextColors;
 
+    property BorderThickness: Integer read FBorderThickness write SetBorderThickness default -1;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property Alignment: TAlignment read FAlignment write SetAlignment default taCenter;
     property Images: TCustomImageList read FImages write SetImages;
@@ -125,8 +126,7 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
-  BorderThickness := 1;
-  mulScale:=1;
+  FBorderThickness := -1;
 
   //  New properties
   FBackColors := TUThemeButtonStateColorSet.Create;
@@ -262,6 +262,16 @@ begin
   FTextColors.Assign(Value);
 end;
 
+procedure TUButton.SetBorderThickness(Value: Integer);
+begin
+  if FBorderThickness <> Value then begin
+    if Value < -1 then
+      Value := -1;
+    FBorderThickness := Value;
+    UpdateTheme;
+  end;
+end;
+
 procedure TUButton.SetButtonState(const Value: TUControlState);
 begin
   if Value <> FButtonState then begin
@@ -365,7 +375,7 @@ begin
     P:=ScreenToClient(P);
 
     // Draw border
-    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, SelectControlBorderThickness(TM, BorderThickness) * mulScale);
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, SelectControlBorderThickness(TM, FBorderThickness, mulScale));
 
     if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
       DrawBumpMap(bmp.Canvas, P.X, P.Y, TM.ThemeUsed = utDark);
@@ -403,8 +413,7 @@ end;
 
 procedure TUButton.DoChangeScale(M, D: Integer);
 begin
-//  BorderThickness := MulDiv(BorderThickness, M, D);
-  mulScale := MulDiv(mulScale, M, D);
+  inherited DoChangeScale(M, D);
   UpdateRects;
 end;
 

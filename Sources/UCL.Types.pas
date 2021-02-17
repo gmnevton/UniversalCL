@@ -9,6 +9,15 @@ interface
 uses
   Types;
 
+//type
+//  // our data types
+//  TU_SInt8  = type ShortInt;
+//  TU_UInt8  = type Byte;
+//  TU_SInt16 = type SmallInt;
+//  TU_UInt16 = type Word;
+//  TU_SInt32 = type Integer;
+//  TU_UInt32 = type LongWord;
+
 {$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
 const

@@ -37,6 +37,7 @@ type
   TUCustomControl = class(TCustomControl, IUThemedComponent, IUIDEAware)
   protected
     FThemeManager: TUThemeManager;
+    mulScale: Integer;
   {$IF CompilerVersion < 30}
     FCurrentPPI: Integer;
     FIsScaling: Boolean;
@@ -47,6 +48,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
     procedure DoChangeScale(M, D: Integer); virtual;
+    procedure UpdateScale(var Scale: Integer; M, D: Integer); virtual;
     //
     procedure SetThemeManager(const Value: TUThemeManager); virtual;
     // IUThemedComponent
@@ -431,6 +433,7 @@ constructor TUCustomControl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FThemeManager := Nil;
+  mulScale := 1;
 end;
 
 destructor TUCustomControl.Destroy;
@@ -467,6 +470,14 @@ end;
 function TUCustomControl.IsDesigning: Boolean;
 begin
   Result := (csDesigning in ComponentState);
+end;
+
+procedure TUCustomControl.UpdateScale(var Scale: Integer; M, D: Integer);
+begin
+  if M > D then // up size
+    Inc(Scale, (M - D) div 24)
+  else // down size
+    Dec(Scale, (D - M) div 24);
 end;
 
 {$REGION 'Compatibility with older Delphi'}
@@ -528,7 +539,7 @@ end;
 
 procedure TUCustomControl.DoChangeScale(M, D: Integer);
 begin
-// nothing here
+  UpdateScale(mulScale, M, D);
 end;
 
 procedure TUCustomControl.SetThemeManager(const Value: TUThemeManager);
