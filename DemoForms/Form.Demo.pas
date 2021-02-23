@@ -207,6 +207,8 @@ begin
   TM := SelectThemeManager(Self);
   TM.OnBeforeUpdate := AppThemeBeforeUpdate;
   TM.OnAfterUpdate  := AppThemeAfterUpdate;
+  TM.ControlsBorderThickness:=1;
+  TM.UseStrictControlsBorderThickness:=True; // no rescaling
 end;
 
 procedure TformDemo.FormShow(Sender: TObject);

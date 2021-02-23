@@ -358,6 +358,7 @@ var
   ParentForm: TCustomForm;
   FullScreen: Boolean;
   MousePoint: TPoint;
+  Restore: Boolean;
 begin
   if not Enabled then
     Exit;
@@ -381,7 +382,13 @@ begin
         qbsMax: begin
           if (ParentForm <> Nil) and not FullScreen then begin
             ReleaseCapture;
-            if ParentForm.WindowState <> wsNormal then
+            Restore:=(ParentForm.WindowState <> wsNormal);
+            if Restore then
+              Caption := UF_MAXIMIZE
+            else
+              Caption := UF_RESTORE;
+            //
+            if Restore then
               SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)
             else
               SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);

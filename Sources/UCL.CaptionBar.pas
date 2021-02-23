@@ -82,7 +82,9 @@ uses
   UCL.ThemeManager,
   UCL.Form,
   UCL.IntAnimation,
-  UCL.Graphics;
+  UCL.Graphics,
+  UCL.FontIcons,
+  UCL.QuickButton;
 
 type
   TUFormAccess = class(TUForm);
@@ -270,6 +272,25 @@ end;
 procedure TUCaptionBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 var
   ParentForm: TCustomForm;
+  Restore: Boolean;
+
+  procedure SetMaximizeButtonCaption(const IsNormal: Boolean; const NormalCaption, RestoreCaption: String);
+  var
+    Control: TControl;
+    i: Integer;
+  begin
+    for i:=0 to ControlCount - 1 do begin
+      Control:=Controls[i];
+      if (Control is TUQuickButton) and (TUQuickButton(Control).ButtonStyle = qbsMax) then begin
+        if IsNormal then
+          TUQuickButton(Control).Caption := NormalCaption
+        else
+          TUQuickButton(Control).Caption := RestoreCaption;
+        Exit;
+      end;
+    end;
+  end;
+
 begin
   inherited;
   if IsDesigning then
@@ -277,10 +298,13 @@ begin
 
   ParentForm := GetParentForm(Self, True);
   if (ParentForm is TForm) and (biMaximize in (ParentForm as TForm).BorderIcons) then begin
-    if ParentForm.WindowState = wsMaximized then
-      ParentForm.WindowState := wsNormal
-    else if ParentForm.WindowState = wsNormal then
-      ParentForm.WindowState := wsMaximized;
+    Restore:=(ParentForm.WindowState <> wsNormal);
+    SetMaximizeButtonCaption(not Restore, UF_MAXIMIZE, UF_RESTORE);
+    //
+    if Restore then
+      SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)
+    else
+      SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
   end;
 end;
 

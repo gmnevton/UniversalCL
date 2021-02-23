@@ -26,7 +26,7 @@ type
 
   TUItemButton = class(TUCustomControl)
   private var
-    BorderThickness: Integer;
+    FBorderThickness: Integer;
     BackColor, BorderColor, TextColor, DetailColor, ActiveColor: TColor;
     CheckBoxRect, LeftIconRect, RightIconRect, DetailRect, TextRect: TRect;
 
@@ -71,6 +71,7 @@ type
     procedure DoToggle;
 
     // Setters
+    procedure SetBorderThickness(Value: Integer);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetImageLeftIndex(const Value: Integer);
     procedure SetImageRightIndex(const Value: Integer);
@@ -127,6 +128,7 @@ type
     property ObjectSelected: TUItemObjectKind read FObjectSelected default iokNone;
 
   published
+    property BorderThickness: Integer read FBorderThickness write SetBorderThickness default -1;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
 
     // Image
@@ -190,7 +192,7 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
-  BorderThickness := 1;
+  FBorderThickness := -1;
 
   DragCursor:=crDefault;
 
@@ -439,6 +441,16 @@ end;
 
 //  SETTERS
 
+procedure TUItemButton.SetBorderThickness(Value: Integer);
+begin
+  if FBorderThickness <> Value then begin
+    if Value < -1 then
+      Value := -1;
+    FBorderThickness := Value;
+    UpdateTheme;
+  end;
+end;
+
 procedure TUItemButton.SetButtonState(const Value: TUControlState);
 begin
   if Value <> FButtonState then begin
@@ -618,7 +630,7 @@ begin
     P:=ScreenToClient(P);
 
     // Draw border
-    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, BorderThickness);
+    DrawBorder(bmp.Canvas, Rect(0, 0, Width, Height), BorderColor, SelectControlBorderThickness(TM, FBorderThickness, mulScale));
 
     if Enabled and MouseInClient and not (csPaintCopy in ControlState) then
 //      DrawBumpMap(bmp.Canvas, P.X, Height div 2, TM.ThemeUsed = utDark);
