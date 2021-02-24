@@ -58,6 +58,7 @@ type
 
     //
     procedure UpdateChildControls(const Root: TControl);
+    procedure UpdateButtons;
 
   published
     property BackColors: TUThemeCaptionBarColorSet read FBackColors write SetBackColors;
@@ -221,6 +222,8 @@ begin
 end;
 
 procedure TUCaptionBar.Paint;
+var
+  bmp: TBitmap;
 begin
 //  if IsDesigning then begin
 //    // Do not inherited
@@ -228,14 +231,46 @@ begin
 //    Exit;
 //  end;
   //  Paint background
-  Canvas.Brush.Color := BackColor;
-  Canvas.FillRect(Rect(0, 0, Width, Height));
+  bmp := TBitmap.Create;
+  try
+    bmp.SetSize(Width, Height);
 
-  //  Draw text
-  if ShowCaption then begin
-    Canvas.Font.Assign(Font);
-    Canvas.Font.Color := TextColor;
-    DrawTextRect(Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
+//  Canvas.Brush.Color := BackColor;
+//  Canvas.FillRect(Rect(0, 0, Width, Height));
+    // Paint background
+    bmp.Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
+    bmp.Canvas.FillRect(Rect(0, 0, Width, Height));
+
+    // Draw text
+    if ShowCaption then begin
+//      Canvas.Font.Assign(Font);
+//      Canvas.Font.Color := TextColor;
+//      DrawTextRect(Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
+      bmp.Canvas.Font.Assign(Font);
+      bmp.Canvas.Font.Color := TextColor;
+      DrawTextRect(bmp.Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
+    end;
+    //
+    Canvas.Draw(0, 0, bmp);
+  finally
+    bmp.Free;
+  end;
+end;
+
+procedure TUCaptionBar.UpdateButtons;
+var
+  ParentForm: TCustomForm;
+  i: Integer;
+  control: TControl;
+  full_screen: Boolean;
+begin
+  ParentForm := GetParentForm(Self, True);
+  full_screen:=(ParentForm is TUForm) and TUForm(ParentForm).FullScreen;
+  for i := 0 to ControlCount - 1 do begin
+    control := Controls[i];
+    if (control is TUQuickButton) and (TUQuickButton(control).ButtonStyle in [qbsMax, qbsMin]) then begin
+      control.Visible := not full_screen;
+    end;
   end;
 end;
 
@@ -276,16 +311,20 @@ var
 
   procedure SetMaximizeButtonCaption(const IsNormal: Boolean; const NormalCaption, RestoreCaption: String);
   var
-    Control: TControl;
     i: Integer;
+    control: TControl;
   begin
     for i:=0 to ControlCount - 1 do begin
-      Control:=Controls[i];
-      if (Control is TUQuickButton) and (TUQuickButton(Control).ButtonStyle = qbsMax) then begin
-        if IsNormal then
-          TUQuickButton(Control).Caption := NormalCaption
-        else
-          TUQuickButton(Control).Caption := RestoreCaption;
+      control:=Controls[i];
+      if (control is TUQuickButton) and (TUQuickButton(control).ButtonStyle = qbsMax) then begin
+        if IsNormal then begin
+          TUQuickButton(control).Caption := NormalCaption;
+          TUQuickButton(control).Hint := TUQuickButton(control).HintMaxButton;
+        end
+        else begin
+          TUQuickButton(control).Caption := RestoreCaption;
+          TUQuickButton(control).Hint := TUQuickButton(control).HintRestoreButton;
+        end;
         Exit;
       end;
     end;
@@ -297,14 +336,14 @@ begin
     Exit;
 
   ParentForm := GetParentForm(Self, True);
-  if (ParentForm is TForm) and (biMaximize in (ParentForm as TForm).BorderIcons) then begin
+  if (ParentForm is TUForm) and (biMaximize in TUForm(ParentForm).BorderIcons) and not TUForm(ParentForm).FullScreen then begin
     Restore:=(ParentForm.WindowState <> wsNormal);
-    SetMaximizeButtonCaption(not Restore, UF_MAXIMIZE, UF_RESTORE);
+    SetMaximizeButtonCaption(Restore, UF_MAXIMIZE, UF_RESTORE);
     //
     if Restore then
-      SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)
+      ParentForm.WindowState := wsNormal
     else
-      SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+      ParentForm.WindowState := wsMaximized;
   end;
 end;
 

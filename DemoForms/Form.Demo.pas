@@ -155,6 +155,7 @@ type
     PasteCtrlV1: TMenuItem;
     buttonAppListForm: TUSymbolButton;
     buttonBlurForm: TUQuickButton;
+    UQuickButton1: TUQuickButton;
     procedure buttonReloadSettingsClick(Sender: TObject);
     procedure buttonAniToRightClick(Sender: TObject);
     procedure buttonRandomProgressClick(Sender: TObject);
@@ -177,6 +178,7 @@ type
     procedure buttonAppListFormClick(Sender: TObject);
     procedure buttonBlurFormClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure UQuickButton1Click(Sender: TObject);
 
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
@@ -394,6 +396,14 @@ procedure TformDemo.sliderHorzChange(Sender: TObject);
 begin
   //  Change progress bar value
   progressConnected.Value := sliderHorz.Value;
+end;
+
+procedure TformDemo.UQuickButton1Click(Sender: TObject);
+begin
+  if not FullScreen then
+    FullScreen := True
+  else
+    FullScreen := False;
 end;
 
 procedure TformDemo.buttonBlurFormClick(Sender: TObject);

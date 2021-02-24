@@ -30,9 +30,18 @@ type
     FCustomAccentColor: TColor;
     FPressBrightnessDelta: Integer;
     FTransparent: Boolean;
+    FStickToControl: TControl;
+    FUpdatingAlignment: Boolean;
+    FHintMinButton: String;
+    FHintMaxButton: String;
+    FHintRestoreButton: String;
+    FHintCloseButton: String;
+    FHintHighlightButton: String;
+    FHintSysButton: String;
 
     //  Internal
     procedure UpdateColors;
+    function ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
 
     //  Setters
     procedure SetButtonState(const Value: TUControlState);
@@ -46,7 +55,12 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
+    procedure StickToControl(AControl: TControl); virtual;
+
+  protected
     procedure Paint; override;
+    procedure RequestAlign; override;
+    procedure VisibleChanging; override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -58,6 +72,13 @@ type
   published
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default qbsSysButton;
+
+    property HintMinButton: String read FHintMinButton write FHintMinButton;
+    property HintMaxButton: String read FHintMaxButton write FHintMaxButton;
+    property HintRestoreButton: String read FHintRestoreButton write FHintRestoreButton;
+    property HintCloseButton: String read FHintCloseButton write FHintCloseButton;
+    property HintHighlightButton: String read FHintHighlightButton write FHintHighlightButton;
+    property HintSysButton: String read FHintSysButton write FHintSysButton;
 
     property LightColor: TColor read FLightColor write FLightColor default $E6E6E6;
     property DarkColor: TColor read FDarkColor write FDarkColor default $191919;
@@ -78,7 +99,8 @@ uses
   UCL.ThemeManager,
   UCL.Colors,
   UCL.FontIcons,
-  UCL.Form;
+  UCL.Form,
+  UCL.CaptionBar;
 
 { TUQuickButton }
 
@@ -97,6 +119,8 @@ begin
   FCustomAccentColor := $D77800;
   FPressBrightnessDelta := 25;
   FTransparent := False;
+  FStickToControl := Nil;
+  FUpdatingAlignment := False;
 
   //  Old props
   Caption := UF_HOME; // Back icon
@@ -250,6 +274,32 @@ begin
   TextColor := GetTextColorFromBackground(BackColor);
 end;
 
+function TUQuickButton.ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
+var
+  LControl: TControl;
+
+  function GetControlAtPos(AControl: TControl): Boolean;
+  var
+    P: TPoint;
+  begin
+    with AControl do begin
+      P := Point(Pos.X - Left, Pos.Y - Top);
+      Result := PointInRect(P, ClientRect) and (((csDesigning in ComponentState) or (Enabled or AllowDisabled)) and (Perform(CM_HITTEST, 0, PointToLParam(P)) <> 0));
+      if Result then
+        LControl := AControl;
+    end;
+  end;
+
+var
+  I: Integer;
+begin
+  LControl := Nil;
+  for I := ParentControl.ControlCount - 1 downto 0 do
+    if (ParentControl.Controls[I] <> Self) and GetControlAtPos(TControl(ParentControl.Controls[I])) then
+      Break;
+  Result := LControl;
+end;
+
 //  SETTERS
 
 procedure TUQuickButton.SetButtonState(const Value: TUControlState);
@@ -280,6 +330,7 @@ begin
         FCustomAccentColor := clNone;
         FPressBrightnessDelta := 32;
         Caption := UF_CLOSE; // Close icon
+        Hint := HintCloseButton;
       end;
       qbsSysButton,
       qbsMax,
@@ -290,9 +341,18 @@ begin
         FCustomAccentColor := clNone;
         FPressBrightnessDelta := 32;
         case FButtonStyle of
-          qbsMax      : Caption := UF_MAXIMIZE;
-          qbsMin      : Caption := UF_MINIMIZE;
-          qbsSysButton: Caption := UF_HOME;
+          qbsMax: begin
+            Caption := UF_MAXIMIZE;
+            Hint := HintMaxButton;
+          end;
+          qbsMin: begin
+            Caption := UF_MINIMIZE;
+            Hint := HintMinButton;
+          end;
+          qbsSysButton: begin
+            Caption := UF_HOME;
+            Hint := HintSysButton;
+          end;
         end;
       end;
       qbsHighlight: begin
@@ -304,6 +364,7 @@ begin
         FCustomAccentColor := clDefault;
         FPressBrightnessDelta := 25;
         //Caption := UF_BACK;
+        Hint := HintHighlightButton;
       end;
     end;
 
@@ -317,6 +378,46 @@ begin
     FTransparent := Value;
     UpdateColors;
     Repaint;
+  end;
+end;
+
+procedure TUQuickButton.StickToControl(AControl: TControl);
+
+  function GetWallPosition(C1: TControl; AAlign: TAlign): TPoint;
+  begin
+    Result := EmptyPoint;
+    case AAlign of
+      alTop   : Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop{ - 1});
+      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop + C1.Margins.ControlHeight{ + 1});
+      alLeft  : Result := Point(C1.Margins.ControlLeft{ - 1}, C1.Margins.ControlTop);
+      alRight : Result := Point(C1.Margins.ControlLeft + C1.Margins.ControlWidth{ + 1}, C1.Margins.ControlTop);
+    end;
+  end;
+
+var
+  control: TControl;
+begin
+  if (Parent = Nil) or FUpdatingAlignment then
+    Exit;
+  //
+  if AControl = Nil then begin // determine which control is next to us according to our alignment
+    control := ControlAtPos(Parent, GetWallPosition(Self, Align), True);
+    if control <> Nil then
+      FStickToControl := control;
+  end
+  else begin
+    FUpdatingAlignment := True;
+    try
+      case Align of
+        alTop   : SetBounds(FStickToControl.Margins.ControlLeft, FStickToControl.Margins.ControlTop + FStickToControl.Margins.ControlHeight + 1, Width, Height);
+        alBottom: SetBounds(FStickToControl.Margins.ControlLeft, FStickToControl.Margins.ControlTop - 1, Width, Height);
+        alLeft  : SetBounds(FStickToControl.Margins.ControlLeft + FStickToControl.Margins.ControlWidth + 1, FStickToControl.Margins.ControlTop, Width, Height);
+        alRight : SetBounds(FStickToControl.Margins.ControlLeft - 1, FStickToControl.Margins.ControlTop, Width, Height);
+      end;
+    finally
+      FStickToControl := Nil;
+      FUpdatingAlignment := False;
+    end;
   end;
 end;
 
@@ -341,6 +442,26 @@ begin
 
   TextRect := Rect(0, 0, Width, Height);
   DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, True);
+end;
+
+procedure TUQuickButton.RequestAlign;
+begin
+  inherited;
+  if IsDesigning then
+    Exit;
+  //
+  if (Parent <> Nil) and (Parent is TUCaptionBar) then begin
+    if Visible and (FStickToControl <> Nil) then
+      StickToControl(FStickToControl);
+  end;
+end;
+
+procedure TUQuickButton.VisibleChanging;
+begin
+  if Visible and (Parent <> Nil) and (Parent is TUCaptionBar) then
+    StickToControl(Nil);
+  //
+  inherited;
 end;
 
 //  MESSAGES

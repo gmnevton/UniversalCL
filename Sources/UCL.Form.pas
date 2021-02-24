@@ -64,6 +64,7 @@ type
 
   private
     // Messages
+    procedure WM_SysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
     procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
     procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
     procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
@@ -137,7 +138,8 @@ uses
   Dwmapi,
   UCL.SystemSettings,
   UCL.Types,
-  UCL.Utils;
+  UCL.Utils,
+  UCL.CaptionBar;
 
 { TUForm }
 
@@ -496,6 +498,12 @@ begin
     end;
   end;
 
+  // Update cation bar
+  if CaptionBar <> Nil then begin
+    if not IsDesigning and (CaptionBar is TUCaptionBar) then
+      TUCaptionBar(CaptionBar).UpdateButtons;
+  end;
+
   CurrentScreen := Screen.MonitorFromWindow(Handle);
   if CurrentScreen = Nil then
     Exit;
@@ -518,7 +526,7 @@ begin
     Top := CurrentScreen.Top - Space;
     Left := CurrentScreen.Left - Space;
     Width := CurrentScreen.WorkareaRect.Width + Space2;
-    Height := CurrentScreen.WorkAreaRect.Height + Space2;
+    Height := CurrentScreen.WorkareaRect.Height + Space2;
   end;
 end;
 
@@ -582,6 +590,19 @@ end;
 //  MESSAGES
 
 {$REGION 'Messages handling'}
+procedure TUForm.WM_SysCommand(var Msg: TWMSysCommand);
+begin
+  // Prevent move and restore
+  if FullScreen then begin
+    case Msg.CmdType and $FFF0 of
+      SC_MOVE,
+      SC_RESTORE: Exit;
+    end;
+  end;
+
+  inherited;
+end;
+
 procedure TUForm.WMActivate(var Msg: TWMActivate);
 begin
   inherited;

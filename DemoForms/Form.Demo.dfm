@@ -12,6 +12,7 @@ object formDemo: TformDemo
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
+  ShowHint = True
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
@@ -482,6 +483,7 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       ButtonStyle = qbsHighlight
+      HintHighlightButton = 'Cofnij'
       LightColor = 14120960
       DarkColor = 14120960
       CustomAccentColor = clDefault
@@ -490,7 +492,6 @@ object formDemo: TformDemo
     object buttonWinClose: TUQuickButton
       Left = 955
       Top = 0
-      Hint = 'Close'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -498,19 +499,18 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
-      ParentShowHint = False
-      ShowHint = True
       ButtonStyle = qbsQuit
+      HintCloseButton = 'Zamknij'
       LightColor = 2298344
       DarkColor = 2298344
       CustomAccentColor = clNone
       PressBrightnessDelta = 32
       Caption = #57610
+      ExplicitLeft = 987
     end
     object buttonWinMax: TUQuickButton
       Left = 910
       Top = 0
-      Hint = 'Maximize'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -518,19 +518,20 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
-      ParentShowHint = False
-      ShowHint = True
       ButtonStyle = qbsMax
+      HintMaxButton = 'Maksymalizuj okno'
+      HintRestoreButton = 'Zmniejsz okno'
       LightColor = 13619151
       DarkColor = 3947580
       CustomAccentColor = clNone
       PressBrightnessDelta = 32
       Caption = #57347
+      ExplicitLeft = 931
+      ExplicitTop = 4
     end
     object buttonWinMin: TUQuickButton
       Left = 865
       Top = 0
-      Hint = 'Minimize'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -538,16 +539,15 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
-      ParentShowHint = False
-      ShowHint = True
       ButtonStyle = qbsMin
+      HintMinButton = 'Minimalizuj okno'
       LightColor = 13619151
       DarkColor = 3947580
       CustomAccentColor = clNone
       PressBrightnessDelta = 32
       Caption = #57608
-      ExplicitLeft = 868
-      ExplicitTop = -6
+      ExplicitLeft = 891
+      ExplicitTop = 4
     end
     object buttonBlurForm: TUQuickButton
       Left = 544
@@ -560,11 +560,32 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       OnClick = buttonBlurFormClick
+      HintSysButton = 'Test prze'#378'roczysto'#347'ci'
       LightColor = 2829099
       DarkColor = 2829099
       CustomAccentColor = clNone
       PressBrightnessDelta = 32
-      Caption = #57615
+      Caption = #59627
+      ExplicitLeft = 560
+    end
+    object UQuickButton1: TUQuickButton
+      Left = 499
+      Top = 0
+      Hint = 'Pe'#322'ny ekran'
+      Align = alRight
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe MDL2 Assets'
+      Font.Style = []
+      ParentFont = False
+      OnClick = UQuickButton1Click
+      ButtonStyle = qbsNone
+      LightColor = 13619151
+      DarkColor = 3947580
+      CustomAccentColor = clNone
+      PressBrightnessDelta = 32
+      Caption = #59200
       ExplicitLeft = 540
       ExplicitTop = 10
     end
