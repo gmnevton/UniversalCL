@@ -12,7 +12,8 @@ uses
   UCL.Classes,
   UCL.Types,
   UCL.Utils,
-  UCL.Graphics;
+  UCL.Graphics,
+  UCL.Colors;
 
 type
   TUQuickButtonStyle = (qbsNone, qbsQuit, qbsMax, qbsMin, qbsSysButton, qbsHighlight);
@@ -23,13 +24,11 @@ type
     TextColor: TColor;
 
   private
+    FBackColors: TUThemeControlColorSet;
     FButtonState: TUControlState;
     FButtonStyle: TUQuickButtonStyle;
-    FLightColor: TColor;
-    FDarkColor: TColor;
     FCustomAccentColor: TColor;
     FPressBrightnessDelta: Integer;
-    FTransparent: Boolean;
     FStickToControl: TControl;
     FUpdatingAlignment: Boolean;
     FHintMinButton: String;
@@ -44,9 +43,9 @@ type
     function ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
 
     //  Setters
+    procedure SetBackColors(Value: TUThemeControlColorSet);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetButtonStyle(const Value: TUQuickButtonStyle);
-    procedure SetTransparent(const Value: Boolean);
 
     //  Messages
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
@@ -54,10 +53,14 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
+    // Childs property change events
+    procedure ColorsChange(Sender: TObject);
+
   protected
     procedure StickToControl(AControl: TControl); virtual;
 
   protected
+    procedure Loaded; override;
     procedure Paint; override;
     procedure RequestAlign; override;
     procedure VisibleChanging; override;
@@ -70,6 +73,7 @@ type
     procedure UpdateTheme; override;
 
   published
+    property BackColors: TUThemeControlColorSet read FBackColors write SetBackColors;
     property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property ButtonStyle: TUQuickButtonStyle read FButtonStyle write SetButtonStyle default qbsSysButton;
 
@@ -80,11 +84,7 @@ type
     property HintHighlightButton: String read FHintHighlightButton write FHintHighlightButton;
     property HintSysButton: String read FHintSysButton write FHintSysButton;
 
-    property LightColor: TColor read FLightColor write FLightColor default $E6E6E6;
-    property DarkColor: TColor read FDarkColor write FDarkColor default $191919;
     property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
-    property PressBrightnessDelta: Integer read FPressBrightnessDelta write FPressBrightnessDelta default 25;
-    property Transparent: Boolean read FTransparent write SetTransparent default false;
 
     property Caption;
     property Height default 32;
@@ -97,7 +97,6 @@ uses
   SysUtils,
   Windows,
   UCL.ThemeManager,
-  UCL.Colors,
   UCL.FontIcons,
   UCL.Form,
   UCL.CaptionBar;
@@ -111,29 +110,44 @@ begin
   inherited Create(AOwner);
   ControlStyle := ControlStyle - [csDoubleClicks];
 
-  //  New props
+  // New props
   FButtonState := csNone;
   FButtonStyle := qbsSysButton;
-  FLightColor := $E6E6E6;
-  FDarkColor := $191919;
   FCustomAccentColor := $D77800;
   FPressBrightnessDelta := 25;
-  FTransparent := False;
   FStickToControl := Nil;
   FUpdatingAlignment := False;
 
-  //  Old props
+  FBackColors := TUThemeControlColorSet.Create;
+  FBackColors.Assign(QUICKBUTTON_BACK);
+  FBackColors.OnChange := ColorsChange;
+
+  // Old props
   Caption := UF_HOME; // Back icon
   Font.Name := 'Segoe MDL2 Assets';
   Font.Size := 10;
   Height := 32;
   Width := 45;
+  ParentColor := True;
 
   UpdateColors;
 end;
 
 destructor TUQuickButton.Destroy;
 begin
+  FBackColors.Free;
+  inherited;
+end;
+
+procedure TUQuickButton.Loaded;
+begin
+  case FButtonStyle of
+    qbsQuit     : Hint := HintCloseButton;
+    qbsMax      : Hint := HintMaxButton;
+    qbsMin      : Hint := HintMinButton;
+    qbsSysButton: Hint := HintSysButton;
+    qbsHighlight: Hint := HintHighlightButton;
+  end;
   inherited;
 end;
 
@@ -159,44 +173,33 @@ begin
   AccentColor := SelectAccentColor(TM, CustomAccentColor);
 
   if ButtonState = csNone then begin
-    if not Transparent then begin
-      ParentColor := True;
-      BackColor := Color;
-    end
-    else begin
-      TextColor := Font.Color;
-      Exit;
-    end;
+    ParentColor := True;
+    BackColor := Color;
   end
   else begin
-    BaseColor:=clNone; // satisfy compiler
     // select base color
     case ButtonStyle of
-      qbsNone: ;
       qbsQuit: BaseColor := $002311E8;
       qbsHighlight: BaseColor := AccentColor;
-      //qbsMax: ;
-      //qbsMin: ;
-      //qbsSysButton: ;
+      qbsMax,
+      qbsMin,
+      qbsSysButton: BaseColor := Color;
     else
-      begin
-        ParentColor := True;
-        BaseColor := Color;
-      end;
+      BaseColor := FBackColors.GetColor(TM);
     end;
     //
     // change BaseColor to BackColor
     case ButtonState of
       csHover: begin
         if ButtonStyle in [qbsNone, qbsMax, qbsMin, qbsSysButton] then begin
-          BackColor := BrightenColor(BaseColor, PressBrightnessDelta);
+          BackColor := BrightenColor(BaseColor, FPressBrightnessDelta);
         end
         else
           BackColor := BaseColor;
       end;
       csPress: begin
         if ButtonStyle in [qbsQuit, qbsHighlight] then begin
-          BackColor := BrightenColor(BaseColor, PressBrightnessDelta);
+          BackColor := BrightenColor(BaseColor, FPressBrightnessDelta);
         end
         else begin
           if IsDark then
@@ -207,71 +210,13 @@ begin
       end;
     end;
   end;
-{
-  case ButtonState of
-    csHover: begin
-      if CustomAccentColor = clDefault then
-        BackColor := SelectAccentColor(TM, CustomAccentColor)
-      else if CustomAccentColor = clNone then begin
-        case ButtonStyle of
-          qbsQuit: begin
-            //FLightColor := $002311E8;
-            //FDarkColor := $002311E8;
-            BackColor := $002311E8;
-          end;
-          qbsMax,
-          qbsMin,
-          qbsSysButton: begin
-            ParentColor := True;
-            BackColor := Color;
-            BackColor := BrightenColor(BackColor, PressBrightnessDelta);
-          end;
-          qbsHighlight: begin
-            if TM.UseSystemAccentColor then
-              BackColor := SelectAccentColor(TM, CustomAccentColor)
-            else begin
-              if TM.ThemeUsed = utLight then
-                BackColor := LightColor
-              else
-                BackColor := DarkColor;
-            end;
-          end;
-        else
-          if TM.ThemeUsed = utLight then
-            BackColor := LightColor
-          else
-            BackColor := DarkColor;
-        end;
-      end
-      else
-        BackColor := CustomAccentColor;
-    end;
-
-    csPress: begin
-//      if not TM.UseSystemAccentColor then
-//        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
-//      else if TM.ThemeUsed = utLight then
-//        BackColor := BrightenColor(LightColor, PressBrightnessDelta)
-//      else
-//        BackColor := BrightenColor(DarkColor, -PressBrightnessDelta);
-      BackColor := BrightenColor(BackColor, PressBrightnessDelta)
-    end;
-
-    csDisabled: begin
-      BackColor := $666666;
-    end;
-
-    csFocused: begin
-      if not TM.UseSystemAccentColor then
-        BackColor := LightColor
-      else if TM.ThemeUsed = utLight then
-        BackColor := LightColor
-      else
-        BackColor := DarkColor;
-    end;
-  end;
-}
   TextColor := GetTextColorFromBackground(BackColor);
+end;
+
+procedure TUQuickButton.ColorsChange(Sender: TObject);
+begin
+  UpdateColors;
+  Invalidate;
 end;
 
 function TUQuickButton.ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
@@ -302,6 +247,11 @@ end;
 
 //  SETTERS
 
+procedure TUQuickButton.SetBackColors(Value: TUThemeControlColorSet);
+begin
+  FBackColors.Assign(Value);
+end;
+
 procedure TUQuickButton.SetButtonState(const Value: TUControlState);
 begin
   if Value <> FButtonState then begin
@@ -312,21 +262,15 @@ begin
 end;
 
 procedure TUQuickButton.SetButtonStyle(const Value: TUQuickButtonStyle);
-var
-  TM: TUCustomThemeManager;
+//var
+//  TM: TUCustomThemeManager;
 begin
-  TM := SelectThemeManager(Self);
+//  TM := SelectThemeManager(Self);
   if Value <> FButtonStyle then begin
     FButtonStyle := Value;
 
     case FButtonStyle of
-      qbsNone: begin
-        FLightColor := $CFCFCF;
-        FDarkColor := $3C3C3C;
-      end;
       qbsQuit: begin
-        FLightColor := $002311E8;
-        FDarkColor := $002311E8;
         FCustomAccentColor := clNone;
         FPressBrightnessDelta := 32;
         Caption := UF_CLOSE; // Close icon
@@ -335,9 +279,6 @@ begin
       qbsSysButton,
       qbsMax,
       qbsMin: begin
-        ParentColor := True;
-        FLightColor := Color;
-        FDarkColor := Color;
         FCustomAccentColor := clNone;
         FPressBrightnessDelta := 32;
         case FButtonStyle of
@@ -356,12 +297,7 @@ begin
         end;
       end;
       qbsHighlight: begin
-        if not TM.UseSystemAccentColor or ((CustomAccentColor <> clNone) and (CustomAccentColor <> clDefault)) then
-          FLightColor := CustomAccentColor
-        else
-          FLightColor := TM.AccentColor;
-        FDarkColor := FLightColor;
-        FCustomAccentColor := clDefault;
+        FCustomAccentColor := $D77800;
         FPressBrightnessDelta := 25;
         //Caption := UF_BACK;
         Hint := HintHighlightButton;
@@ -369,15 +305,6 @@ begin
     end;
 
     UpdateTheme;
-  end;
-end;
-
-procedure TUQuickButton.SetTransparent(const Value: Boolean);
-begin
-  if Value <> FTransparent then begin
-    FTransparent := Value;
-    UpdateColors;
-    Repaint;
   end;
 end;
 
@@ -427,9 +354,7 @@ procedure TUQuickButton.Paint;
 var
   TextRect: TRect;
 begin
-//  inherited Paint; // no need to call TGraphicControl.Paint, because it is empty procedure
-
-  if not Transparent or (ButtonState <> csNone) then begin //  Paint background
+  if ButtonState <> csNone then begin // Paint background
     Canvas.Brush.Style := bsSolid;
     Canvas.Brush.Handle := CreateSolidBrushWithAlpha(BackColor, 255);
     Canvas.FillRect(Rect(0, 0, Width, Height));
@@ -437,7 +362,7 @@ begin
 
   //  Draw text
   Canvas.Brush.Style := bsClear;
-  Canvas.Font := Font;
+  Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
 
   TextRect := Rect(0, 0, Width, Height);
@@ -504,10 +429,14 @@ begin
           if (ParentForm <> Nil) and not FullScreen then begin
             ReleaseCapture;
             Restore:=(ParentForm.WindowState <> wsNormal);
-            if Restore then
-              Caption := UF_MAXIMIZE
-            else
+            if Restore then begin
+              Caption := UF_MAXIMIZE;
+              Hint := HintMaxButton;
+            end
+            else begin
               Caption := UF_RESTORE;
+              Hint := HintRestoreButton;
+            end;
             //
             if Restore then
               SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)

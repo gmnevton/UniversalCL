@@ -475,6 +475,7 @@ object formDemo: TformDemo
     object buttonAppBack: TUQuickButton
       Left = 0
       Top = 0
+      Hint = 'Cofnij'
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -482,16 +483,18 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       ButtonStyle = qbsHighlight
       HintHighlightButton = 'Cofnij'
-      LightColor = 14120960
-      DarkColor = 14120960
-      CustomAccentColor = clDefault
       Caption = #57510
     end
     object buttonWinClose: TUQuickButton
       Left = 955
       Top = 0
+      Hint = 'Zamknij'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -499,18 +502,20 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       ButtonStyle = qbsQuit
       HintCloseButton = 'Zamknij'
-      LightColor = 2298344
-      DarkColor = 2298344
       CustomAccentColor = clNone
-      PressBrightnessDelta = 32
       Caption = #57610
       ExplicitLeft = 987
     end
     object buttonWinMax: TUQuickButton
       Left = 910
       Top = 0
+      Hint = 'Maksymalizuj okno'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -518,20 +523,22 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       ButtonStyle = qbsMax
       HintMaxButton = 'Maksymalizuj okno'
       HintRestoreButton = 'Zmniejsz okno'
-      LightColor = 13619151
-      DarkColor = 3947580
       CustomAccentColor = clNone
-      PressBrightnessDelta = 32
-      Caption = #57347
-      ExplicitLeft = 931
-      ExplicitTop = 4
+      Caption = #59682
+      ExplicitLeft = 904
+      ExplicitTop = -6
     end
     object buttonWinMin: TUQuickButton
       Left = 865
       Top = 0
+      Hint = 'Minimalizuj okno'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -539,19 +546,21 @@ object formDemo: TformDemo
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       ButtonStyle = qbsMin
       HintMinButton = 'Minimalizuj okno'
-      LightColor = 13619151
-      DarkColor = 3947580
       CustomAccentColor = clNone
-      PressBrightnessDelta = 32
-      Caption = #57608
+      Caption = #59681
       ExplicitLeft = 891
       ExplicitTop = 4
     end
     object buttonBlurForm: TUQuickButton
       Left = 544
       Top = 0
+      Hint = 'Test prze'#378'roczysto'#347'ci'
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -560,12 +569,13 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       OnClick = buttonBlurFormClick
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       HintSysButton = 'Test prze'#378'roczysto'#347'ci'
-      LightColor = 2829099
-      DarkColor = 2829099
       CustomAccentColor = clNone
-      PressBrightnessDelta = 32
-      Caption = #59627
+      Caption = #57615
       ExplicitLeft = 560
     end
     object UQuickButton1: TUQuickButton
@@ -580,11 +590,11 @@ object formDemo: TformDemo
       Font.Style = []
       ParentFont = False
       OnClick = UQuickButton1Click
+      BackColors.Enabled = False
+      BackColors.Color = clBlack
+      BackColors.LightColor = 13619151
+      BackColors.DarkColor = 3947580
       ButtonStyle = qbsNone
-      LightColor = 13619151
-      DarkColor = 3947580
-      CustomAccentColor = clNone
-      PressBrightnessDelta = 32
       Caption = #59200
       ExplicitLeft = 540
       ExplicitTop = 10

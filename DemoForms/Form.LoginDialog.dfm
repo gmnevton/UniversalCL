@@ -330,9 +330,6 @@ object formLoginDialog: TformLoginDialog
       ParentShowHint = False
       ShowHint = True
       ButtonStyle = qbsQuit
-      LightColor = 2298344
-      DarkColor = 2298344
-      PressBrightnessDelta = 32
       Caption = #57606
     end
     object buttonAppMinimized: TUQuickButton
@@ -349,9 +346,6 @@ object formLoginDialog: TformLoginDialog
       ParentShowHint = False
       ShowHint = True
       ButtonStyle = qbsMin
-      LightColor = 13619151
-      DarkColor = 3947580
-      PressBrightnessDelta = -32
       Caption = #59192
     end
     object buttonAppTheme: TUQuickButton
@@ -368,9 +362,6 @@ object formLoginDialog: TformLoginDialog
       ParentShowHint = False
       ShowHint = True
       OnClick = buttonAppThemeClick
-      LightColor = 13619151
-      DarkColor = 3947580
-      PressBrightnessDelta = -32
       Caption = #59144
     end
   end

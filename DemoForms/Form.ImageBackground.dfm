@@ -14551,10 +14551,6 @@ object formImageBackground: TformImageBackground
     ParentShowHint = False
     ShowHint = True
     ButtonStyle = qbsQuit
-    LightColor = 2298344
-    DarkColor = 2298344
-    PressBrightnessDelta = 32
-    Transparent = True
     Caption = #57606
   end
   object buttonAppMinimized: TUQuickButton
@@ -14571,10 +14567,6 @@ object formImageBackground: TformImageBackground
     ParentShowHint = False
     ShowHint = True
     ButtonStyle = qbsMin
-    LightColor = 13619151
-    DarkColor = 3947580
-    PressBrightnessDelta = -32
-    Transparent = True
     Caption = #59192
   end
   object titlebarMain: TUTitleBar
