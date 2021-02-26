@@ -458,6 +458,7 @@ object formDemo: TformDemo
     Left = 0
     Top = 0
     Width = 1000
+    Height = 32
     Caption = '                Delphi UWP app'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -687,6 +688,7 @@ object formDemo: TformDemo
     BackColor.LightColor = 14342874
     BackColor.DarkColor = 3355443
     ScrollOrientation = oHorizontal
+    ExplicitTop = 0
     object separator1: TUSeparator
       Left = 120
       Top = 0
@@ -1440,6 +1442,8 @@ object formDemo: TformDemo
     BackColor.Color = clWhite
     BackColor.LightColor = 15132390
     BackColor.DarkColor = 2039583
+    ExplicitTop = 60
+    ExplicitHeight = 530
     object buttonOpenMenu: TUSymbolButton
       Left = 0
       Top = 0
@@ -1618,6 +1622,8 @@ object formDemo: TformDemo
     BackColor.LightColor = 15132390
     BackColor.DarkColor = 2039583
     MaxScrollCount = 6
+    ExplicitTop = 60
+    ExplicitHeight = 530
     object headingSettings: TUText
       AlignWithMargins = True
       Left = 15

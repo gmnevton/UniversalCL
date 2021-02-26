@@ -22,6 +22,7 @@ type
   private
     FBackColors: TUThemeCaptionBarColorSet;
 
+    FCaptionHeight: Integer;
     FCollapsed: Boolean;
     FDragMovement: Boolean;
     FSystemMenuEnabled: Boolean;
@@ -32,6 +33,7 @@ type
 
     // Setters
     procedure SetBackColors(Value: TUThemeCaptionBarColorSet);
+    procedure SetCaptionHeight(Value: Integer);
     procedure SetCollapsed(const Value: Boolean);
     procedure SetUseSystemCaptionColor(const Value: Boolean);
 
@@ -48,6 +50,10 @@ type
 
   protected
     procedure Paint; override;
+    procedure DoChangeScale(M, D: Integer); override;
+    //
+    property Width; // hide property
+    property Height; // hide property
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -67,11 +73,11 @@ type
     property DragMovement: Boolean read FDragMovement write FDragMovement default True;
     property SystemMenuEnabled: Boolean read FSystemMenuEnabled write FSystemMenuEnabled default True;
     property UseSystemCaptionColor: Boolean read FUseSystemCaptionColor write SetUseSystemCaptionColor default False;
+    property CaptionHeight: Integer read FCaptionHeight write SetCaptionHeight default 32;
 
     property Align default alTop;
     property Alignment default taLeftJustify;
     property BevelOuter default bvNone;
-    property Height default 32;
     property ParentBackground default False;
   end;
 
@@ -98,6 +104,7 @@ constructor TUCaptionBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //
+  FCaptionHeight := 32;
   FCollapsed := False;
   FDragMovement := True;
   FSystemMenuEnabled := True;
@@ -112,7 +119,7 @@ begin
   Caption := '   Caption bar';
   BevelOuter := bvNone;
 //  TabStop := False;
-  Height := 32;
+  Height := FCaptionHeight;
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 9;
 //  FullRepaint := True;
@@ -122,6 +129,12 @@ destructor TUCaptionBar.Destroy;
 begin
   FBackColors.Free;
   inherited;
+end;
+
+procedure TUCaptionBar.DoChangeScale(M, D: Integer);
+begin
+  inherited DoChangeScale(M, D);
+  FCaptionHeight := MulDiv(FCaptionHeight, M, D);
 end;
 
 procedure TUCaptionBar.UpdateColors;
@@ -175,6 +188,14 @@ begin
   FBackColors.Assign(Value);
 end;
 
+procedure TUCaptionBar.SetCaptionHeight(Value: Integer);
+begin
+  if FCaptionHeight <> Value then begin
+    FCaptionHeight := Value;
+    Height := Value;
+  end;
+end;
+
 procedure TUCaptionBar.SetCollapsed(const Value: Boolean);
 var
   Ani: TIntAni;
@@ -194,7 +215,7 @@ begin
     if Value then
       Delta := 1 - Height
     else
-      Delta := 32 - Height;
+      Delta := FCaptionHeight - Height;
 
     Ani := TIntAni.Create(Height, Delta,
       procedure (V: Integer)

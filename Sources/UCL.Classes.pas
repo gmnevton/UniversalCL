@@ -18,10 +18,11 @@ uses
 
 type
   IUIDEAware = interface ['{5DA6292C-87B7-4434-93CD-BFDF4852DA4B}']
-    function IsCreating: Boolean;
-    function IsDestroying: Boolean;
-    function IsLoading: Boolean;
-    function IsDesigning: Boolean;
+    function IsCreating: Boolean; // creating component
+    function IsDestroying: Boolean; // freeing component
+    //function IsReading: Boolean; // properties reading from dfm stream // if csReading in ComponentState then
+    function IsLoading: Boolean; //
+    function IsDesigning: Boolean; // designing inside Delphi IDE
   end;
 (*
   IUDragReorderControl = interface ['{B9828BC2-CA4A-437E-866C-CBB5015F1412}']
@@ -336,6 +337,7 @@ type
 
   protected
     FThemeManager: TUThemeManager;
+    mulScale: Integer;
   {$IF CompilerVersion < 30}
     FCurrentPPI: Integer;
     FIsScaling: Boolean;
@@ -346,6 +348,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure ChangeScale(M, D: Integer{$IF CompilerVersion > 29}; isDpiChange: Boolean{$IFEND}); override;
     procedure DoChangeScale(M, D: Integer); virtual;
+    procedure UpdateScale(var Scale: Integer; M, D: Integer); virtual;
     //
     procedure SetThemeManager(const Value: TUThemeManager); virtual;
     // IUThemedComponent
@@ -472,14 +475,6 @@ begin
   Result := (csDesigning in ComponentState);
 end;
 
-procedure TUCustomControl.UpdateScale(var Scale: Integer; M, D: Integer);
-begin
-  if M > D then // up size
-    Inc(Scale, (M - D) div 24)
-  else // down size
-    Dec(Scale, (D - M) div 24);
-end;
-
 {$REGION 'Compatibility with older Delphi'}
 {$IF CompilerVersion < 30}
 function TUCustomControl.GetDesignDpi: Integer;
@@ -540,6 +535,14 @@ end;
 procedure TUCustomControl.DoChangeScale(M, D: Integer);
 begin
   UpdateScale(mulScale, M, D);
+end;
+
+procedure TUCustomControl.UpdateScale(var Scale: Integer; M, D: Integer);
+begin
+  if M > D then // up size
+    Inc(Scale, (M - D) div 24)
+  else // down size
+    Dec(Scale, (D - M) div 24);
 end;
 
 procedure TUCustomControl.SetThemeManager(const Value: TUThemeManager);
@@ -865,6 +868,7 @@ constructor TUCustomPanel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FThemeManager := Nil;
+  mulScale := 1;
 end;
 
 destructor TUCustomPanel.Destroy;
@@ -970,7 +974,15 @@ end;
 
 procedure TUCustomPanel.DoChangeScale(M, D: Integer);
 begin
-// nothing here
+  UpdateScale(mulScale, M, D);
+end;
+
+procedure TUCustomPanel.UpdateScale(var Scale: Integer; M, D: Integer);
+begin
+  if M > D then // up size
+    Inc(Scale, (M - D) div 24)
+  else // down size
+    Dec(Scale, (D - M) div 24);
 end;
 
 procedure TUCustomPanel.SetThemeManager(const Value: TUThemeManager);
