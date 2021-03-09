@@ -64,6 +64,7 @@ type
     procedure Paint; override;
     procedure RequestAlign; override;
     procedure VisibleChanging; override;
+    procedure DoChangeScale(M, D: Integer); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -137,6 +138,12 @@ destructor TUQuickButton.Destroy;
 begin
   FBackColors.Free;
   inherited;
+end;
+
+procedure TUQuickButton.DoChangeScale(M, D: Integer);
+begin
+  inherited DoChangeScale(M, D);
+
 end;
 
 procedure TUQuickButton.Loaded;
