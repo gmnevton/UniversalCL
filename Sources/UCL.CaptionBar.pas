@@ -289,8 +289,10 @@ begin
   full_screen:=(ParentForm is TUForm) and TUForm(ParentForm).FullScreen;
   for i := 0 to ControlCount - 1 do begin
     control := Controls[i];
-    if (control is TUQuickButton) and (TUQuickButton(control).ButtonStyle in [qbsMax, qbsMin]) then begin
-      control.Visible := not full_screen;
+    if (control is TUQuickButton) and (TUQuickButton(control).ButtonStyle > qbsNone) then begin
+      TUQuickButton(control).UpdateButton;
+      if (TUQuickButton(control).ButtonStyle in [qbsMax, qbsMin]) then
+        control.Visible := not full_screen;
     end;
   end;
 end;

@@ -72,6 +72,7 @@ type
 
     // IUThemedComponent
     procedure UpdateTheme; override;
+    procedure UpdateButton; virtual;
 
   published
     property BackColors: TUThemeControlColorSet read FBackColors write SetBackColors;
@@ -168,6 +169,57 @@ begin
 end;
 
 //  INTERNAL
+
+procedure TUQuickButton.UpdateButton;
+var
+  ParentForm: TCustomForm;
+  Restore: Boolean;
+begin
+  ParentForm := GetParentForm(Self, True);
+  case FButtonStyle of
+    qbsQuit: begin
+//      FCustomAccentColor := clNone;
+      FPressBrightnessDelta := 32;
+      Caption := UF_CLOSE; // Close icon
+      Hint := HintCloseButton;
+    end;
+    qbsSysButton,
+    qbsMax,
+    qbsMin: begin
+//      FCustomAccentColor := clNone;
+      FPressBrightnessDelta := 32;
+      case FButtonStyle of
+        qbsMax: begin
+          Restore:=(ParentForm.WindowState <> wsNormal);
+          if Restore then begin
+            Caption := UF_RESTORE;
+            Hint := HintRestoreButton;
+          end
+          else begin
+            Caption := UF_MAXIMIZE;
+            Hint := HintMaxButton;
+          end;
+//          Caption := UF_MAXIMIZE;
+//          Hint := HintMaxButton;
+        end;
+        qbsMin: begin
+          Caption := UF_MINIMIZE;
+          Hint := HintMinButton;
+        end;
+        qbsSysButton: begin
+          Caption := UF_HOME;
+          Hint := HintSysButton;
+        end;
+      end;
+    end;
+    qbsHighlight: begin
+//      FCustomAccentColor := $D77800;
+      FPressBrightnessDelta := 25;
+      //Caption := UF_BACK;
+      Hint := HintHighlightButton;
+    end;
+  end;
+end;
 
 procedure TUQuickButton.UpdateColors;
 var
@@ -269,48 +321,11 @@ begin
 end;
 
 procedure TUQuickButton.SetButtonStyle(const Value: TUQuickButtonStyle);
-//var
-//  TM: TUCustomThemeManager;
 begin
-//  TM := SelectThemeManager(Self);
   if Value <> FButtonStyle then begin
     FButtonStyle := Value;
-
-    case FButtonStyle of
-      qbsQuit: begin
-        FCustomAccentColor := clNone;
-        FPressBrightnessDelta := 32;
-        Caption := UF_CLOSE; // Close icon
-        Hint := HintCloseButton;
-      end;
-      qbsSysButton,
-      qbsMax,
-      qbsMin: begin
-        FCustomAccentColor := clNone;
-        FPressBrightnessDelta := 32;
-        case FButtonStyle of
-          qbsMax: begin
-            Caption := UF_MAXIMIZE;
-            Hint := HintMaxButton;
-          end;
-          qbsMin: begin
-            Caption := UF_MINIMIZE;
-            Hint := HintMinButton;
-          end;
-          qbsSysButton: begin
-            Caption := UF_HOME;
-            Hint := HintSysButton;
-          end;
-        end;
-      end;
-      qbsHighlight: begin
-        FCustomAccentColor := $D77800;
-        FPressBrightnessDelta := 25;
-        //Caption := UF_BACK;
-        Hint := HintHighlightButton;
-      end;
-    end;
-
+    //
+    UpdateButton;
     UpdateTheme;
   end;
 end;
@@ -436,14 +451,14 @@ begin
           if (ParentForm <> Nil) and not FullScreen then begin
             ReleaseCapture;
             Restore:=(ParentForm.WindowState <> wsNormal);
-            if Restore then begin
-              Caption := UF_MAXIMIZE;
-              Hint := HintMaxButton;
-            end
-            else begin
-              Caption := UF_RESTORE;
-              Hint := HintRestoreButton;
-            end;
+//            if Restore then begin
+//              Caption := UF_MAXIMIZE;
+//              Hint := HintMaxButton;
+//            end
+//            else begin
+//              Caption := UF_RESTORE;
+//              Hint := HintRestoreButton;
+//            end;
             //
             if Restore then
               SendMessage(ParentForm.Handle, WM_SYSCOMMAND, SC_RESTORE, 0)
