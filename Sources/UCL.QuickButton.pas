@@ -29,7 +29,7 @@ type
     FButtonStyle: TUQuickButtonStyle;
     FCustomAccentColor: TColor;
     FPressBrightnessDelta: Integer;
-    FStickToControl: TControl;
+    FStickToControl: TUQuickButton; // TControl;
     FUpdatingAlignment: Boolean;
     FHintMinButton: String;
     FHintMaxButton: String;
@@ -190,7 +190,7 @@ begin
       FPressBrightnessDelta := 32;
       case FButtonStyle of
         qbsMax: begin
-          Restore:=(ParentForm.WindowState <> wsNormal);
+          Restore:=(ParentForm <> Nil) and (ParentForm.WindowState <> wsNormal);
           if Restore then begin
             Caption := UF_RESTORE;
             Hint := HintRestoreButton;
