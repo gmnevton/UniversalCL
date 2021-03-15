@@ -510,7 +510,7 @@ object formDemo: TformDemo
       ButtonStyle = qbsQuit
       HintCloseButton = 'Zamknij'
       CustomAccentColor = clNone
-      Caption = #57610
+      Caption = #59153
       ExplicitLeft = 987
     end
     object buttonWinMax: TUQuickButton
@@ -532,9 +532,9 @@ object formDemo: TformDemo
       HintMaxButton = 'Maksymalizuj okno'
       HintRestoreButton = 'Zmniejsz okno'
       CustomAccentColor = clNone
-      Caption = #59682
-      ExplicitLeft = 904
-      ExplicitTop = -6
+      StickToControl = buttonWinClose
+      Caption = #57347
+      ExplicitLeft = 909
     end
     object buttonWinMin: TUQuickButton
       Left = 865
@@ -554,9 +554,9 @@ object formDemo: TformDemo
       ButtonStyle = qbsMin
       HintMinButton = 'Minimalizuj okno'
       CustomAccentColor = clNone
-      Caption = #59681
-      ExplicitLeft = 891
-      ExplicitTop = 4
+      StickToControl = buttonWinMax
+      Caption = #57608
+      ExplicitLeft = 864
     end
     object buttonBlurForm: TUQuickButton
       Left = 544
@@ -1619,6 +1619,8 @@ object formDemo: TformDemo
     BackColor.LightColor = 15132390
     BackColor.DarkColor = 2039583
     MaxScrollCount = 6
+    ExplicitLeft = 450
+    ExplicitTop = 84
     object headingSettings: TUText
       AlignWithMargins = True
       Left = 15

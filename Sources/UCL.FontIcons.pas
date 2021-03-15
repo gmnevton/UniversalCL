@@ -4,10 +4,10 @@ interface
 
 const
   //  Control icons
-  UF_MINIMIZE = #$E921;
-  UF_MAXIMIZE = #$E922;
+  UF_MINIMIZE = #$E108; // #$E921;
+  UF_MAXIMIZE = #$E003; // #$E922;
   UF_RESTORE  = #$E923;
-  UF_CLOSE = #$E10A;
+  UF_CLOSE = #$E711; //#$E10A;
   UF_BACK = #$E112;
   UF_CHECKBOX_OUTLINE = #$E003;
   UF_CHECKBOX_SMALL = #$E004;

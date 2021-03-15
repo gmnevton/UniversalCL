@@ -29,7 +29,7 @@ type
     FButtonStyle: TUQuickButtonStyle;
     FCustomAccentColor: TColor;
     FPressBrightnessDelta: Integer;
-    FStickToControl: TUQuickButton; // TControl;
+    FStickToControl: TControl;
     FUpdatingAlignment: Boolean;
     FHintMinButton: String;
     FHintMaxButton: String;
@@ -46,6 +46,7 @@ type
     procedure SetBackColors(Value: TUThemeControlColorSet);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetButtonStyle(const Value: TUQuickButtonStyle);
+    procedure SetStickToControl(Value: TControl);
 
     //  Messages
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
@@ -57,7 +58,8 @@ type
     procedure ColorsChange(Sender: TObject);
 
   protected
-    procedure StickToControl(AControl: TControl); virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure DoStickToControl(AControl: TControl); virtual;
 
   protected
     procedure Loaded; override;
@@ -87,6 +89,7 @@ type
     property HintSysButton: String read FHintSysButton write FHintSysButton;
 
     property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
+    property StickToControl: TControl read FStickToControl write SetStickToControl;
 
     property Caption;
     property Height default 32;
@@ -157,6 +160,15 @@ begin
     qbsHighlight: Hint := HintHighlightButton;
   end;
   inherited;
+end;
+
+procedure TUQuickButton.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  if (Operation = opRemove) and (AComponent = FStickToControl) then begin
+    FStickToControl:=Nil;
+    Exit;
+  end;
+  inherited Notification(AComponent, Operation);
 end;
 
 //  THEME
@@ -330,44 +342,52 @@ begin
   end;
 end;
 
-procedure TUQuickButton.StickToControl(AControl: TControl);
+procedure TUQuickButton.SetStickToControl(Value: TControl);
+begin
+  if FStickToControl <> Value then begin
+    FStickToControl := Value;
+    DoStickToControl(FStickToControl);
+  end;
+end;
+
+procedure TUQuickButton.DoStickToControl(AControl: TControl);
 
   function GetWallPosition(C1: TControl; AAlign: TAlign): TPoint;
   begin
     Result := EmptyPoint;
     case AAlign of
-      alTop   : Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop{ - 1});
-      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop + C1.Margins.ControlHeight{ + 1});
-      alLeft  : Result := Point(C1.Margins.ControlLeft{ - 1}, C1.Margins.ControlTop);
-      alRight : Result := Point(C1.Margins.ControlLeft + C1.Margins.ControlWidth{ + 1}, C1.Margins.ControlTop);
+      alTop   : Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop + C1.Margins.ControlHeight + 1);
+      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop - Height - 1);
+      alLeft  : Result := Point(C1.Margins.ControlLeft + C1.Margins.ControlWidth + 1, C1.Margins.ControlTop);
+      alRight : Result := Point(C1.Margins.ControlLeft - Width - 1, C1.Margins.ControlTop);
     end;
   end;
 
 var
-  control: TControl;
+//  control: TControl;
+  P: TPoint;
 begin
-  if (Parent = Nil) or FUpdatingAlignment then
+  if (Parent = Nil) or (AControl = Nil) or FUpdatingAlignment then
     Exit;
   //
-  if AControl = Nil then begin // determine which control is next to us according to our alignment
-    control := ControlAtPos(Parent, GetWallPosition(Self, Align), True);
-    if control <> Nil then
-      FStickToControl := control;
-  end
-  else begin
+//  if AControl = Nil then begin // determine which control is next to us according to our alignment
+//    control := ControlAtPos(Parent, GetWallPosition(Self, Align), True);
+//    if control <> Nil then
+//      FStickToControl := control;
+//  end
+//  else begin
+    P := GetWallPosition(AControl, Align);
     FUpdatingAlignment := True;
+    Parent.DisableAlign;
     try
-      case Align of
-        alTop   : SetBounds(FStickToControl.Margins.ControlLeft, FStickToControl.Margins.ControlTop + FStickToControl.Margins.ControlHeight + 1, Width, Height);
-        alBottom: SetBounds(FStickToControl.Margins.ControlLeft, FStickToControl.Margins.ControlTop - 1, Width, Height);
-        alLeft  : SetBounds(FStickToControl.Margins.ControlLeft + FStickToControl.Margins.ControlWidth + 1, FStickToControl.Margins.ControlTop, Width, Height);
-        alRight : SetBounds(FStickToControl.Margins.ControlLeft - 1, FStickToControl.Margins.ControlTop, Width, Height);
-      end;
+      SetBounds(P.X, P.Y, Width, Height);
+//      Parent.Realign;
     finally
-      FStickToControl := Nil;
+//      FStickToControl := Nil;
+      Parent.EnableAlign;
       FUpdatingAlignment := False;
     end;
-  end;
+//  end;
 end;
 
 //  CUSTOM METHODS
@@ -397,16 +417,14 @@ begin
   if IsDesigning then
     Exit;
   //
-  if (Parent <> Nil) and (Parent is TUCaptionBar) then begin
-    if Visible and (FStickToControl <> Nil) then
-      StickToControl(FStickToControl);
-  end;
+  if Visible and (FStickToControl <> Nil) and (Parent <> Nil) and (Parent is TUCaptionBar) then
+    DoStickToControl(FStickToControl);
 end;
 
 procedure TUQuickButton.VisibleChanging;
 begin
-  if Visible and (Parent <> Nil) and (Parent is TUCaptionBar) then
-    StickToControl(Nil);
+  if Visible and (FStickToControl <> Nil) and (Parent <> Nil) and (Parent is TUCaptionBar) then
+    DoStickToControl(FStickToControl);
   //
   inherited;
 end;
