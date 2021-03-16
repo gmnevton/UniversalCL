@@ -357,9 +357,9 @@ procedure TUQuickButton.DoStickToControl(AControl: TControl);
     Result := EmptyPoint;
     case AAlign of
       alTop   : Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop + C1.Margins.ControlHeight + 1);
-      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop - Height - 1);
+      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop - Height);
       alLeft  : Result := Point(C1.Margins.ControlLeft + C1.Margins.ControlWidth + 1, C1.Margins.ControlTop);
-      alRight : Result := Point(C1.Margins.ControlLeft - Width - 1, C1.Margins.ControlTop);
+      alRight : Result := Point(C1.Margins.ControlLeft - Width, C1.Margins.ControlTop);
     end;
   end;
 
@@ -378,13 +378,12 @@ begin
 //  else begin
     P := GetWallPosition(AControl, Align);
     FUpdatingAlignment := True;
-    Parent.DisableAlign;
+//    Parent.DisableAlign;
     try
       SetBounds(P.X, P.Y, Width, Height);
-//      Parent.Realign;
     finally
 //      FStickToControl := Nil;
-      Parent.EnableAlign;
+//      Parent.EnableAlign;
       FUpdatingAlignment := False;
     end;
 //  end;

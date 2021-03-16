@@ -1619,8 +1619,6 @@ object formDemo: TformDemo
     BackColor.LightColor = 15132390
     BackColor.DarkColor = 2039583
     MaxScrollCount = 6
-    ExplicitLeft = 450
-    ExplicitTop = 84
     object headingSettings: TUText
       AlignWithMargins = True
       Left = 15

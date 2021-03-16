@@ -51,6 +51,7 @@ type
   protected
     procedure Paint; override;
     procedure DoChangeScale(M, D: Integer); override;
+    procedure Resize; override;
     //
     property Width; // hide property
     property Height; // hide property
@@ -276,6 +277,13 @@ begin
   finally
     bmp.Free;
   end;
+end;
+
+procedure TUCaptionBar.Resize;
+begin
+  inherited Resize;
+  //
+  Realign;
 end;
 
 procedure TUCaptionBar.UpdateButtons;
