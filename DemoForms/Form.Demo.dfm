@@ -460,11 +460,13 @@ object formDemo: TformDemo
     Width = 1000
     Height = 32
     Caption = '                Delphi UWP app'
+    DoubleBuffered = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
     BackColors.Enabled = False
@@ -496,7 +498,7 @@ object formDemo: TformDemo
       Left = 955
       Top = 0
       Hint = 'Zamknij'
-      Align = alRight
+      Align = alCustom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
@@ -510,14 +512,15 @@ object formDemo: TformDemo
       ButtonStyle = qbsQuit
       HintCloseButton = 'Zamknij'
       CustomAccentColor = clNone
+      StickAlign = alRight
       Caption = #59153
-      ExplicitLeft = 987
+      ExplicitLeft = 276
     end
     object buttonWinMax: TUQuickButton
       Left = 910
       Top = 0
       Hint = 'Maksymalizuj okno'
-      Align = alRight
+      Align = alCustom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
@@ -532,15 +535,16 @@ object formDemo: TformDemo
       HintMaxButton = 'Maksymalizuj okno'
       HintRestoreButton = 'Zmniejsz okno'
       CustomAccentColor = clNone
+      StickAlign = alRight
       StickToControl = buttonWinClose
       Caption = #57347
-      ExplicitLeft = 909
+      ExplicitLeft = 769
     end
     object buttonWinMin: TUQuickButton
       Left = 865
       Top = 0
       Hint = 'Minimalizuj okno'
-      Align = alRight
+      Align = alCustom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -13
@@ -554,15 +558,17 @@ object formDemo: TformDemo
       ButtonStyle = qbsMin
       HintMinButton = 'Minimalizuj okno'
       CustomAccentColor = clNone
+      StickAlign = alRight
       StickToControl = buttonWinMax
       Caption = #57608
-      ExplicitLeft = 864
+      ExplicitLeft = 724
     end
     object buttonBlurForm: TUQuickButton
+      Tag = 3
       Left = 544
       Top = 0
       Hint = 'Test prze'#378'roczysto'#347'ci'
-      Align = alRight
+      Align = alCustom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -577,30 +583,31 @@ object formDemo: TformDemo
       HintSysButton = 'Test prze'#378'roczysto'#347'ci'
       CustomAccentColor = clNone
       Caption = #57615
-      ExplicitLeft = 560
+      ExplicitLeft = 955
     end
-    object UQuickButton1: TUQuickButton
+    object buttonFullScreen: TUQuickButton
+      Tag = 4
       Left = 499
       Top = 0
       Hint = 'Pe'#322'ny ekran'
-      Align = alRight
+      Align = alCustom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
       Font.Name = 'Segoe MDL2 Assets'
       Font.Style = []
       ParentFont = False
-      OnClick = UQuickButton1Click
+      OnClick = buttonFullScreenClick
       BackColors.Enabled = False
       BackColors.Color = clBlack
       BackColors.LightColor = 13619151
       BackColors.DarkColor = 3947580
       ButtonStyle = qbsNone
       Caption = #59200
-      ExplicitLeft = 540
-      ExplicitTop = 10
+      ExplicitLeft = 955
     end
     object comboAppDPI: TComboBox
+      Tag = 1
       AlignWithMargins = True
       Left = 741
       Top = 4
@@ -610,7 +617,7 @@ object formDemo: TformDemo
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
-      Align = alRight
+      Align = alCustom
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -630,6 +637,7 @@ object formDemo: TformDemo
         '200%')
     end
     object comboAppBorderStyle: TComboBox
+      Tag = 2
       AlignWithMargins = True
       Left = 613
       Top = 4
@@ -640,7 +648,7 @@ object formDemo: TformDemo
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
-      Align = alRight
+      Align = alCustom
       Style = csDropDownList
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack

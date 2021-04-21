@@ -29,8 +29,9 @@ type
     FButtonStyle: TUQuickButtonStyle;
     FCustomAccentColor: TColor;
     FPressBrightnessDelta: Integer;
+    FStickAlign: TAlign;
     FStickToControl: TControl;
-    FUpdatingAlignment: Boolean;
+    //FUpdatingAlignment: Boolean;
     FHintMinButton: String;
     FHintMaxButton: String;
     FHintRestoreButton: String;
@@ -40,15 +41,17 @@ type
 
     //  Internal
     procedure UpdateColors;
-    function ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
+    //function ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
 
     //  Setters
     procedure SetBackColors(Value: TUThemeControlColorSet);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetButtonStyle(const Value: TUQuickButtonStyle);
+    procedure SetStickAlign(Value: TAlign);
     procedure SetStickToControl(Value: TControl);
 
     //  Messages
+    procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
@@ -59,13 +62,14 @@ type
 
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure DoStickToControl(AControl: TControl); virtual;
+    //procedure DoStickToControl(AControl: TControl); virtual;
 
   protected
     procedure Loaded; override;
     procedure Paint; override;
-    procedure RequestAlign; override;
-    procedure VisibleChanging; override;
+    //procedure AdjustSize; override;
+    //procedure RequestAlign; override;
+    //procedure VisibleChanging; override;
     procedure DoChangeScale(M, D: Integer); override;
 
   public
@@ -89,6 +93,7 @@ type
     property HintSysButton: String read FHintSysButton write FHintSysButton;
 
     property CustomAccentColor: TColor read FCustomAccentColor write FCustomAccentColor default $D77800;
+    property StickAlign: TAlign read FStickAlign write SetStickAlign default alNone;
     property StickToControl: TControl read FStickToControl write SetStickToControl;
 
     property Caption;
@@ -103,8 +108,8 @@ uses
   Windows,
   UCL.ThemeManager,
   UCL.FontIcons,
-  UCL.Form,
-  UCL.CaptionBar;
+  UCL.Form;
+  //UCL.CaptionBar;
 
 { TUQuickButton }
 
@@ -120,8 +125,9 @@ begin
   FButtonStyle := qbsSysButton;
   FCustomAccentColor := $D77800;
   FPressBrightnessDelta := 25;
+  FStickAlign := alNone;
   FStickToControl := Nil;
-  FUpdatingAlignment := False;
+  //FUpdatingAlignment := False;
 
   FBackColors := TUThemeControlColorSet.Create;
   FBackColors.Assign(QUICKBUTTON_BACK);
@@ -147,7 +153,6 @@ end;
 procedure TUQuickButton.DoChangeScale(M, D: Integer);
 begin
   inherited DoChangeScale(M, D);
-
 end;
 
 procedure TUQuickButton.Loaded;
@@ -289,7 +294,7 @@ begin
   UpdateColors;
   Invalidate;
 end;
-
+{
 function TUQuickButton.ControlAtPos(ParentControl: TWinControl; const Pos: TPoint; AllowDisabled: Boolean): TControl;
 var
   LControl: TControl;
@@ -315,7 +320,7 @@ begin
       Break;
   Result := LControl;
 end;
-
+}
 //  SETTERS
 
 procedure TUQuickButton.SetBackColors(Value: TUThemeControlColorSet);
@@ -342,14 +347,26 @@ begin
   end;
 end;
 
+procedure TUQuickButton.SetStickAlign(Value: TAlign);
+begin
+  if FStickAlign <> Value then begin
+    FStickAlign := Value;
+    Align := alCustom;
+    RequestAlign;
+    //DoStickToControl(FStickToControl);
+  end;
+end;
+
 procedure TUQuickButton.SetStickToControl(Value: TControl);
 begin
   if FStickToControl <> Value then begin
     FStickToControl := Value;
-    DoStickToControl(FStickToControl);
+    Align := alCustom;
+    RequestAlign;
+    //DoStickToControl(FStickToControl);
   end;
 end;
-
+{
 procedure TUQuickButton.DoStickToControl(AControl: TControl);
 
   function GetWallPosition(C1: TControl; AAlign: TAlign): TPoint;
@@ -367,7 +384,7 @@ var
 //  control: TControl;
   P: TPoint;
 begin
-  if (Parent = Nil) or (AControl = Nil) or FUpdatingAlignment then
+  if (Parent = Nil) or (AControl = Nil) or (Align = alNone) or FUpdatingAlignment then
     Exit;
   //
 //  if AControl = Nil then begin // determine which control is next to us according to our alignment
@@ -388,7 +405,7 @@ begin
     end;
 //  end;
 end;
-
+}
 //  CUSTOM METHODS
 
 procedure TUQuickButton.Paint;
@@ -409,15 +426,32 @@ begin
   TextRect := Rect(0, 0, Width, Height);
   DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, True);
 end;
+{
+procedure TUQuickButton.AdjustSize;
+begin
+  if IsDesigning then begin
+    inherited;
+    Exit;
+  end;
+  //
+  if Visible and (FStickToControl <> Nil) and (Parent <> Nil) and (Parent is TUCaptionBar) then
+    DoStickToControl(FStickToControl)
+  else
+    inherited;
+end;
 
 procedure TUQuickButton.RequestAlign;
 begin
-  inherited;
-  if IsDesigning then
+  if IsDesigning then begin
+    inherited;
     Exit;
+  end;
   //
   if Visible and (FStickToControl <> Nil) and (Parent <> Nil) and (Parent is TUCaptionBar) then
-    DoStickToControl(FStickToControl);
+//  if Visible and (FStickToControl <> Nil) and (Parent <> Nil) and (Parent is TUCaptionBar) and Parent.AlignDisabled then
+    DoStickToControl(FStickToControl)
+  else
+    inherited;
 end;
 
 procedure TUQuickButton.VisibleChanging;
@@ -427,8 +461,13 @@ begin
   //
   inherited;
 end;
-
+}
 //  MESSAGES
+
+procedure TUQuickButton.WMEraseBkgnd(var Message: TWmEraseBkgnd);
+begin
+  Message.Result := 1;
+end;
 
 procedure TUQuickButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin

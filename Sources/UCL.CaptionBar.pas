@@ -18,6 +18,7 @@ type
   TUCaptionBar = class(TUCustomPanel)
   private var
     BackColor, TextColor: TColor;
+    FOldWidth: Integer;
 
   private
     FBackColors: TUThemeCaptionBarColorSet;
@@ -41,6 +42,7 @@ type
     procedure BackColor_OnChange(Sender: TObject);
 
     // Messages
+    procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
@@ -49,6 +51,8 @@ type
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
+    function CustomAlignInsertBefore(C1, C2: TControl): Boolean; override;
+    procedure CustomAlignPosition(Control: TControl; var NewLeft, NewTop, NewWidth, NewHeight: Integer; var AlignRect: TRect; AlignInfo: TAlignInfo); override;
     procedure Paint; override;
     procedure DoChangeScale(M, D: Integer); override;
     procedure Resize; override;
@@ -86,6 +90,8 @@ implementation
 
 uses
   Types,
+  Math,
+  UCL.Types,
   UCL.SystemSettings,
   UCL.ThemeManager,
   UCL.Form,
@@ -105,6 +111,7 @@ constructor TUCaptionBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //
+  FOldWidth := -1;
   FCaptionHeight := 32;
   FCollapsed := False;
   FDragMovement := True;
@@ -119,6 +126,7 @@ begin
   Alignment := taLeftJustify;
   Caption := '   Caption bar';
   BevelOuter := bvNone;
+  DoubleBuffered := True;
 //  TabStop := False;
   Height := FCaptionHeight;
 //  Font.Name := 'Segoe UI';
@@ -130,6 +138,147 @@ destructor TUCaptionBar.Destroy;
 begin
   FBackColors.Free;
   inherited;
+end;
+
+function TUCaptionBar.CustomAlignInsertBefore(C1, C2: TControl): Boolean;
+var
+  StickAlign1, StickAlign2: TAlign;
+  StickToControl1, StickToControl2: TControl;
+begin
+  if C1 is TUQuickButton then begin
+    StickAlign1:=TUQuickButton(C1).StickAlign;
+    StickToControl1:=TUQuickButton(C1).StickToControl;
+    if C2 is TUQuickButton then begin
+      StickAlign2:=TUQuickButton(C2).StickAlign;
+      StickToControl2:=TUQuickButton(C2).StickToControl;
+      if (StickToControl1 <> Nil) and (StickAlign1 > alNone) and (StickToControl2 <> Nil) and (StickAlign2 > alNone) then begin
+        if StickToControl1 = C2 then begin
+          if StickAlign1 in [alBottom, alRight] then
+            Result := True
+          else if StickAlign1 in [alTop, alLeft] then
+            Result := False
+          else
+            Result := False;
+        end
+        else
+          Result := (C1.Tag > C2.Tag);
+      end
+      else if StickToControl2 = Nil then begin
+        if StickToControl1 = C2 then begin
+          if StickAlign1 in [alBottom, alRight] then
+            Result := True
+          else if StickAlign1 in [alTop, alLeft] then
+            Result := False
+          else
+            Result := False;
+        end
+        else
+          Result := (C1.Tag > C2.Tag);
+      end
+      else
+        Result := (C1.Tag > C2.Tag);
+    end
+    else if (StickToControl1 <> Nil) and (StickAlign1 > alNone) then begin
+      if StickToControl1 = C2 then begin
+        if StickAlign1 in [alBottom, alRight] then
+          Result := True
+        else if StickAlign1 in [alTop, alLeft] then
+          Result := False
+        else
+          Result := False;
+      end
+      else
+        Result := (C1.Tag > C2.Tag);
+    end
+    else
+      Result := (C1.Tag > C2.Tag);
+  end
+  else
+    Result := (C1.Tag > C2.Tag);
+end;
+
+procedure TUCaptionBar.CustomAlignPosition(Control: TControl; var NewLeft, NewTop, NewWidth, NewHeight: Integer; var AlignRect: TRect; AlignInfo: TAlignInfo);
+
+//  function GetWallPosition(C1, C2: TControl; AAlign: TAlign): TPoint;
+//  begin
+//    Result := EmptyPoint;
+//    case AAlign of
+//      alTop   : Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop + C1.Margins.ControlHeight + 1);
+//      alBottom: Result := Point(C1.Margins.ControlLeft, C1.Margins.ControlTop - C2.Height);
+//      alLeft  : Result := Point(C1.Margins.ControlLeft + C1.Margins.ControlWidth + 1, C1.Margins.ControlTop);
+//      alRight : Result := Point(C1.Margins.ControlLeft - C2.Width, C1.Margins.ControlTop);
+//    end;
+//  end;
+
+var
+  i, LLeft: Integer;
+//  UQuickButton: TUQuickButton;
+  Ctrl{, StickToControl}: TControl;
+  P: TPoint;
+//  NewAlignRect: TRect;
+begin
+  LLeft:=AlignRect.Right;
+  for i:=AlignInfo.ControlIndex to AlignInfo.AlignList.Count - 1 do begin
+    Ctrl:=TControl(AlignInfo.AlignList[i]);
+    Dec(LLeft, Ctrl.Margins.ControlWidth);
+  end;
+  //
+  P:=Point(LLeft, AlignRect.Top);
+  // ensure we are in AlignRect coords
+  P.X := Min(Max(P.X, AlignRect.Left), AlignRect.Right);
+  P.Y := Min(Max(P.Y, AlignRect.Top), AlignRect.Bottom);
+  //
+  NewLeft:=P.X;
+  NewTop:=P.Y;
+{
+  if Control is TUQuickButton then begin
+    UQuickButton:=TUQuickButton(Control);
+    if UQuickButton.StickToControl <> Nil then
+      P := GetWallPosition(UQuickButton.StickToControl, UQuickButton, UQuickButton.StickAlign)
+    else begin
+      case UQuickButton.StickAlign of
+        alTop: begin
+          P := Point(NewLeft, AlignRect.Top);
+          Inc(NewAlignRect.Top, NewHeight);
+        end;
+        alBottom: begin
+          P := Point(NewLeft, AlignRect.Bottom);
+          Dec(NewAlignRect.Bottom, NewHeight);
+        end;
+        alLeft: begin
+          P := Point(AlignRect.Left, NewTop);
+          Inc(NewAlignRect.Left, NewWidth);
+        end;
+        alRight: begin
+          P := Point(AlignRect.Right, NewTop);
+          Dec(NewAlignRect.Right, NewWidth);
+        end;
+        alClient: begin
+          P := Point(AlignRect.Left, AlignRect.Top);
+          NewWidth := AlignRect.Right - AlignRect.Left;
+          NewHeight := AlignRect.Bottom - AlignRect.Top;
+        end;
+      else
+        P:=Point(AlignRect.Right - NewWidth, AlignRect.Top);
+        Dec(NewAlignRect.Right, NewWidth);
+      end;
+    end;
+    // ensure we are in AlignRect coords
+    P.X := Min(Max(P.X, AlignRect.Left), AlignRect.Right);
+    P.Y := Min(Max(P.Y, AlignRect.Top), AlignRect.Bottom);
+  end
+  else begin
+    P:=Point(AlignRect.Right - NewWidth, AlignRect.Top);
+    Dec(NewAlignRect.Right, NewWidth);
+    // ensure we are in AlignRect coords
+    P.X := Min(Max(P.X, AlignRect.Left), AlignRect.Right);
+    P.Y := Min(Max(P.Y, AlignRect.Top), AlignRect.Bottom);
+  end;
+  //
+  NewLeft:=P.X;
+  NewTop:=P.Y;
+  AlignRect:=NewAlignRect;
+}
 end;
 
 procedure TUCaptionBar.DoChangeScale(M, D: Integer);
@@ -283,7 +432,11 @@ procedure TUCaptionBar.Resize;
 begin
   inherited Resize;
   //
-  Realign;
+  // realign only when width changes
+  if FOldWidth <> Width then begin
+    FOldWidth := Width;
+    Realign;
+  end;
 end;
 
 procedure TUCaptionBar.UpdateButtons;
@@ -334,6 +487,30 @@ begin
 end;
 
 // MESSAGES
+
+procedure TUCaptionBar.WMEraseBkgnd(var Message: TWmEraseBkgnd);
+begin
+//  if StyleServices.Enabled and Assigned(Parent) and (csParentBackground in FControlStyle) then
+//  begin
+//    { Get the parent to draw its background into the control's background. }
+//    if Parent.DoubleBuffered then
+//      PerformEraseBackground(Self, Message.DC)
+//    else
+//      StyleServices.DrawParentBackground(Handle, Message.DC, nil, False);
+//  end
+//  else
+//  begin
+//    { Only erase background if we're not doublebuffering or painting to memory. }
+//    if not FDoubleBuffered or
+//{$IF DEFINED(CLR)}
+//       (Message.OriginalMessage.WParam = Message.OriginalMessage.LParam) then
+//{$ELSE}
+//       (TMessage(Message).wParam = WPARAM(TMessage(Message).lParam)) then
+//{$ENDIF}
+//      FillRect(Message.DC, ClientRect, FBrush.Handle);
+//  end;
+  Message.Result := 1;
+end;
 
 procedure TUCaptionBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
 var

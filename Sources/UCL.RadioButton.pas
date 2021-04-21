@@ -10,6 +10,7 @@ uses
   StdCtrls,
   Graphics,
   UCL.Classes,
+  UCL.Types,
   UCL.Utils,
   UCL.Graphics;
 
@@ -22,6 +23,7 @@ type
   private
     FIconFont: TFont;
     FAutoSize: Boolean;
+    //FButtonState: TUControlState;
     FChecked: Boolean;
     FGroup: string;
     FCustomActiveColor: TColor;
@@ -34,6 +36,7 @@ type
 
     //  Setters
     procedure SetAutoSize(const Value: Boolean); reintroduce;
+    //procedure SetButtonState(const Value: TUControlState);
     procedure SetChecked(const Value: Boolean);
     procedure SetTextOnGlass(const Value: Boolean);
 
@@ -42,6 +45,8 @@ type
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
@@ -60,6 +65,7 @@ type
     property IconFont: TFont read FIconFont write FIconFont;
     //
     property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    //property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
     property Checked: Boolean read FChecked write SetChecked default False;
     property Group: string read FGroup write FGroup;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
@@ -94,6 +100,7 @@ begin
 
   //  New props
   FAutoSize := False;
+  //FButtonState := csNone;
   FChecked := False;
   FCustomActiveColor := clDefault; // $D77800;
   FTextOnGlass := False;
@@ -168,8 +175,8 @@ end;
 procedure TURadioButton.UpdateRects;
 begin
   IconRect := Rect(0, 0, Height, Height);
-  TextRect := Rect(Height, 0, Width, Height);
-  FocusRect:= Rect(Height - 3, 2, Width - 2, Height - 2);
+  TextRect := Rect(Height, 0, Width - 2, Height);
+  FocusRect:= Rect(Height - 3, 2, Width, Height - 2);
 end;
 
 //  SETTERS
@@ -181,7 +188,16 @@ begin
     Resize;
   end;
 end;
-
+{
+procedure TURadioButton.SetButtonState(const Value: TUControlState);
+begin
+  if Value <> FButtonState then begin
+    FButtonState := Value;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+}
 procedure TURadioButton.SetChecked(const Value: Boolean);
 
   procedure TurnSiblingsOff;
@@ -256,13 +272,14 @@ begin
   end;
 
   // Paint focus rect
-  if Focused then begin
-    Canvas.Font.Color := TextColor;
-    Canvas.Pen.Style := psDot;
-    Canvas.Pen.Color := TextColor;
-    DrawFocusRect(Canvas.Handle, FocusRect);
-    Canvas.Pen.Style := psClear;
-    Canvas.Pen.Color := Color;
+  if Focused or MouseInClient then begin
+    DrawFocusRect(Canvas, FocusRect, Color);
+    //Canvas.Font.Color := GetTextColorFromBackground(Color);
+    //Canvas.Pen.Style := psDot;
+    //Canvas.Pen.Color := GetTextColorFromBackground(Color);
+    //DrawFocusRect(Canvas.Handle, FocusRect);
+    //Canvas.Pen.Style := psClear;
+    //Canvas.Pen.Color := Color;
   end;
 end;
 
@@ -320,6 +337,22 @@ begin
   if PtInRect(IconRect, Msg.Pos) then
     Checked := True;
   inherited;
+end;
+
+procedure TURadioButton.CMMouseEnter(var Msg: TMessage);
+begin
+  if Enabled then begin
+    Invalidate;
+    inherited;
+  end;
+end;
+
+procedure TURadioButton.CMMouseLeave(var Msg: TMessage);
+begin
+  if Enabled then begin
+    Invalidate;
+    inherited;
+  end;
 end;
 
 procedure TURadioButton.CMEnabledChanged(var Msg: TMessage);

@@ -155,7 +155,7 @@ type
     PasteCtrlV1: TMenuItem;
     buttonAppListForm: TUSymbolButton;
     buttonBlurForm: TUQuickButton;
-    UQuickButton1: TUQuickButton;
+    buttonFullScreen: TUQuickButton;
     procedure buttonReloadSettingsClick(Sender: TObject);
     procedure buttonAniToRightClick(Sender: TObject);
     procedure buttonRandomProgressClick(Sender: TObject);
@@ -178,7 +178,7 @@ type
     procedure buttonAppListFormClick(Sender: TObject);
     procedure buttonBlurFormClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure UQuickButton1Click(Sender: TObject);
+    procedure buttonFullScreenClick(Sender: TObject);
 
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
@@ -398,7 +398,7 @@ begin
   progressConnected.Value := sliderHorz.Value;
 end;
 
-procedure TformDemo.UQuickButton1Click(Sender: TObject);
+procedure TformDemo.buttonFullScreenClick(Sender: TObject);
 begin
   if not FullScreen then
     FullScreen := True

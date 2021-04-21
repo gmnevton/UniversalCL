@@ -48,6 +48,8 @@ type
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
 
   protected
@@ -177,8 +179,8 @@ end;
 procedure TUCheckBox.UpdateRects;
 begin
   IconRect := Rect(0, 0, Height, Height);
-  TextRect := Rect(Height, 0, Width, Height);
-  FocusRect:= Rect(Height - 3, 2, Width - 2, Height - 2);
+  TextRect := Rect(Height, 0, Width - 2, Height);
+  FocusRect:= Rect(Height - 3, 2, Width, Height - 2);
 end;
 
 procedure TUCheckBox.Toggle;
@@ -284,13 +286,14 @@ begin
   end;
 
   // Paint focus rect
-  if Focused then begin
-    Canvas.Font.Color := TextColor;
-    Canvas.Pen.Style := psDot;
-    Canvas.Pen.Color := TextColor;
-    DrawFocusRect(Canvas.Handle, FocusRect);
-    Canvas.Pen.Style := psClear;
-    Canvas.Pen.Color := Color;
+  if Focused or MouseInClient then begin
+    DrawFocusRect(Canvas, FocusRect, Color);
+//    Canvas.Font.Color := TextColor;
+//    Canvas.Pen.Style := psDot;
+//    Canvas.Pen.Color := TextColor;
+//    DrawFocusRect(Canvas.Handle, FocusRect);
+//    Canvas.Pen.Style := psClear;
+//    Canvas.Pen.Color := Color;
   end;
 end;
 
@@ -362,6 +365,22 @@ begin
   if PtInRect(IconRect, Msg.Pos) then
     Toggle;
   inherited;
+end;
+
+procedure TUCheckBox.CMMouseEnter(var Msg: TMessage);
+begin
+  if Enabled then begin
+    Invalidate;
+    inherited;
+  end;
+end;
+
+procedure TUCheckBox.CMMouseLeave(var Msg: TMessage);
+begin
+  if Enabled then begin
+    Invalidate;
+    inherited;
+  end;
 end;
 
 procedure TUCheckBox.CMEnabledChanged(var Msg: TMessage);

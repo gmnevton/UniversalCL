@@ -37,6 +37,7 @@ function PointInRect(const p: TSmallPoint; const Rect: TRect): Boolean; overload
 procedure GetCenterPos(Width, Height: Integer; Rect: TRect; out X, Y: Integer);
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
+procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
 procedure InitBumpMap;
 procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer; Add: Boolean);
 
@@ -50,7 +51,8 @@ uses
   DwmApi,
   UxTheme,
   UCL.Classes,
-  UCL.Types;
+  UCL.Types,
+  UCL.Utils;
 
 {$REGION 'Older Delphi versions'}
 {$IF CompilerVersion <= 30}
@@ -274,6 +276,16 @@ begin
     if Overlay then
       Canvas.Pen.Mode:=spm;
   end;
+end;
+
+procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
+begin
+  Canvas.Pen.Color := GetTextColorFromBackground(Color);
+  Canvas.Pen.Width := 1;
+  Canvas.Pen.Style := psDot;
+  Canvas.Rectangle(R);
+  Canvas.Pen.Style := psClear;
+  Canvas.Pen.Color := Color;
 end;
 
 function Mix(A, B: Byte; Sign: Boolean): Byte; inline;
