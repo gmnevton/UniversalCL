@@ -279,10 +279,19 @@ begin
 end;
 
 procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
+const
+  PenPattern: Array[1..4] of DWORD = (1, 2, 1, 2);
+var
+  logBrush: TLogBrush;
 begin
+  //
   Canvas.Pen.Color := GetTextColorFromBackground(Color);
   Canvas.Pen.Width := 1;
-  Canvas.Pen.Style := psDot;
+  //Canvas.Pen.Style := psDot;
+  Canvas.Pen.Style := psUserStyle;
+  logBrush.lbStyle := BS_SOLID;
+  logBrush.lbColor := Canvas.Pen.Color;
+  Canvas.Pen.Handle := ExtCreatePen(PS_GEOMETRIC or PS_USERSTYLE, Canvas.Pen.Width, logBrush, Length(PenPattern), @PenPattern);
   Canvas.Rectangle(R);
   Canvas.Pen.Style := psClear;
   Canvas.Pen.Color := Color;
