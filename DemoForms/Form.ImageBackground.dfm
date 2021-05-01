@@ -14540,7 +14540,6 @@ object formImageBackground: TformImageBackground
   object buttonAppQuit: TUQuickButton
     Left = 566
     Top = 1
-    Hint = 'Close'
     Anchors = [akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -14550,13 +14549,16 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 13619151
+    BackColors.DarkColor = 3947580
     ButtonStyle = qbsQuit
     Caption = #57606
   end
   object buttonAppMinimized: TUQuickButton
     Left = 526
     Top = 1
-    Hint = 'Minimize'
     Anchors = [akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
@@ -14566,6 +14568,10 @@ object formImageBackground: TformImageBackground
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 13619151
+    BackColors.DarkColor = 3947580
     ButtonStyle = qbsMin
     Caption = #59192
   end
@@ -14587,7 +14593,7 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 151
+    Width = 161
     AutoSize = True
     TabOrder = 0
     OnClick = radioSystemThemeClick
@@ -14605,7 +14611,7 @@ object formImageBackground: TformImageBackground
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 64
+    Width = 56
     AutoSize = True
     TabOrder = 1
     OnClick = radioLightThemeClick
@@ -14622,7 +14628,7 @@ object formImageBackground: TformImageBackground
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 63
+    Width = 57
     AutoSize = True
     TabOrder = 2
     OnClick = radioDarkThemeClick

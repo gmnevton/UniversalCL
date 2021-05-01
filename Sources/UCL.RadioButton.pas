@@ -27,6 +27,7 @@ type
     FChecked: Boolean;
     FGroup: string;
     FCustomActiveColor: TColor;
+    FMultiline,
     FTextOnGlass: Boolean;
     FOnChange: TNotifyEvent;
 
@@ -38,6 +39,7 @@ type
     procedure SetAutoSize(const Value: Boolean); reintroduce;
     //procedure SetButtonState(const Value: TUControlState);
     procedure SetChecked(const Value: Boolean);
+    procedure SetMultiline(const Value: Boolean);
     procedure SetTextOnGlass(const Value: Boolean);
 
     //  Messages
@@ -48,11 +50,13 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
 
   protected
     procedure DoChangeScale(M, D: Integer); override;
     procedure Paint; override;
     procedure Resize; override;
+    procedure KeyPress(var Key: Char); override;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -69,6 +73,7 @@ type
     property Checked: Boolean read FChecked write SetChecked default False;
     property Group: string read FGroup write FGroup;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
+    property Multiline: Boolean read FMultiline write SetMultiline default False;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
@@ -85,6 +90,7 @@ implementation
 
 uses
   SysUtils,
+  Forms,
   UITypes,
   UCL.ThemeManager,
   UCL.Colors,
@@ -103,6 +109,7 @@ begin
   //FButtonState := csNone;
   FChecked := False;
   FCustomActiveColor := clDefault; // $D77800;
+  FMultiline := False;
   FTextOnGlass := False;
 
   FIconFont := TFont.Create;
@@ -110,6 +117,7 @@ begin
   FIconFont.Size := 15;
 
   ParentColor := True;
+  ParentFont := True;
 //  Font.Name := 'Segoe UI';
 //  Font.Size := 10;
 
@@ -227,6 +235,14 @@ begin
   end;
 end;
 
+procedure TURadioButton.SetMultiline(const Value: Boolean);
+begin
+  if Value <> FMultiline then begin
+    FMultiline := Value;
+    Repaint;
+  end;
+end;
+
 procedure TURadioButton.SetTextOnGlass(const Value: Boolean);
 begin
   if Value <> FTextOnGlass then begin
@@ -239,9 +255,19 @@ end;
 
 procedure TURadioButton.DoChangeScale(M, D: Integer);
 begin
+  inherited DoChangeScale(M, D);
+//  Width := MulDiv(Width, M, D);
+//  Font.Height := MulDiv(Font.Height, M, D);
   IconFont.Height := MulDiv(IconFont.Height, M, D);
   Resize;   //  Autosize
   //UpdateRects;  //  Do not update rects, resize already do that
+end;
+
+procedure TURadioButton.KeyPress(var Key: Char);
+begin
+  inherited KeyPress(Key);
+  if (Key = ' ') and not Checked then
+    Checked := True;
 end;
 
 procedure TURadioButton.Paint;
@@ -257,22 +283,22 @@ begin
   Canvas.Brush.Style := bsClear;
   Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
-  DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, TextOnGlass);
+  DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, Multiline, TextOnGlass);
 
   // Paint icon
   Canvas.Font.Assign(IconFont);
   Canvas.Font.Color := ActiveColor;
   if not Checked then
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, TextOnGlass)
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, Multiline, TextOnGlass)
   else begin
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, TextOnGlass);
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_OUTLINE, Multiline, TextOnGlass);
     //
     Canvas.Font.Color := TextColor;
-    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_SMALL, TextOnGlass);
+    DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_RADIO_SMALL, Multiline, TextOnGlass);
   end;
 
   // Paint focus rect
-  if Focused or MouseInClient then begin
+  if not IsDesigning and (Focused or MouseInClient) then begin
     DrawFocusRect(Canvas, FocusRect, Color);
     //Canvas.Font.Color := GetTextColorFromBackground(Color);
     //Canvas.Pen.Style := psDot;
@@ -285,14 +311,23 @@ end;
 
 procedure TURadioButton.Resize;
 var
-  Space: Integer;
+  Space, W, H: Integer;
+  R: TRect;
+//  ParentForm: TCustomForm;
 begin
+//  ParentForm := GetParentForm(Self, True);
   if AutoSize and (Align = alNone) then begin
     Space := 5;
     Canvas.Font.Assign(IconFont);
-    Height := 2 * Space + Canvas.TextHeight(UF_RADIO_OUTLINE);
-    Canvas.Font.Assign(Font);
-    Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
+    W := Canvas.TextHeight(UF_RADIO_OUTLINE);
+    H := 2 * Space + W;
+//    Canvas.Font.Assign(Font);
+    R := TextRect;
+    MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
+    W := W + Space + R.Width;
+    //
+    Height := H;
+    Width := W;
   end
   else
     inherited;
@@ -360,6 +395,12 @@ begin
   UpdateColors;
   Repaint;
   inherited;
+end;
+
+procedure TURadioButton.CMTextChanged(var Message: TMessage);
+begin
+  inherited;
+  Resize;
 end;
 
 end.

@@ -419,7 +419,7 @@ begin
 //      DrawTextRect(Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
       bmp.Canvas.Font.Assign(Font);
       bmp.Canvas.Font.Color := TextColor;
-      DrawTextRect(bmp.Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False);
+      DrawTextRect(bmp.Canvas, Alignment, VerticalAlignment, Rect(0, 0, Width, Height), Caption, False, False);
     end;
     //
     Canvas.Draw(0, 0, bmp);

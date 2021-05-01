@@ -25,6 +25,7 @@ type
     FIconFont: TFont;
     FAutoSize: Boolean;
     FAllowGrayed: Boolean;
+    FMultiline,
     FTextOnGlass: Boolean;
     FState: TUCheckBoxState;
     FCustomActiveColor: TColor;
@@ -39,6 +40,7 @@ type
     function GetChecked: Boolean;
     procedure SetChecked(const Value: Boolean);
     procedure SetAutoSize(const Value: Boolean); reintroduce;
+    procedure SetMultiline(const Value: Boolean);
     procedure SetTextOnGlass(const Value: Boolean);
     procedure SetAllowGrayed(const Value: Boolean);
     procedure SetState(const Value: TUCheckBoxState);
@@ -51,6 +53,7 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
 
   protected
     procedure Paint; override;
@@ -71,6 +74,7 @@ type
     property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
     property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default False;
     property Checked: Boolean read GetChecked write SetChecked default False;
+    property Multiline: Boolean read FMultiline write SetMultiline default False;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
     //
     property State: TUCheckBoxState read FState write SetState default cbsUnchecked;
@@ -110,6 +114,7 @@ begin
 
   FAutoSize := False;
   FAllowGrayed := False;
+  FMultiline := False;
   FTextOnGlass := False;
   FState := cbsUnchecked;
   FCustomActiveColor := clDefault; // $D77800 // Default blue
@@ -246,6 +251,14 @@ begin
   end;
 end;
 
+procedure TUCheckBox.SetMultiline(const Value: Boolean);
+begin
+  if Value <> FMultiline then begin
+    FMultiline := Value;
+    Repaint;
+  end;
+end;
+
 procedure TUCheckBox.SetTextOnGlass(const Value: Boolean);
 begin
   if Value <> FTextOnGlass then begin
@@ -269,19 +282,19 @@ begin
   Canvas.Brush.Style := bsClear;
   Canvas.Font.Assign(Font);
   Canvas.Font.Color := TextColor;
-  DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, TextOnGlass);
+  DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, TextRect, Caption, Multiline, TextOnGlass);
 
   // Paint icon
   Canvas.Font.Assign(IconFont);
   Canvas.Font.Color := ActiveColor;
   case State of
-    cbsChecked  : DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_CHECKED, TextOnGlass);
-    cbsUnchecked: DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, TextOnGlass);
+    cbsChecked  : DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_CHECKED, Multiline, TextOnGlass);
+    cbsUnchecked: DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, Multiline, TextOnGlass);
     cbsGrayed   : begin
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, TextOnGlass);
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_OUTLINE, Multiline, TextOnGlass);
       //
       Canvas.Font.Color := TextColor;
-      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_SMALL, TextOnGlass);
+      DrawTextRect(Canvas, taLeftJustify, taVerticalCenter, IconRect, UF_CHECKBOX_SMALL, Multiline, TextOnGlass);
     end;
   end;
 
@@ -299,14 +312,21 @@ end;
 
 procedure TUCheckBox.Resize;
 var
-  Space: Integer;
+  Space, W, H: Integer;
+  R: TRect;
 begin
   if AutoSize and (Align = alNone) then begin
     Space := 5;
     Canvas.Font.Assign(IconFont);
-    Height := 2 * Space + Canvas.TextHeight(UF_CHECKBOX_OUTLINE);
-    Canvas.Font.Assign(Font);
-    Width := Height + Canvas.TextWidth(Text) + (Height - Canvas.TextHeight(Text)) div 2;
+    W := Canvas.TextHeight(UF_CHECKBOX_OUTLINE);
+    H := 2 * Space + W;
+//    Canvas.Font.Assign(Font);
+    R := TextRect;
+    MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
+    W := W + Space + R.Width;
+    //
+    Height := H;
+    Width := W;
   end
   else
     inherited;
@@ -388,6 +408,12 @@ begin
   UpdateColors;
   Repaint;
   inherited;
+end;
+
+procedure TUCheckBox.CMTextChanged(var Message: TMessage);
+begin
+  inherited;
+  Resize;
 end;
 
 end.

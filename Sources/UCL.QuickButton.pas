@@ -424,7 +424,7 @@ begin
   Canvas.Font.Color := TextColor;
 
   TextRect := Rect(0, 0, Width, Height);
-  DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, True);
+  DrawTextRect(Canvas, taCenter, taVerticalCenter, TextRect, Caption, False, True);
 end;
 {
 procedure TUQuickButton.AdjustSize;

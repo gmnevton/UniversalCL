@@ -474,7 +474,7 @@ begin
       if ShowIcon then begin
         bmp.Canvas.Font := SymbolFont;
         bmp.Canvas.Font.Color := TextColor;
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, False)
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, IconRect, SymbolChar, False, False)
       end;
     end
     else begin
@@ -489,18 +489,18 @@ begin
       bmp.Canvas.Font := DetailFont;
       bmp.Canvas.Font.Color := DetailColor;
       if Orientation = oHorizontal then
-        DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False)
+        DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False, False)
       else
-        DrawTextRect(bmp.Canvas, taCenter, taAlignTop, DetailRect, Detail, False);
+        DrawTextRect(bmp.Canvas, taCenter, taAlignTop, DetailRect, Detail, False, False);
     end;
 
     // Paint text
     bmp.Canvas.Font := Font;
     bmp.Canvas.Font.Color := TextColor;
     if Orientation = oHorizontal then
-      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False)
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False, False)
     else
-      DrawTextRect(bmp.Canvas, taCenter, taAlignTop, TextRect, Text, False);
+      DrawTextRect(bmp.Canvas, taCenter, taAlignTop, TextRect, Text, False, False);
 
     //
     Canvas.Draw(0, 0, bmp);

@@ -640,11 +640,11 @@ begin
     if iokCheckBox in ObjectsVisible then begin
       if IsChecked then begin
         bmp.Canvas.Font.Color := ActiveColor;
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_CHECKED, False);
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_CHECKED, False, False);
       end
       else begin
         bmp.Canvas.Font.Color := TextColor;
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_OUTLINE, False);
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, CheckBoxRect, UF_CHECKBOX_OUTLINE, False, False);
       end;
     end;
 
@@ -653,7 +653,7 @@ begin
     //  Paint left icon
     if iokLeftIcon in ObjectsVisible then begin
       if LeftIconKind = ikFontIcon then
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, LeftIconRect, LeftIcon, false)
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, LeftIconRect, LeftIcon, False, False)
       else if Images <> Nil then begin
         GetCenterPos(Images.Width, Images.Height, LeftIconRect, ImgX, ImgY);
         Images.Draw(bmp.Canvas, ImgX, ImgY, ImageLeftIndex, Enabled);
@@ -663,7 +663,7 @@ begin
     //  Paint right icon
     if iokRightIcon in ObjectsVisible then begin
       if RightIconKind = ikFontIcon then
-        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, RightIconRect, RightIcon, false)
+        DrawTextRect(bmp.Canvas, taCenter, taVerticalCenter, RightIconRect, RightIcon, False, False)
       else if Images <> Nil then begin
         GetCenterPos(Images.Width, Images.Height, RightIconRect, ImgX, ImgY);
         Images.Draw(bmp.Canvas, ImgX, ImgY, ImageRightIndex, Enabled);
@@ -674,14 +674,14 @@ begin
     if iokDetail in ObjectsVisible then begin
       bmp.Canvas.Font.Assign(DetailFont);
       bmp.Canvas.Font.Color := DetailColor;
-      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, false);
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False, False);
     end;
 
     //  Paint text
     if iokText in ObjectsVisible then begin
       bmp.Canvas.Font.Assign(Font);
       bmp.Canvas.Font.Color := TextColor;
-      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, false);
+      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False, False);
     end;
 
     //

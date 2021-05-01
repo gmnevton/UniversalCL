@@ -35,7 +35,8 @@ function PointInRect(const X, Y: Integer; const Rect: TRect): Boolean; overload;
 function PointInRect(const p: TPoint; const Rect: TRect): Boolean; overload;
 function PointInRect(const p: TSmallPoint; const Rect: TRect): Boolean; overload;
 procedure GetCenterPos(Width, Height: Integer; Rect: TRect; out X, Y: Integer);
-procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
+procedure MeasureTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; var Rect: TRect; Text: String; Multiline, TextOnGlass: Boolean);
+procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: String; Multiline, TextOnGlass: Boolean);
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
 procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
 procedure InitBumpMap;
@@ -220,21 +221,18 @@ end;
 {$IFEND}
 {$ENDREGION}
 
-procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: string; TextOnGlass: Boolean);
+procedure DrawTextFormat(const Canvas: TCanvas; Text: String; var Rect: TRect; TextFlags: Cardinal; TextOnGlass: Boolean);
 var
-  Flags: Cardinal;
   LFormat: TTextFormat;
   LOptions: TStyleTextOptions;
 begin
-  Flags := DT_EXPANDTABS or DT_SINGLELINE or HAlignments[HAlign] or VAlignments[VAlign];
-
   if not TextOnGlass then
-    DrawText(Canvas.Handle, Text, Length(Text), Rect, Flags)
+    DrawText(Canvas.Handle, Text, Length(Text), Rect, TextFlags)
   else begin
   {$IF CompilerVersion <= 30}
-    LFormat := TextFlagsToTextFormat(Flags);
+    LFormat := TextFlagsToTextFormat(TextFlags);
   {$ELSE}
-    LFormat := TTextFormatFlags(Flags);
+    LFormat := TTextFormatFlags(TextFlags);
   {$IFEND}
 
     LOptions.Flags := [stfTextColor, stfGlowSize];
@@ -249,6 +247,28 @@ begin
     StyleServices.DrawText(Canvas.Handle, StyleServices.GetElementDetails(ttlTextLabelNormal), Text, Rect, LFormat, LOptions);
   {$IFEND}
   end;
+end;
+
+procedure MeasureTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; var Rect: TRect; Text: String; Multiline, TextOnGlass: Boolean);
+const
+  LineStyle: Array[Boolean] of Cardinal = (DT_SINGLELINE, 0);
+var
+  Flags: Cardinal;
+begin
+  Flags := DT_CALCRECT or DT_EXPANDTABS or LineStyle[Multiline] or HAlignments[HAlign] or VAlignments[VAlign];
+  //
+  DrawTextFormat(Canvas, Text, Rect, Flags, TextOnGlass);
+end;
+
+procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: String; Multiline, TextOnGlass: Boolean);
+const
+  LineStyle: Array[Boolean] of Cardinal = (DT_SINGLELINE, 0);
+var
+  Flags: Cardinal;
+begin
+  Flags := DT_EXPANDTABS or LineStyle[Multiline] or HAlignments[HAlign] or VAlignments[VAlign];
+  //
+  DrawTextFormat(Canvas, Text, Rect, Flags, TextOnGlass);
 end;
 
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
@@ -279,8 +299,8 @@ begin
 end;
 
 procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
-const
-  PenPattern: Array[1..4] of DWORD = (1, 2, 1, 2);
+//const
+//  PenPattern: Array[1..4] of DWORD = (1, 2, 1, 2);
 var
   logBrush: TLogBrush;
 begin
@@ -291,7 +311,7 @@ begin
   Canvas.Pen.Style := psUserStyle;
   logBrush.lbStyle := BS_SOLID;
   logBrush.lbColor := Canvas.Pen.Color;
-  Canvas.Pen.Handle := ExtCreatePen(PS_GEOMETRIC or PS_USERSTYLE, Canvas.Pen.Width, logBrush, Length(PenPattern), @PenPattern);
+  Canvas.Pen.Handle := ExtCreatePen({PS_GEOMETRIC}PS_COSMETIC or PS_ALTERNATE{ or PS_USERSTYLE}, Canvas.Pen.Width, logBrush, 0, Nil); // Length(PenPattern), @PenPattern);
   Canvas.Rectangle(R);
   Canvas.Pen.Style := psClear;
   Canvas.Pen.Color := Color;

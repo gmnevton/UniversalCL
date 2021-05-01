@@ -388,7 +388,7 @@ begin
     // Paint text
     bmp.Canvas.Font.Assign(Font);
     bmp.Canvas.Font.Color := TextColor;
-    DrawTextRect(bmp.Canvas, Alignment, taVerticalCenter, TextRect, Caption, False);
+    DrawTextRect(bmp.Canvas, Alignment, taVerticalCenter, TextRect, Caption, False, False);
 
     //
     Canvas.Draw(0, 0, bmp);

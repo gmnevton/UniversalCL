@@ -108,7 +108,7 @@ begin
 
   //  Draw text
   TextRect := Rect(TextPosition, 0, Width, Height);
-  DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, True);
+  DrawTextRect(Canvas, Alignment, taVerticalCenter, TextRect, Caption, False, True);
 end;
 
 procedure TUTitleBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);

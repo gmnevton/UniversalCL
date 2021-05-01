@@ -294,7 +294,7 @@ object formDemo: TformDemo
   object radioA1: TURadioButton
     Left = 390
     Top = 240
-    Width = 89
+    Width = 111
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -307,13 +307,12 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupA'
-    TextOnGlass = True
     Caption = 'Radio A1'
   end
   object radioA2: TURadioButton
     Left = 390
     Top = 270
-    Width = 89
+    Width = 111
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -332,7 +331,7 @@ object formDemo: TformDemo
   object radioA3: TURadioButton
     Left = 390
     Top = 300
-    Width = 89
+    Width = 111
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -352,7 +351,7 @@ object formDemo: TformDemo
   object radioB1: TURadioButton
     Left = 540
     Top = 240
-    Width = 88
+    Width = 112
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -371,7 +370,7 @@ object formDemo: TformDemo
   object radioB2: TURadioButton
     Left = 540
     Top = 270
-    Width = 88
+    Width = 112
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
