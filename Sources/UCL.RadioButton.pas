@@ -20,6 +20,9 @@ type
     ActiveColor, TextColor: TColor;
     IconRect, TextRect, FocusRect: TRect;
 
+  private const
+    Space: Integer = 5;
+
   private
     FIconFont: TFont;
     FAutoSize: Boolean;
@@ -28,6 +31,7 @@ type
     FGroup: string;
     FCustomActiveColor: TColor;
     FMultiline,
+    FTransparent,
     FTextOnGlass: Boolean;
     FOnChange: TNotifyEvent;
 
@@ -40,9 +44,11 @@ type
     //procedure SetButtonState(const Value: TUControlState);
     procedure SetChecked(const Value: Boolean);
     procedure SetMultiline(const Value: Boolean);
+    procedure SetTransparent(const Value: Boolean);
     procedure SetTextOnGlass(const Value: Boolean);
 
     //  Messages
+    procedure WMEraseBkgnd(var Msg: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
@@ -50,13 +56,17 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-    procedure CMTextChanged(var Message: TMessage); message CM_TEXTCHANGED;
+    procedure CMTextChanged(var Msg: TMessage); message CM_TEXTCHANGED;
+    procedure CMFontChanged(var Msg: TMessage); message CM_FONTCHANGED;
+    procedure CMParentFontChanged(var Msg: TCMParentFontChanged); message CM_PARENTFONTCHANGED;
 
   protected
-    procedure DoChangeScale(M, D: Integer); override;
     procedure Paint; override;
     procedure Resize; override;
+    procedure DoChangeScale(M, D: Integer); override;
     procedure KeyPress(var Key: Char); override;
+
+    function GetIconWidth: Integer; virtual;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -74,6 +84,7 @@ type
     property Group: string read FGroup write FGroup;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
     property Multiline: Boolean read FMultiline write SetMultiline default False;
+    property Transparent: Boolean read FTransparent write SetTransparent default True;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
@@ -92,6 +103,9 @@ uses
   SysUtils,
   Forms,
   UITypes,
+//  Themes,
+//  UxTheme,
+//  DwmApi,
   UCL.ThemeManager,
   UCL.Colors,
   UCL.FontIcons;
@@ -103,6 +117,7 @@ uses
 constructor TURadioButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle + [csOpaque];
 
   //  New props
   FAutoSize := False;
@@ -110,6 +125,7 @@ begin
   FChecked := False;
   FCustomActiveColor := clDefault; // $D77800;
   FMultiline := False;
+  FTransparent := True;
   FTextOnGlass := False;
 
   FIconFont := TFont.Create;
@@ -181,10 +197,13 @@ begin
 end;
 
 procedure TURadioButton.UpdateRects;
+var
+  W: Integer;
 begin
-  IconRect := Rect(0, 0, Height, Height);
-  TextRect := Rect(Height, 0, Width - 2, Height);
-  FocusRect:= Rect(Height - 3, 2, Width, Height - 2);
+  W := GetIconWidth;
+  IconRect := Rect(0, 0, W, Height);
+  TextRect := Rect(W, 0, Width - 1, Height);
+  FocusRect:= Rect(W - 1, 2, Width, Height - 2);
 end;
 
 //  SETTERS
@@ -243,6 +262,18 @@ begin
   end;
 end;
 
+procedure TURadioButton.SetTransparent(const Value: Boolean);
+begin
+  if Value <> FTransparent then begin
+    FTransparent := Value;
+//    if Value then
+//      ControlStyle := ControlStyle - [csOpaque]
+//    else
+//      ControlStyle := ControlStyle + [csOpaque];
+    Repaint;
+  end;
+end;
+
 procedure TURadioButton.SetTextOnGlass(const Value: Boolean);
 begin
   if Value <> FTextOnGlass then begin
@@ -253,30 +284,32 @@ end;
 
 //  CUSTOM METHODS
 
-procedure TURadioButton.DoChangeScale(M, D: Integer);
-begin
-  inherited DoChangeScale(M, D);
-//  Width := MulDiv(Width, M, D);
-//  Font.Height := MulDiv(Font.Height, M, D);
-  IconFont.Height := MulDiv(IconFont.Height, M, D);
-  Resize;   //  Autosize
-  //UpdateRects;  //  Do not update rects, resize already do that
-end;
-
-procedure TURadioButton.KeyPress(var Key: Char);
-begin
-  inherited KeyPress(Key);
-  if (Key = ' ') and not Checked then
-    Checked := True;
-end;
-
 procedure TURadioButton.Paint;
+
+  function DoGlassPaint: Boolean;
+  var
+    LParent: TWinControl;
+  begin
+    Result := csGlassPaint in ControlState;
+    if Result then begin
+      LParent := Parent;
+      while (LParent <> Nil) and not LParent.DoubleBuffered do
+        LParent := LParent.Parent;
+      Result := (LParent = Nil) or not LParent.DoubleBuffered or (LParent is TCustomForm);
+    end;
+  end;
+
 begin
   // Paint background
-  if not TextOnGlass then begin
-    Canvas.Brush.Style := bsSolid;
-    Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
-    Canvas.FillRect(Rect(0, 0, Width, Height));
+  if not Transparent then begin
+    if not DoGlassPaint or not TextOnGlass then begin
+//      PerformEraseBackground(Self, Canvas.Handle)
+//    else begin
+      //FillRect(Canvas.Handle, ClientRect, GetStockObject(BLACK_BRUSH));
+      Canvas.Brush.Style := bsSolid;
+      Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
+      Canvas.FillRect(Rect(0, 0, Width, Height));
+    end;
   end;
 
   // Paint text
@@ -298,43 +331,71 @@ begin
   end;
 
   // Paint focus rect
-  if not IsDesigning and (Focused or MouseInClient) then begin
+  if not IsDesigning and (Focused or MouseInClient) then
     DrawFocusRect(Canvas, FocusRect, Color);
-    //Canvas.Font.Color := GetTextColorFromBackground(Color);
-    //Canvas.Pen.Style := psDot;
-    //Canvas.Pen.Color := GetTextColorFromBackground(Color);
-    //DrawFocusRect(Canvas.Handle, FocusRect);
-    //Canvas.Pen.Style := psClear;
-    //Canvas.Pen.Color := Color;
-  end;
 end;
 
 procedure TURadioButton.Resize;
 var
-  Space, W, H: Integer;
+  W, H: Integer;
   R: TRect;
-//  ParentForm: TCustomForm;
 begin
-//  ParentForm := GetParentForm(Self, True);
   if AutoSize and (Align = alNone) then begin
-    Space := 5;
-    Canvas.Font.Assign(IconFont);
-    W := Canvas.TextHeight(UF_RADIO_OUTLINE);
-    H := 2 * Space + W;
-//    Canvas.Font.Assign(Font);
+    H := GetIconWidth;
+    Canvas.Font.Assign(Font);
     R := TextRect;
     MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
-    W := W + Space + R.Width;
+    W := R.Left + R.Width + 1;
     //
-    Height := H;
-    Width := W;
+    SetBounds(Left, Top, W, H);
   end
   else
     inherited;
   UpdateRects;
 end;
 
+procedure TURadioButton.DoChangeScale(M, D: Integer);
+begin
+  inherited DoChangeScale(M, D);
+  if M = D then
+    Exit;
+  //
+  IconFont.Height := MulDiv(IconFont.Height, M, D);
+  Invalidate;
+  Resize;   //  Autosize
+end;
+
+procedure TURadioButton.KeyPress(var Key: Char);
+begin
+  inherited KeyPress(Key);
+  if (Key = ' ') and not Checked then
+    Checked := True;
+end;
+
+function TURadioButton.GetIconWidth: Integer;
+begin
+  if HandleAllocated then begin
+    Canvas.Font.Assign(IconFont);
+    Result := Canvas.TextHeight(UF_RADIO_OUTLINE);
+  end
+  else
+    Result := Height;
+  Result := 2 * Space + Result;
+end;
+
 //  MESSAGES
+
+procedure TURadioButton.WMEraseBkgnd(var Msg: TWmEraseBkgnd);
+begin
+  if Transparent then begin
+    if (Parent <> Nil) and Parent.DoubleBuffered then
+      PerformEraseBackground(Self, Msg.DC);
+    DrawParentImage(Self, Msg.DC, False);
+    Msg.Result := 1;
+  end
+  else
+    inherited;
+end;
 
 procedure TURadioButton.WMSetFocus(var Msg: TWMSetFocus);
 var
@@ -397,10 +458,25 @@ begin
   inherited;
 end;
 
-procedure TURadioButton.CMTextChanged(var Message: TMessage);
+procedure TURadioButton.CMTextChanged(var Msg: TMessage);
 begin
   inherited;
   Resize;
+  Invalidate;
+end;
+
+procedure TURadioButton.CMFontChanged(var Msg: TMessage);
+begin
+  inherited;
+  Resize;
+  Invalidate;
+end;
+
+procedure TURadioButton.CMParentFontChanged(var Msg: TCMParentFontChanged);
+begin
+  inherited;
+  Resize;
+  Invalidate;
 end;
 
 end.

@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  Controls,
   Types,
   Windows,
   Graphics,
@@ -39,6 +40,7 @@ procedure MeasureTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVe
 procedure DrawTextRect(const Canvas: TCanvas; HAlign: TAlignment; VAlign: TVerticalAlignment; Rect: TRect; Text: String; Multiline, TextOnGlass: Boolean);
 procedure DrawBorder(const Canvas: TCanvas; R: TRect; Color: TColor; Thickness: Integer; const Overlay: Boolean = False);
 procedure DrawFocusRect(const Canvas: TCanvas; R: TRect; Color: TColor);
+procedure DrawParentImage(Control: TControl; DC: HDC; InvalidateParent: Boolean = False);
 procedure InitBumpMap;
 procedure DrawBumpMap(const Canvas: TCanvas; X, Y: Integer; Add: Boolean);
 
@@ -49,8 +51,11 @@ implementation
 
 uses
   SysUtils,
+  Forms,
+  Messages,
   DwmApi,
   UxTheme,
+  UITypes,
   UCL.Classes,
   UCL.Types,
   UCL.Utils;
@@ -77,8 +82,8 @@ const
 {$ENDREGION}
 
 const
-  HAlignments: Array[TAlignment] of Longint = (DT_LEFT, DT_RIGHT, DT_CENTER);
-  VAlignments: Array[TVerticalAlignment] of Longint = (DT_TOP, DT_BOTTOM, DT_VCENTER);
+  HAlignments: Array[TAlignment] of Cardinal = (DT_LEFT, DT_RIGHT, DT_CENTER);
+  VAlignments: Array[TVerticalAlignment] of Cardinal = (DT_TOP, DT_BOTTOM, DT_VCENTER);
 {$IF CompilerVersion > 29}
   CStates: Array[Boolean] of TThemedTextLabel = (ttlTextLabelDisabled, ttlTextLabelNormal);
 {$IFEND}
@@ -315,6 +320,28 @@ begin
   Canvas.Rectangle(R);
   Canvas.Pen.Style := psClear;
   Canvas.Pen.Color := Color;
+end;
+
+procedure DrawParentImage(Control: TControl; DC: HDC; InvalidateParent: Boolean = False);
+var
+  SaveIndex: Integer;
+  P: TPoint;
+begin
+  if Control.Parent = Nil then
+    Exit;
+  //
+  SaveIndex := SaveDC(DC);
+  GetViewportOrgEx(DC, P);
+  SetViewportOrgEx(DC, P.X - Control.Left, P.Y - Control.Top, nil);
+  IntersectClipRect(DC, 0, 0, Control.Parent.ClientWidth, Control.Parent.ClientHeight);
+  //
+  Control.Parent.Perform(WM_ERASEBKGND, DC, 0);
+  Control.Parent.Perform(WM_PRINTCLIENT, DC, prf_Client);
+  //
+  RestoreDC(DC, SaveIndex);
+  //
+  if InvalidateParent and not (Control.Parent is TCustomControl) and not (Control.Parent is TCustomForm) and not (csDesigning in Control.ComponentState) then
+    Control.Parent.Invalidate;
 end;
 
 function Mix(A, B: Byte; Sign: Boolean): Byte; inline;

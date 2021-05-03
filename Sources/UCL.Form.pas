@@ -64,7 +64,7 @@ type
 
   private
     // Messages
-    procedure WM_SysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
+    procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
     procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
     procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
     procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
@@ -590,7 +590,7 @@ end;
 //  MESSAGES
 
 {$REGION 'Messages handling'}
-procedure TUForm.WM_SysCommand(var Msg: TWMSysCommand);
+procedure TUForm.WMSysCommand(var Msg: TWMSysCommand);
 begin
   // Prevent move and restore
   if FullScreen then begin

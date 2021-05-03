@@ -170,8 +170,8 @@ object formDemo: TformDemo
     TextKind = tkTitle
   end
   object sliderHorz: TUSlider
-    Left = 560
-    Top = 370
+    Left = 390
+    Top = 446
     Width = 140
     ParentShowHint = False
     ShowHint = False
@@ -200,8 +200,8 @@ object formDemo: TformDemo
     OnChange = sliderHorzChange
   end
   object sliderDisabled: TUSlider
-    Left = 560
-    Top = 340
+    Left = 390
+    Top = 416
     Width = 140
     Enabled = False
     BackColor.Enabled = False
@@ -231,7 +231,7 @@ object formDemo: TformDemo
   end
   object sliderVert: TUSlider
     Left = 680
-    Top = 420
+    Top = 480
     Width = 25
     Height = 70
     BackColor.Enabled = False
@@ -262,7 +262,7 @@ object formDemo: TformDemo
   object check2State: TUCheckBox
     Left = 390
     Top = 340
-    Width = 134
+    Width = 129
     AutoSize = True
     TabOrder = 25
     IconFont.Charset = DEFAULT_CHARSET
@@ -271,14 +271,13 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Checked = True
-    TextOnGlass = True
     State = cbsChecked
     Caption = '2-state checkbox'
   end
   object check3State: TUCheckBox
     Left = 390
     Top = 368
-    Width = 134
+    Width = 129
     AutoSize = True
     TabOrder = 26
     IconFont.Charset = DEFAULT_CHARSET
@@ -287,14 +286,13 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     AllowGrayed = True
-    TextOnGlass = True
     State = cbsGrayed
     Caption = '3-state checkbox'
   end
   object radioA1: TURadioButton
     Left = 390
     Top = 240
-    Width = 111
+    Width = 84
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -312,7 +310,7 @@ object formDemo: TformDemo
   object radioA2: TURadioButton
     Left = 390
     Top = 270
-    Width = 111
+    Width = 84
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -325,13 +323,12 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupA'
-    TextOnGlass = True
     Caption = 'Radio A2'
   end
   object radioA3: TURadioButton
     Left = 390
     Top = 300
-    Width = 111
+    Width = 84
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -345,13 +342,12 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupA'
-    TextOnGlass = True
     Caption = 'Radio A3'
   end
   object radioB1: TURadioButton
     Left = 540
     Top = 240
-    Width = 112
+    Width = 83
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -364,13 +360,12 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupB'
-    TextOnGlass = True
     Caption = 'Radio B1'
   end
   object radioB2: TURadioButton
     Left = 540
     Top = 270
-    Width = 112
+    Width = 83
     Margins.Left = 0
     Margins.Top = 0
     Margins.Right = 0
@@ -383,12 +378,11 @@ object formDemo: TformDemo
     IconFont.Name = 'Segoe MDL2 Assets'
     IconFont.Style = []
     Group = 'GroupB'
-    TextOnGlass = True
     Caption = 'Radio B2'
   end
   object progressVert: TUProgressBar
     Left = 660
-    Top = 420
+    Top = 480
     Width = 5
     Height = 70
     ParentColor = False
@@ -411,7 +405,7 @@ object formDemo: TformDemo
   end
   object progressCustomColor: TUProgressBar
     Left = 390
-    Top = 420
+    Top = 480
     Width = 250
     ParentColor = False
     TabOrder = 27
@@ -433,7 +427,7 @@ object formDemo: TformDemo
   end
   object progressConnected: TUProgressBar
     Left = 390
-    Top = 440
+    Top = 500
     Width = 250
     ParentColor = False
     TabOrder = 28
@@ -1318,7 +1312,7 @@ object formDemo: TformDemo
   object buttonRandomProgress: TUButton
     Tag = 5
     Left = 390
-    Top = 460
+    Top = 520
     Width = 250
     Height = 31
     Hint = 'This is tooltip'
@@ -2060,13 +2054,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 0
-      OnClick = radioSystemThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
+      OnChange = radioSystemThemeChange
       Caption = 'Use system setting'
     end
     object radioLightTheme: TURadioButton
@@ -2075,13 +2069,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 1
-      OnClick = radioLightThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
+      OnChange = radioLightThemeChange
       Caption = 'Light'
     end
     object radioDarkTheme: TURadioButton
@@ -2090,13 +2084,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 2
-      OnClick = radioDarkThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
+      OnChange = radioDarkThemeChange
       Caption = 'Dark'
     end
     object radioFreeAccount: TURadioButton
@@ -2357,10 +2351,29 @@ object formDemo: TformDemo
       Transparent = True
     end
   end
+  object radioC1: TURadioButton
+    Left = 540
+    Top = 317
+    Width = 193
+    Height = 90
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 0
+    TabOrder = 31
+    IconFont.Charset = DEFAULT_CHARSET
+    IconFont.Color = clWindowText
+    IconFont.Height = -20
+    IconFont.Name = 'Segoe MDL2 Assets'
+    IconFont.Style = []
+    Group = 'GroupC'
+    Multiline = True
+    Caption = 'Radio C1'
+  end
   object dialogSelectColor: TColorDialog
     Color = 14120960
-    Left = 440
-    Top = 510
+    Left = 560
+    Top = 110
   end
   object popupEdit: TUPopupMenu
     AniSet.AniKind = akOut
@@ -2369,8 +2382,8 @@ object formDemo: TformDemo
     AniSet.Duration = 120
     AniSet.Step = 20
     OnItemClick = popupEditItemClick
-    Left = 570
-    Top = 512
+    Left = 666
+    Top = 112
     object CutCtrlX1: TMenuItem
       Caption = #57707'Cut|Ctrl+X'
       Hint = 'Remove the selected content and put it on the clipboard'

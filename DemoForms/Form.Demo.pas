@@ -156,14 +156,12 @@ type
     buttonAppListForm: TUSymbolButton;
     buttonBlurForm: TUQuickButton;
     buttonFullScreen: TUQuickButton;
+    radioC1: TURadioButton;
     procedure buttonReloadSettingsClick(Sender: TObject);
     procedure buttonAniToRightClick(Sender: TObject);
     procedure buttonRandomProgressClick(Sender: TObject);
     procedure buttonAniToLeftClick(Sender: TObject);
     procedure buttonOpenMenuClick(Sender: TObject);
-    procedure radioSystemThemeClick(Sender: TObject);
-    procedure radioLightThemeClick(Sender: TObject);
-    procedure radioDarkThemeClick(Sender: TObject);
     procedure panelSelectAccentColorClick(Sender: TObject);
     procedure buttonMenuSettingsClick(Sender: TObject);
     procedure sliderHorzChange(Sender: TObject);
@@ -179,6 +177,9 @@ type
     procedure buttonBlurFormClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure buttonFullScreenClick(Sender: TObject);
+    procedure radioSystemThemeChange(Sender: TObject);
+    procedure radioLightThemeChange(Sender: TObject);
+    procedure radioDarkThemeChange(Sender: TObject);
 
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
@@ -518,35 +519,28 @@ begin
   end;
 end;
 
-procedure TformDemo.radioSystemThemeClick(Sender: TObject);
+procedure TformDemo.radioSystemThemeChange(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
   TM := SelectThemeManager(Self);
   TM.Theme := ttSystem;
-//  ThemeManager.Reload;
 end;
 
-procedure TformDemo.radioLightThemeClick(Sender: TObject);
+procedure TformDemo.radioLightThemeChange(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
   TM := SelectThemeManager(Self);
   TM.Theme := ttLight;
-//  ThemeManager.CustomTheme := utLight;
-//  ThemeManager.UseSystemTheme := False;
-//  ThemeManager.Reload;
 end;
 
-procedure TformDemo.radioDarkThemeClick(Sender: TObject);
+procedure TformDemo.radioDarkThemeChange(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
   TM := SelectThemeManager(Self);
   TM.Theme := ttDark;
-//  ThemeManager.CustomTheme := utDark;
-//  ThemeManager.UseSystemTheme := False;
-//  ThemeManager.Reload;
 end;
 
 //  POPUP MENU

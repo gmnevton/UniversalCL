@@ -14593,7 +14593,7 @@ object formImageBackground: TformImageBackground
   object radioSystemTheme: TURadioButton
     Left = 20
     Top = 60
-    Width = 161
+    Width = 146
     AutoSize = True
     TabOrder = 0
     OnClick = radioSystemThemeClick
@@ -14605,13 +14605,12 @@ object formImageBackground: TformImageBackground
     Checked = True
     Group = 'Theme'
     CustomActiveColor = 14120960
-    TextOnGlass = True
     Caption = 'Use system settings'
   end
   object radioLightTheme: TURadioButton
     Left = 20
     Top = 90
-    Width = 56
+    Width = 59
     AutoSize = True
     TabOrder = 1
     OnClick = radioLightThemeClick
@@ -14622,13 +14621,12 @@ object formImageBackground: TformImageBackground
     IconFont.Style = []
     Group = 'Theme'
     CustomActiveColor = 14120960
-    TextOnGlass = True
     Caption = 'Light'
   end
   object radioDarkTheme: TURadioButton
     Left = 20
     Top = 120
-    Width = 57
+    Width = 58
     AutoSize = True
     TabOrder = 2
     OnClick = radioDarkThemeClick
@@ -14639,7 +14637,6 @@ object formImageBackground: TformImageBackground
     IconFont.Style = []
     Group = 'Theme'
     CustomActiveColor = 14120960
-    TextOnGlass = True
     Caption = 'Dark'
   end
   object progressMain: TUProgressBar

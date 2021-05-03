@@ -42,7 +42,7 @@ type
     procedure BackColor_OnChange(Sender: TObject);
 
     // Messages
-    procedure WMEraseBkgnd(var Message: TWmEraseBkgnd); message WM_ERASEBKGND;
+    procedure WMEraseBkgnd(var Msg: TWmEraseBkgnd); message WM_ERASEBKGND;
     procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMRButtonUp(var Msg: TMessage); message WM_RBUTTONUP;
@@ -488,7 +488,7 @@ end;
 
 // MESSAGES
 
-procedure TUCaptionBar.WMEraseBkgnd(var Message: TWmEraseBkgnd);
+procedure TUCaptionBar.WMEraseBkgnd(var Msg: TWmEraseBkgnd);
 begin
 //  if StyleServices.Enabled and Assigned(Parent) and (csParentBackground in FControlStyle) then
 //  begin
@@ -509,7 +509,7 @@ begin
 //{$ENDIF}
 //      FillRect(Message.DC, ClientRect, FBrush.Handle);
 //  end;
-  Message.Result := 1;
+  Msg.Result := 1;
 end;
 
 procedure TUCaptionBar.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
