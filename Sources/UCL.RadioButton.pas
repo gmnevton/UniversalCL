@@ -33,13 +33,15 @@ type
     FMultiline,
     FTransparent,
     FTextOnGlass: Boolean;
-    FOnChange: TNotifyEvent;
+    FUpdating: Boolean;
 
     //  Internal
     procedure UpdateColors;
     procedure UpdateRects;
+    procedure FontChanged(Sender: TObject);
 
     //  Setters
+    procedure SetIconFont(Value: TFont);
     procedure SetAutoSize(const Value: Boolean); reintroduce;
     //procedure SetButtonState(const Value: TUControlState);
     procedure SetChecked(const Value: Boolean);
@@ -53,6 +55,7 @@ type
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
@@ -76,7 +79,7 @@ type
     procedure UpdateTheme; override;
 
   published
-    property IconFont: TFont read FIconFont write FIconFont;
+    property IconFont: TFont read FIconFont write SetIconFont;
     //
     property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
     //property ButtonState: TUControlState read FButtonState write SetButtonState default csNone;
@@ -86,7 +89,6 @@ type
     property Multiline: Boolean read FMultiline write SetMultiline default False;
     property Transparent: Boolean read FTransparent write SetTransparent default True;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
     property Caption;
     property Color;
@@ -127,10 +129,12 @@ begin
   FMultiline := False;
   FTransparent := True;
   FTextOnGlass := False;
+  FUpdating := False;
 
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
   FIconFont.Size := 15;
+  FIconFont.OnChange := FontChanged;
 
   ParentColor := True;
   ParentFont := True;
@@ -201,12 +205,29 @@ var
   W: Integer;
 begin
   W := GetIconWidth;
+  if W = -1 then
+    Exit;
+  //
   IconRect := Rect(0, 0, W, Height);
   TextRect := Rect(W, 0, Width - 1, Height);
   FocusRect:= Rect(W - 1, 2, Width, Height - 2);
 end;
 
+procedure TURadioButton.FontChanged(Sender: TObject);
+begin
+  if FUpdating then
+    Exit;
+  //
+  UpdateRects;
+  Repaint;
+end;
+
 //  SETTERS
+
+procedure TURadioButton.SetIconFont(Value: TFont);
+begin
+  FIconFont.Assign(Value);
+end;
 
 procedure TURadioButton.SetAutoSize(const Value: Boolean);
 begin
@@ -249,8 +270,9 @@ begin
       TurnSiblingsOff;
     Invalidate;
     //
-    if Assigned(FOnChange) then
-      FOnChange(Self);
+    Click;
+//    if Assigned(FOnChange) then
+//      FOnChange(Self);
   end;
 end;
 
@@ -337,20 +359,41 @@ end;
 
 procedure TURadioButton.Resize;
 var
-  W, H: Integer;
+  W, H{, L}: Integer;
   R: TRect;
 begin
   if AutoSize and (Align = alNone) then begin
     H := GetIconWidth;
-    Canvas.Font.Assign(Font);
-    R := TextRect;
-    MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
-    W := R.Left + R.Width + 1;
-    //
-    SetBounds(Left, Top, W, H);
+    if H > -1 then begin
+      Canvas.Font.Assign(Font);
+      R := Rect(H, 0, Width - 1, Height);
+      MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
+      W := R.Left + R.Width + 1;
+      //
+      SetBounds(Left, Top, W, H);
+    end;
   end
-  else
+  else begin
     inherited;
+    // ensure that all sizes are good when not autosize and multiline
+//    if Multiline then begin
+//      L := GetIconWidth;
+//      if L > -1 then begin
+//        Canvas.Font.Assign(Font);
+//        R := Rect(L, 0, Width - 1, Height);
+//        MeasureTextRect(Canvas, taLeftJustify, taAlignTop, R, Caption, Multiline, TextOnGlass);
+//        W := Width;
+//        H := Height;
+//        if W < (R.Left + R.Width + 1) then
+//          W := R.Left + R.Width + 1;
+//        if H < R.Height then
+//          H := R.Height;
+//        //
+//        if (W <> Width) or (H <> Height) then
+//          SetBounds(Left, Top, W, H);
+//      end;
+//    end;
+  end;
   UpdateRects;
 end;
 
@@ -360,9 +403,14 @@ begin
   if M = D then
     Exit;
   //
-  IconFont.Height := MulDiv(IconFont.Height, M, D);
-  Invalidate;
-  Resize;   //  Autosize
+  FUpdating := True;
+  try
+    IconFont.Height := MulDiv(IconFont.Height, M, D);
+    Invalidate;
+    Resize;   //  Autosize
+  finally
+    FUpdating := False;
+  end;
 end;
 
 procedure TURadioButton.KeyPress(var Key: Char);
@@ -378,8 +426,10 @@ begin
     Canvas.Font.Assign(IconFont);
     Result := Canvas.TextHeight(UF_RADIO_OUTLINE);
   end
-  else
-    Result := Height;
+  else begin
+    Result := -1;
+    Exit;
+  end;
   Result := 2 * Space + Result;
 end;
 
@@ -431,6 +481,16 @@ begin
     Exit;
   //
   if PtInRect(IconRect, Msg.Pos) then
+    Checked := True;
+  inherited;
+end;
+
+procedure TURadioButton.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+begin
+  if not Enabled then
+    Exit;
+  //
+  //if PtInRect(IconRect, Msg.Pos) then
     Checked := True;
   inherited;
 end;

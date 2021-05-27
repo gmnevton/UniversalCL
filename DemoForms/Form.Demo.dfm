@@ -193,8 +193,8 @@ object formDemo: TformDemo
     CurColor.LightDisabled = 14120960
     CurColor.LightFocused = 1513239
     CurColor.DarkColor = 14120960
-    CurColor.DarkHover = 15921906
-    CurColor.DarkPress = 7763574
+    CurColor.DarkHover = 7763574
+    CurColor.DarkPress = 15921906
     CurColor.DarkDisabled = 14120960
     CurColor.DarkFocused = 15921906
     OnChange = sliderHorzChange
@@ -222,8 +222,8 @@ object formDemo: TformDemo
     CurColor.LightDisabled = 14120960
     CurColor.LightFocused = 1513239
     CurColor.DarkColor = 14120960
-    CurColor.DarkHover = 15921906
-    CurColor.DarkPress = 7763574
+    CurColor.DarkHover = 7763574
+    CurColor.DarkPress = 15921906
     CurColor.DarkDisabled = 14120960
     CurColor.DarkFocused = 15921906
     ControlState = csDisabled
@@ -258,6 +258,27 @@ object formDemo: TformDemo
     CurColor.DarkFocused = 15921906
     Orientation = oVertical
     Max = 4
+  end
+  object radioC1: TURadioButton
+    Left = 540
+    Top = 317
+    Width = 193
+    Height = 90
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 0
+    TabOrder = 31
+    IconFont.Charset = DEFAULT_CHARSET
+    IconFont.Color = clWindowText
+    IconFont.Height = -20
+    IconFont.Name = 'Segoe MDL2 Assets'
+    IconFont.Style = []
+    Group = 'GroupC'
+    Multiline = True
+    Caption = 
+      'Radio C1'#13#10#13#10'More than one line of text'#13#10'This is another demo'#13#10'On' +
+      'e more line...'
   end
   object check2State: TUCheckBox
     Left = 390
@@ -1590,6 +1611,16 @@ object formDemo: TformDemo
       KeepOrginalColor = False
     end
   end
+  object TrackBar1: TTrackBar
+    Left = 555
+    Top = 410
+    Width = 150
+    Height = 31
+    ShowSelRange = False
+    TabOrder = 32
+    TickMarks = tmBoth
+    TickStyle = tsNone
+  end
   object boxSettings: TUScrollBox
     Left = 750
     Top = 92
@@ -2054,13 +2085,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 0
+      OnClick = radioSystemThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
-      OnChange = radioSystemThemeChange
       Caption = 'Use system setting'
     end
     object radioLightTheme: TURadioButton
@@ -2069,13 +2100,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 1
+      OnClick = radioLightThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
-      OnChange = radioLightThemeChange
       Caption = 'Light'
     end
     object radioDarkTheme: TURadioButton
@@ -2084,13 +2115,13 @@ object formDemo: TformDemo
       Width = 203
       Align = alTop
       TabOrder = 2
+      OnClick = radioDarkThemeClick
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
       IconFont.Name = 'Segoe MDL2 Assets'
       IconFont.Style = []
       Group = 'AppTheme'
-      OnChange = radioDarkThemeChange
       Caption = 'Dark'
     end
     object radioFreeAccount: TURadioButton
@@ -2350,25 +2381,6 @@ object formDemo: TformDemo
       BorderColor.FocusedDarkColor = 14120960
       Transparent = True
     end
-  end
-  object radioC1: TURadioButton
-    Left = 540
-    Top = 317
-    Width = 193
-    Height = 90
-    Margins.Left = 0
-    Margins.Top = 0
-    Margins.Right = 0
-    Margins.Bottom = 0
-    TabOrder = 31
-    IconFont.Charset = DEFAULT_CHARSET
-    IconFont.Color = clWindowText
-    IconFont.Height = -20
-    IconFont.Name = 'Segoe MDL2 Assets'
-    IconFont.Style = []
-    Group = 'GroupC'
-    Multiline = True
-    Caption = 'Radio C1'
   end
   object dialogSelectColor: TColorDialog
     Color = 14120960

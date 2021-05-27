@@ -14,17 +14,6 @@ uses
   UCL.Colors;
 
 type
-//  private const
-//    DefActiveColor: TDefColor = (
-//      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
-//      ($D77800, $D77800, $D77800, $333333, $D77800));
-//    DefBackColor: TDefColor = (
-//      ($999999, $666666, $999999, $CCCCCC, $999999),
-//      ($666666, $999999, $666666, $333333, $666666));
-//    DefCurColor: TDefColor = (
-//      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
-//      ($D77800, $F2F2F2, $767676, $333333, $D77800));
-
   TUSlider = class(TUGraphicControl)
   private var
     LCurWidth: Integer;
@@ -50,6 +39,7 @@ type
     // Internal
     procedure UpdateColors;
     procedure UpdateRects;
+    procedure ColorsChange(Sender: TObject);
 
     // Setters
     procedure SetBackColor(Value: TUThemeFocusableControlStateColors);
@@ -68,8 +58,6 @@ type
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
-
-    procedure ColorsChange(Sender: TObject);
 
   protected
     procedure Paint; override;
@@ -115,6 +103,7 @@ uses
 constructor TUSlider.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  ControlStyle := ControlStyle - [csDoubleClicks];
 
   //  New properties
   LCurWidth := 8;
@@ -223,6 +212,11 @@ begin
   end;
 end;
 
+procedure TUSlider.ColorsChange(Sender: TObject);
+begin
+  UpdateTheme;
+end;
+
 //  SETTERS
 
 procedure TUSlider.SetBackColor(Value: TUThemeFocusableControlStateColors);
@@ -317,6 +311,10 @@ end;
 
 procedure TUSlider.DoChangeScale(M, D: Integer);
 begin
+  inherited DoChangeScale(M, D);
+  if M = D then
+    Exit;
+  //
   LCurWidth  := MulDiv(LCurWidth, M, D);
   LCurHeight := MulDiv(LCurHeight, M, D);
   LCurCorner := MulDiv(LCurCorner, M, D);
@@ -346,7 +344,7 @@ end;
 
 procedure TUSlider.CMMouseLeave(var Msg: TMessage);
 begin
-  if Enabled then
+  if not Enabled then
     Exit;
   //
   ControlState := csNone;
@@ -419,11 +417,6 @@ begin
   ControlState := csNone;
   FIsSliding := False;
   inherited;
-end;
-
-procedure TUSlider.ColorsChange(Sender: TObject);
-begin
-  UpdateTheme;
 end;
 
 end.

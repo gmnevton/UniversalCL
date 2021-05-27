@@ -51,7 +51,7 @@ uses
   UCL.QuickButton,
   UCL.PopupMenu,
   UCL.RadioButton,
-  UCL.Shadow;
+  UCL.Shadow, Vcl.ComCtrls;
 
 type
   TformDemo = class(TUForm)
@@ -157,6 +157,7 @@ type
     buttonBlurForm: TUQuickButton;
     buttonFullScreen: TUQuickButton;
     radioC1: TURadioButton;
+    TrackBar1: TTrackBar;
     procedure buttonReloadSettingsClick(Sender: TObject);
     procedure buttonAniToRightClick(Sender: TObject);
     procedure buttonRandomProgressClick(Sender: TObject);
@@ -177,9 +178,9 @@ type
     procedure buttonBlurFormClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure buttonFullScreenClick(Sender: TObject);
-    procedure radioSystemThemeChange(Sender: TObject);
-    procedure radioLightThemeChange(Sender: TObject);
-    procedure radioDarkThemeChange(Sender: TObject);
+    procedure radioSystemThemeClick(Sender: TObject);
+    procedure radioLightThemeClick(Sender: TObject);
+    procedure radioDarkThemeClick(Sender: TObject);
 
   private
     procedure AppThemeBeforeUpdate(Sender: TObject);
@@ -519,28 +520,34 @@ begin
   end;
 end;
 
-procedure TformDemo.radioSystemThemeChange(Sender: TObject);
+procedure TformDemo.radioSystemThemeClick(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
-  TM := SelectThemeManager(Self);
-  TM.Theme := ttSystem;
+  if radioSystemTheme.Checked then begin
+    TM := SelectThemeManager(Self);
+    TM.Theme := ttSystem;
+  end;
 end;
 
-procedure TformDemo.radioLightThemeChange(Sender: TObject);
+procedure TformDemo.radioLightThemeClick(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
-  TM := SelectThemeManager(Self);
-  TM.Theme := ttLight;
+  if radioLightTheme.Checked then begin
+    TM := SelectThemeManager(Self);
+    TM.Theme := ttLight;
+  end;
 end;
 
-procedure TformDemo.radioDarkThemeChange(Sender: TObject);
+procedure TformDemo.radioDarkThemeClick(Sender: TObject);
 var
   TM: TUCustomThemeManager;
 begin
-  TM := SelectThemeManager(Self);
-  TM.Theme := ttDark;
+  if radioDarkTheme.Checked then begin
+    TM := SelectThemeManager(Self);
+    TM.Theme := ttDark;
+  end;
 end;
 
 //  POPUP MENU

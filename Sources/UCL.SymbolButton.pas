@@ -47,20 +47,24 @@ type
     FIsToggleButton: Boolean;
     FIsToggled: Boolean;
     FKeepOrginalColor: Boolean;
+    FUpdating: Boolean;
     FToggleEvent: TUSymbolButtonToggleEvent;
 
     // Internal
     procedure UpdateColors;
     procedure UpdateRects;
     procedure DoToggle;
+    procedure FontsChanged(Sender: TObject);
 
     // Setters
+    procedure SetSymbolFont(Value: TFont);
+    procedure SetDetailFont(Value: TFont);
     procedure SetButtonState(const Value: TUControlState);
     procedure SetOrientation(const Value: TUOrientation);
-    procedure SetSymbolChar(const Value: string);
-    procedure SetText(const Value: string);
+    procedure SetSymbolChar(const Value: String);
+    procedure SetText(const Value: String);
     procedure SetTextOffset(const Value: Integer);
-    procedure SetDetail(const Value: string);
+    procedure SetDetail(const Value: String);
     procedure SetDetailRightOffset(const Value: Integer);
     procedure SetShowIcon(const Value: Boolean);
     procedure SetShowDetail(const Value: Boolean);
@@ -76,7 +80,7 @@ type
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
-    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMColorChanged(var Msg: TMessage); message CM_COLORCHANGED;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMFontChanged(var Msg: TMessage); message CM_FONTCHANGED;
@@ -96,8 +100,8 @@ type
     procedure UpdateTheme; override;
 
   published
-    property SymbolFont: TFont read FSymbolFont write FSymbolFont;
-    property DetailFont: TFont read FDetailFont write FDetailFont;
+    property SymbolFont: TFont read FSymbolFont write SetSymbolFont;
+    property DetailFont: TFont read FDetailFont write SetDetailFont;
 
     property ImageIndex: Integer read FImageIndex write SetImageIndex default -1;
     property ImageKind: TUImageKind read FImageKind write SetImageKind default ikFontIcon;
@@ -110,11 +114,11 @@ type
     property TextOffset: Integer read FTextOffset write SetTextOffset default 40;
     property Detail: string read FDetail write SetDetail;
     property DetailRightOffset: Integer read FDetailRightOffset write SetDetailRightOffset default 10;
-    property ShowIcon: Boolean read FShowIcon write SetShowIcon default true;
-    property ShowDetail: Boolean read FShowDetail write SetShowDetail default true;
-    property Transparent: Boolean read FTransparent write SetTransparent default false;
-    property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default false;
-    property IsToggled: Boolean read FIsToggled write SetIsToggled default false;
+    property ShowIcon: Boolean read FShowIcon write SetShowIcon default True;
+    property ShowDetail: Boolean read FShowDetail write SetShowDetail default True;
+    property Transparent: Boolean read FTransparent write SetTransparent default False;
+    property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default False;
+    property IsToggled: Boolean read FIsToggled write SetIsToggled default False;
     property KeepOrginalColor: Boolean read FKeepOrginalColor write SetKeepOrginalColor;
 
     property Caption;
@@ -154,11 +158,13 @@ begin
   FSymbolFont := TFont.Create;
   FSymbolFont.Name := 'Segoe MDL2 Assets';
   FSymbolFont.Size := 12;
+  FSymbolFont.OnChange := FontsChanged;
 
   FDetailFont := TFont.Create;
   FDetailFont.Name := Font.Name;
 //  FDetailFont.Name := 'Segoe UI';
 //  FDetailFont.Size := 10;
+  FDetailFont.OnChange := FontsChanged;
 
   FButtonState := csNone;
   FOrientation := oHorizontal;
@@ -172,6 +178,7 @@ begin
   FTransparent := False;
   FIsToggleButton := False;
   FIsToggled := False;
+  FUpdating := False;
 
   TabStop := True;
   Height := 40;
@@ -313,7 +320,26 @@ begin
     FToggleEvent(Self, FIsToggled);
 end;
 
+procedure TUSymbolButton.FontsChanged(Sender: TObject);
+begin
+  if FUpdating then
+    Exit;
+  //
+  UpdateRects;
+  Repaint;
+end;
+
 //  SETTERS
+
+procedure TUSymbolButton.SetSymbolFont(Value: TFont);
+begin
+  FSymbolFont.Assign(Value);
+end;
+
+procedure TUSymbolButton.SetDetailFont(Value: TFont);
+begin
+  FDetailFont.Assign(Value);
+end;
 
 procedure TUSymbolButton.SetButtonState(const Value: TUControlState);
 begin
@@ -333,7 +359,7 @@ begin
   end;
 end;
 
-procedure TUSymbolButton.SetSymbolChar(const Value: string);
+procedure TUSymbolButton.SetSymbolChar(const Value: String);
 begin
   if Value <> FSymbolChar then begin
     FSymbolChar := Value;
@@ -341,7 +367,7 @@ begin
   end;
 end;
 
-procedure TUSymbolButton.SetText(const Value: string);
+procedure TUSymbolButton.SetText(const Value: String);
 begin
   if Value <> FText then begin
     FText := Value;
@@ -359,7 +385,7 @@ begin
   end;
 end;
 
-procedure TUSymbolButton.SetDetail(const Value: string);
+procedure TUSymbolButton.SetDetail(const Value: String);
 begin
   if Value <> FDetail then begin
     FDetail := Value;
@@ -524,14 +550,23 @@ end;
 
 procedure TUSymbolButton.DoChangeScale(M, D: Integer);
 begin
-  TextOffset := MulDiv(TextOffset, M, D);
-  DetailRightOffset := MulDiv(DetailRightOffset, M, D);
+  inherited DoChangeScale(M, D);
+  if M = D then
+    Exit;
+  //
+  FUpdating := True;
+  try
+    TextOffset := MulDiv(TextOffset, M, D);
+    DetailRightOffset := MulDiv(DetailRightOffset, M, D);
 
-  SymbolFont.Height := MulDiv(SymbolFont.Height, M, D);
-//  Font.Height := MulDiv(Font.Height, M, D);
-  DetailFont.Height := MulDiv(DetailFont.Height, M, D);
+    SymbolFont.Height := MulDiv(SymbolFont.Height, M, D);
+  //  Font.Height := MulDiv(Font.Height, M, D);
+    DetailFont.Height := MulDiv(DetailFont.Height, M, D);
 
-  UpdateRects;
+    UpdateRects;
+  finally
+    FUpdating := False;
+  end;
 end;
 
 //  MESSAGES
@@ -582,7 +617,7 @@ begin
   end;
 end;
 
-procedure TUSymbolButton.CMColorChanged(var Message: TMessage);
+procedure TUSymbolButton.CMColorChanged(var Msg: TMessage);
 begin
   if not IsDesigning then
     UpdateColors;
@@ -608,8 +643,10 @@ end;
 
 procedure TUSymbolButton.CMFontChanged(var Msg: TMessage);
 begin
-  if not IsDesigning then
+  if not IsDesigning then begin
+    UpdateRects;
     Repaint;
+  end;
 end;
 
 procedure TUSymbolButton.CMEnabledChanged(var Msg: TMessage);

@@ -490,25 +490,6 @@ end;
 
 procedure TUCaptionBar.WMEraseBkgnd(var Msg: TWmEraseBkgnd);
 begin
-//  if StyleServices.Enabled and Assigned(Parent) and (csParentBackground in FControlStyle) then
-//  begin
-//    { Get the parent to draw its background into the control's background. }
-//    if Parent.DoubleBuffered then
-//      PerformEraseBackground(Self, Message.DC)
-//    else
-//      StyleServices.DrawParentBackground(Handle, Message.DC, nil, False);
-//  end
-//  else
-//  begin
-//    { Only erase background if we're not doublebuffering or painting to memory. }
-//    if not FDoubleBuffered or
-//{$IF DEFINED(CLR)}
-//       (Message.OriginalMessage.WParam = Message.OriginalMessage.LParam) then
-//{$ELSE}
-//       (TMessage(Message).wParam = WPARAM(TMessage(Message).lParam)) then
-//{$ENDIF}
-//      FillRect(Message.DC, ClientRect, FBrush.Handle);
-//  end;
   Msg.Result := 1;
 end;
 

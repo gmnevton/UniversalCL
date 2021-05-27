@@ -59,7 +59,7 @@ type
     property DarkColor: TColor index 2 read FDarkColor write SetColor;
   end;
 
-  TUStateColorsSet = record
+  TUStateColorsSet = packed record
     Color: TColor;
     Hover: TColor;
     Press: TColor;
@@ -100,7 +100,7 @@ type
     property DarkSelectedPress: TColor index 11 read FDarkSet.SelectedPress write SetColor;
   end;
 
-  TUControlStateColorSet = record
+  TUControlStateColorSet = packed record
     Color: TColor;
     Hover: TColor;
     Press: TColor;
@@ -367,8 +367,19 @@ begin
   if Source is TUThemeControlStateColors then begin
     SourceObject:=TUThemeControlStateColors(Source);
     //
-    FLightSet := SourceObject.FLightSet;
-    FDarkSet  := SourceObject.FDarkSet;
+    FLightSet.Color := SourceObject.FLightSet.Color;
+    FLightSet.Hover := SourceObject.FLightSet.Hover;
+    FLightSet.Press := SourceObject.FLightSet.Press;
+    FLightSet.SelectedColor := SourceObject.FLightSet.SelectedColor;
+    FLightSet.SelectedHover := SourceObject.FLightSet.SelectedHover;
+    FLightSet.SelectedPress := SourceObject.FLightSet.SelectedPress;
+    //
+    FDarkSet.Color  := SourceObject.FDarkSet.Color;
+    FDarkSet.Hover  := SourceObject.FDarkSet.Hover;
+    FDarkSet.Press  := SourceObject.FDarkSet.Press;
+    FDarkSet.SelectedColor  := SourceObject.FDarkSet.SelectedColor;
+    FDarkSet.SelectedHover  := SourceObject.FDarkSet.SelectedHover;
+    FDarkSet.SelectedPress  := SourceObject.FDarkSet.SelectedPress;
   end;
   inherited Assign(Source); // must be last - changed is called here
 end;
@@ -542,8 +553,17 @@ begin
   if Source is TUThemeFocusableControlStateColors then begin
     SourceObject:=TUThemeFocusableControlStateColors(Source);
     //
-    FLightSet := SourceObject.FLightSet;
-    FDarkSet  := SourceObject.FDarkSet;
+    FLightSet.Color    := SourceObject.FLightSet.Color;
+    FLightSet.Hover    := SourceObject.FLightSet.Hover;
+    FLightSet.Press    := SourceObject.FLightSet.Press;
+    FLightSet.Disabled := SourceObject.FLightSet.Disabled;
+    FLightSet.Focused  := SourceObject.FLightSet.Focused;
+    //
+    FDarkSet.Color    := SourceObject.FDarkSet.Color;
+    FDarkSet.Hover    := SourceObject.FDarkSet.Hover;
+    FDarkSet.Press    := SourceObject.FDarkSet.Press;
+    FDarkSet.Disabled := SourceObject.FDarkSet.Disabled;
+    FDarkSet.Focused  := SourceObject.FDarkSet.Focused;
   end;
   inherited Assign(Source); // must be last - changed is called here
 end;
@@ -1015,12 +1035,21 @@ initialization
   QUICKBUTTON_BACK := TUThemeControlColorSet.Create(0, $CFCFCF, $3C3C3C);
 
   // Slider
+//    DefActiveColor: TDefColor = (
+//      ($D77800, $D77800, $D77800, $CCCCCC, $D77800),
+//      ($D77800, $D77800, $D77800, $333333, $D77800));
+//    DefBackColor: TDefColor = (
+//      ($999999, $666666, $999999, $CCCCCC, $999999),
+//      ($666666, $999999, $666666, $333333, $666666));
+//    DefCurColor: TDefColor = (
+//      ($D77800, $171717, $CCCCCC, $CCCCCC, $D77800),
+//      ($D77800, $F2F2F2, $767676, $333333, $D77800));
   SLIDER_BACK := TUThemeFocusableControlStateColors.Create;
-  SLIDER_BACK.SetColors(utLight, $999999, $666666, $999999, $999999, $666666);
-  SLIDER_BACK.SetColors(utDark,  $666666, $999999, $666666, $666666, $999999);
+  SLIDER_BACK.SetColors(utLight, $999999, $666666, $999999, $CCCCCC, $666666);
+  SLIDER_BACK.SetColors(utDark,  $666666, $999999, $666666, $333333, $999999);
   SLIDER_CURSOR := TUThemeFocusableControlStateColors.Create;
   SLIDER_CURSOR.SetColors(utLight, $D77800, $171717, $CCCCCC, $D77800, $171717);
-  SLIDER_CURSOR.SetColors(utDark,  $D77800, $F2F2F2, $767676, $D77800, $F2F2F2);
+  SLIDER_CURSOR.SetColors(utDark,  $D77800, $767676, $F2F2F2, $D77800, $F2F2F2);
 
   // Hyperlink
   HYPERLINK_FONT_NAME := 'Segoe UI';

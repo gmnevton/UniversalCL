@@ -40,8 +40,8 @@ type
   published
     property TextPosition: Integer read FTextPosition write FTextPosition default 12;
     property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
-    property DragMovement: Boolean read FDragMovement write FDragMovement default true;
-    property EnableSystemMenu: Boolean read FEnableSystemMenu write FEnableSystemMenu default true;
+    property DragMovement: Boolean read FDragMovement write FDragMovement default True;
+    property EnableSystemMenu: Boolean read FEnableSystemMenu write FEnableSystemMenu default True;
 
     property Caption;
     property Height default 32;

@@ -33,15 +33,17 @@ type
     FTextOnGlass: Boolean;
     FState: TUCheckBoxState;
     FCustomActiveColor: TColor;
-    FOnChange: TNotifyEvent;
+    FUpdating: Boolean;
 
     // Internal
     procedure UpdateColors;
     procedure UpdateRects;
     procedure Toggle;
+    procedure FontChanged(Sender: TObject);
 
     // Getters / Setters
     function GetChecked: Boolean;
+    procedure SetIconFont(Value: TFont);
     procedure SetChecked(const Value: Boolean);
     procedure SetAutoSize(const Value: Boolean); reintroduce;
     procedure SetMultiline(const Value: Boolean);
@@ -56,6 +58,7 @@ type
     procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure WMLButtonDblClk(var Msg: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
@@ -79,7 +82,7 @@ type
     procedure UpdateTheme; override;
 
   published
-    property IconFont: TFont read FIconFont write FIconFont;
+    property IconFont: TFont read FIconFont write SetIconFont;
     //
     property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
     property AllowGrayed: Boolean read FAllowGrayed write SetAllowGrayed default False;
@@ -90,7 +93,7 @@ type
     //
     property State: TUCheckBoxState read FState write SetState default cbsUnchecked;
     property CustomActiveColor: TColor read FCustomActiveColor write FCustomActiveColor default clDefault;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    //property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
     property Caption;
     property Color;
@@ -123,6 +126,7 @@ begin
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
   FIconFont.Size := 15;
+  FIconFont.OnChange := FontChanged;
 
   FAutoSize := False;
   FAllowGrayed := False;
@@ -222,11 +226,25 @@ begin
   end;
 end;
 
+procedure TUCheckBox.FontChanged(Sender: TObject);
+begin
+  if FUpdating then
+    Exit;
+  //
+  UpdateRects;
+  Repaint;
+end;
+
 // GETTERS / SETTERS
 
 function TUCheckBox.GetChecked: Boolean;
 begin
   Result := (State = cbsChecked);
+end;
+
+procedure TUCheckBox.SetIconFont(Value: TFont);
+begin
+  FIconFont.Assign(Value);
 end;
 
 procedure TUCheckBox.SetChecked(const Value: Boolean);
@@ -246,8 +264,9 @@ begin
       FState := Value;
     Invalidate;
     //
-    if Assigned(FOnChange) then
-      FOnChange(Self);
+    Click;
+//    if Assigned(FOnChange) then
+//      FOnChange(Self);
   end;
 end;
 
@@ -448,6 +467,16 @@ begin
     Exit;
   //
   if PtInRect(IconRect, Msg.Pos) then
+    Toggle;
+  inherited;
+end;
+
+procedure TUCheckBox.WMLButtonDblClk(var Msg: TWMLButtonDblClk);
+begin
+  if not Enabled then
+    Exit;
+  //
+  //if PtInRect(IconRect, Msg.Pos) then
     Toggle;
   inherited;
 end;
