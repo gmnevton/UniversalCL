@@ -14,7 +14,8 @@ uses
   UCL.Types;
 
 // Form
-function EnableBlur(FormHandle: HWND; AccentState: Integer): Integer;
+function BlurAvailable: Boolean;
+function EnableBlur(FormHandle: HWND): Integer;
 
 // Glass support
 function CreatePreMultipliedRGBQuad(Color: TColor; Alpha: Byte = $FF): TRGBQuad;
@@ -51,16 +52,37 @@ uses
   TypInfo,
   RTTI;
 
+var
+  SetWindowCompositionAttribute: function (hWnd: HWND; var data: WindowCompositionAttributeData):integer; stdcall;
+
 // FORM
 
-function EnableBlur(FormHandle: HWND; AccentState: Integer): Integer;
+function BlurAvailable: Boolean;
+var
+  apiHandle: THandle;
+begin
+  apiHandle := GetModuleHandle(User32);
+//  if apiHandle = 0 then
+//    apiHandle := LoadLibrary(User32);
+  if apiHandle = 0 then
+    Exit(False);
+  try
+    if @SetWindowCompositionAttribute = Nil then
+      @SetWindowCompositionAttribute := GetProcAddress(apiHandle, 'SetWindowCompositionAttribute');
+    Result := (@SetWindowCompositionAttribute <> Nil);
+  except
+    Result := False;
+  end;
+end;
+
+function EnableBlur(FormHandle: HWND): Integer;
 const
   WCA_ACCENT_POLICY = 19;
+  ACCENT_ENABLE_BLURBEHIND = 3;
 var
   apiHandle: THandle;
   Accent: AccentPolicy;
   Data: WindowCompositionAttributeData;
-  SetWindowCompositionAttribute: function (hWnd: HWND; var data: WindowCompositionAttributeData):integer; stdcall;
 begin
   apiHandle := GetModuleHandle(User32);
 //  if apiHandle = 0 then
@@ -69,11 +91,13 @@ begin
     Exit(0);
 
   try
-    @SetWindowCompositionAttribute := GetProcAddress(apiHandle, 'SetWindowCompositionAttribute');
+    if @SetWindowCompositionAttribute = Nil then
+      @SetWindowCompositionAttribute := GetProcAddress(apiHandle, 'SetWindowCompositionAttribute');
     if @SetWindowCompositionAttribute = Nil then
       Result := -1
     else begin
-      Accent.AccentState := AccentState;
+      FillChar(Accent, SizeOf(Accent), 0);
+      Accent.AccentState := ACCENT_ENABLE_BLURBEHIND;
 
       Data.Attribute := WCA_ACCENT_POLICY;
       Data.SizeOfData := SizeOf(Accent);
@@ -81,8 +105,10 @@ begin
 
       Result := SetWindowCompositionAttribute(FormHandle, Data);
     end;
-  finally
-//    FreeLibrary(apiHandle);
+  //finally
+  //  FreeLibrary(apiHandle);
+  except
+    Result := 0;
   end;
 end;
 
@@ -316,5 +342,8 @@ begin
     Control.ControlState:=cState;
   end;
 end;
+
+initialization
+  @SetWindowCompositionAttribute := Nil;
 
 end.

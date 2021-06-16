@@ -15,7 +15,7 @@ uses
   UCL.ThemeManager;
 
 type
-  TUOverlayType = (otNone, otBlur, otSplash);
+  TUOverlayType = (otNone, otTransparent, otSplash);
 
   // TIP:
   // AlphaBlend only works for top-level windows in Windows 7 and below,
@@ -68,6 +68,7 @@ begin
 
   BorderStyle := bsNone;
   Color := $FFFFFF;
+  DoubleBuffered := True;
   Anchors := [akLeft, akTop, akRight, akBottom];
   Visible := False;
 
@@ -84,11 +85,11 @@ begin
   if CheckMaxWin32Version(6, 1) then begin // less-equal to win 7
   // NOTE: this is a test - probably not working at all
   {$IF CompilerVersion < 30}
-    if HandleAllocated and ThemeServices.ThemesEnabled and DwmCompositionEnabled then
+    if HandleAllocated and ThemeServices.ThemesEnabled and DwmCompositionEnabled and BlurAvailable then
   {$ELSE}
-    if HandleAllocated and StyleServices.Enabled and DwmCompositionEnabled then
+    if HandleAllocated and StyleServices.Enabled and DwmCompositionEnabled and BlurAvailable then
   {$IFEND}
-      EnableBlur(Handle, 3);
+      EnableBlur(Handle);
 
 //  FParent:=Form;
 //  //BoundsRect := Form.BoundsRect;
@@ -135,7 +136,7 @@ begin
         Visible := False;
       end;
 
-      otBlur: begin
+      otTransparent: begin
         AlphaBlendValue := 150;
         AlphaBlend := True;
         //UpdateLayeredWindowIndirect
@@ -160,7 +161,7 @@ begin
   case OverlayType of
     otNone: Msg.Result := HTTRANSPARENT;
 
-    otBlur: begin
+    otTransparent: begin
       if AllowMove and (Parent <> Nil) then
         if Msg.YPos - Parent.BoundsRect.Top <= CaptionBarHeight then
           Msg.Result := HTTRANSPARENT;
