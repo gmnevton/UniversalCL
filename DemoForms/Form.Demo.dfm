@@ -497,96 +497,6 @@ object formDemo: TformDemo
     Caption = 'Panel1'
     ShowCaption = False
     TabOrder = 4
-    object sliderVert: TUSlider
-      Left = 680
-      Top = 338
-      Width = 25
-      Height = 70
-      BackColor.Enabled = False
-      BackColor.LightColor = 10066329
-      BackColor.LightHover = 6710886
-      BackColor.LightPress = 10066329
-      BackColor.LightDisabled = 10066329
-      BackColor.LightFocused = 6710886
-      BackColor.DarkColor = 6710886
-      BackColor.DarkHover = 10066329
-      BackColor.DarkPress = 6710886
-      BackColor.DarkDisabled = 6710886
-      BackColor.DarkFocused = 10066329
-      CurColor.Enabled = False
-      CurColor.LightColor = 14120960
-      CurColor.LightHover = 1513239
-      CurColor.LightPress = 13421772
-      CurColor.LightDisabled = 14120960
-      CurColor.LightFocused = 1513239
-      CurColor.DarkColor = 14120960
-      CurColor.DarkHover = 15921906
-      CurColor.DarkPress = 7763574
-      CurColor.DarkDisabled = 14120960
-      CurColor.DarkFocused = 15921906
-      Orientation = oVertical
-      Max = 4
-    end
-    object sliderDisabled: TUSlider
-      Left = 390
-      Top = 326
-      Width = 140
-      Enabled = False
-      BackColor.Enabled = False
-      BackColor.LightColor = 10066329
-      BackColor.LightHover = 6710886
-      BackColor.LightPress = 10066329
-      BackColor.LightDisabled = 10066329
-      BackColor.LightFocused = 6710886
-      BackColor.DarkColor = 6710886
-      BackColor.DarkHover = 10066329
-      BackColor.DarkPress = 6710886
-      BackColor.DarkDisabled = 6710886
-      BackColor.DarkFocused = 10066329
-      CurColor.Enabled = False
-      CurColor.LightColor = 14120960
-      CurColor.LightHover = 1513239
-      CurColor.LightPress = 13421772
-      CurColor.LightDisabled = 14120960
-      CurColor.LightFocused = 1513239
-      CurColor.DarkColor = 14120960
-      CurColor.DarkHover = 7763574
-      CurColor.DarkPress = 15921906
-      CurColor.DarkDisabled = 14120960
-      CurColor.DarkFocused = 15921906
-      ControlState = csDisabled
-      Value = 50
-    end
-    object sliderHorz: TUSlider
-      Left = 390
-      Top = 356
-      Width = 140
-      ParentShowHint = False
-      ShowHint = False
-      BackColor.Enabled = False
-      BackColor.LightColor = 10066329
-      BackColor.LightHover = 6710886
-      BackColor.LightPress = 10066329
-      BackColor.LightDisabled = 10066329
-      BackColor.LightFocused = 6710886
-      BackColor.DarkColor = 6710886
-      BackColor.DarkHover = 10066329
-      BackColor.DarkPress = 6710886
-      BackColor.DarkDisabled = 6710886
-      BackColor.DarkFocused = 10066329
-      CurColor.Enabled = False
-      CurColor.LightColor = 14120960
-      CurColor.LightHover = 1513239
-      CurColor.LightPress = 13421772
-      CurColor.LightDisabled = 14120960
-      CurColor.LightFocused = 1513239
-      CurColor.DarkColor = 14120960
-      CurColor.DarkHover = 7763574
-      CurColor.DarkPress = 15921906
-      CurColor.DarkDisabled = 14120960
-      CurColor.DarkFocused = 15921906
-      OnChange = sliderHorzChange
-    end
     object textTitle: TUText
       Left = 390
       Top = 10
@@ -739,6 +649,99 @@ object formDemo: TformDemo
       TextColors.DarkFocused = 14120960
       URL = 'https://embarcadero.com/'
     end
+    object sliderVert: TUSlider
+      Left = 680
+      Top = 338
+      Width = 25
+      Height = 70
+      TabOrder = 29
+      BackColor.Enabled = False
+      BackColor.LightColor = 10066329
+      BackColor.LightHover = 6710886
+      BackColor.LightPress = 10066329
+      BackColor.LightDisabled = 10066329
+      BackColor.LightFocused = 6710886
+      BackColor.DarkColor = 6710886
+      BackColor.DarkHover = 10066329
+      BackColor.DarkPress = 6710886
+      BackColor.DarkDisabled = 6710886
+      BackColor.DarkFocused = 10066329
+      CurColor.Enabled = False
+      CurColor.LightColor = 14120960
+      CurColor.LightHover = 1513239
+      CurColor.LightPress = 13421772
+      CurColor.LightDisabled = 14120960
+      CurColor.LightFocused = 1513239
+      CurColor.DarkColor = 14120960
+      CurColor.DarkHover = 15921906
+      CurColor.DarkPress = 7763574
+      CurColor.DarkDisabled = 14120960
+      CurColor.DarkFocused = 15921906
+      Orientation = oVertical
+      Max = 4
+    end
+    object sliderDisabled: TUSlider
+      Left = 390
+      Top = 326
+      Width = 140
+      Enabled = False
+      TabOrder = 30
+      BackColor.Enabled = False
+      BackColor.LightColor = 10066329
+      BackColor.LightHover = 6710886
+      BackColor.LightPress = 10066329
+      BackColor.LightDisabled = 10066329
+      BackColor.LightFocused = 6710886
+      BackColor.DarkColor = 6710886
+      BackColor.DarkHover = 10066329
+      BackColor.DarkPress = 6710886
+      BackColor.DarkDisabled = 6710886
+      BackColor.DarkFocused = 10066329
+      CurColor.Enabled = False
+      CurColor.LightColor = 14120960
+      CurColor.LightHover = 1513239
+      CurColor.LightPress = 13421772
+      CurColor.LightDisabled = 14120960
+      CurColor.LightFocused = 1513239
+      CurColor.DarkColor = 14120960
+      CurColor.DarkHover = 7763574
+      CurColor.DarkPress = 15921906
+      CurColor.DarkDisabled = 14120960
+      CurColor.DarkFocused = 15921906
+      ControlState = csDisabled
+      Value = 50
+    end
+    object sliderHorz: TUSlider
+      Left = 390
+      Top = 356
+      Width = 140
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 31
+      BackColor.Enabled = False
+      BackColor.LightColor = 10066329
+      BackColor.LightHover = 6710886
+      BackColor.LightPress = 10066329
+      BackColor.LightDisabled = 10066329
+      BackColor.LightFocused = 6710886
+      BackColor.DarkColor = 6710886
+      BackColor.DarkHover = 10066329
+      BackColor.DarkPress = 6710886
+      BackColor.DarkDisabled = 6710886
+      BackColor.DarkFocused = 10066329
+      CurColor.Enabled = False
+      CurColor.LightColor = 14120960
+      CurColor.LightHover = 1513239
+      CurColor.LightPress = 13421772
+      CurColor.LightDisabled = 14120960
+      CurColor.LightFocused = 1513239
+      CurColor.DarkColor = 14120960
+      CurColor.DarkHover = 7763574
+      CurColor.DarkPress = 15921906
+      CurColor.DarkDisabled = 14120960
+      CurColor.DarkFocused = 15921906
+      OnChange = sliderHorzChange
+    end
     object buttonRunning: TButton
       Left = 60
       Top = 20
@@ -754,7 +757,7 @@ object formDemo: TformDemo
       Width = 150
       Height = 31
       ShowSelRange = False
-      TabOrder = 1
+      TabOrder = 16
       TickMarks = tmBoth
       TickStyle = tsNone
     end
@@ -763,7 +766,7 @@ object formDemo: TformDemo
       Left = 60
       Top = 220
       Width = 151
-      TabOrder = 2
+      TabOrder = 9
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772
@@ -806,7 +809,7 @@ object formDemo: TformDemo
       Height = 31
       Caption = 'Reserve animation'
       ImageIndex = 0
-      TabOrder = 3
+      TabOrder = 2
       OnClick = buttonAniToLeftClick
     end
     object buttonAniToRight: TButton
@@ -815,7 +818,7 @@ object formDemo: TformDemo
       Width = 151
       Height = 31
       Caption = 'Start animation'
-      TabOrder = 4
+      TabOrder = 1
       OnClick = buttonAniToRightClick
     end
     object buttonRandomProgress: TUButton
@@ -827,7 +830,7 @@ object formDemo: TformDemo
       Hint = 'This is tooltip'
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 5
+      TabOrder = 17
       OnClick = buttonRandomProgressClick
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
@@ -869,7 +872,7 @@ object formDemo: TformDemo
       Top = 260
       Width = 61
       Height = 91
-      TabOrder = 6
+      TabOrder = 11
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -891,7 +894,7 @@ object formDemo: TformDemo
       Top = 310
       Width = 241
       Height = 41
-      TabOrder = 7
+      TabOrder = 13
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -914,7 +917,7 @@ object formDemo: TformDemo
       Width = 241
       Height = 41
       Enabled = False
-      TabOrder = 8
+      TabOrder = 12
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
       SymbolFont.Height = -16
@@ -937,7 +940,7 @@ object formDemo: TformDemo
       Width = 311
       Height = 41
       DragCursor = crDefault
-      TabOrder = 9
+      TabOrder = 14
       IconFont.Charset = DEFAULT_CHARSET
       IconFont.Color = clWindowText
       IconFont.Height = -20
@@ -961,7 +964,7 @@ object formDemo: TformDemo
       Width = 311
       Height = 41
       DragCursor = crDefault
-      TabOrder = 10
+      TabOrder = 15
       OnClick = itembuttonImageClick
       ImageRightIndex = 3
       IconFont.Charset = DEFAULT_CHARSET
@@ -987,7 +990,7 @@ object formDemo: TformDemo
       Left = 220
       Top = 220
       Width = 151
-      TabOrder = 11
+      TabOrder = 10
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772
@@ -1030,7 +1033,7 @@ object formDemo: TformDemo
       Top = 100
       Width = 151
       Enabled = False
-      TabOrder = 12
+      TabOrder = 4
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772
@@ -1072,7 +1075,7 @@ object formDemo: TformDemo
       Left = 220
       Top = 140
       Width = 151
-      TabOrder = 13
+      TabOrder = 6
       OnClick = buttonHighlightClick
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
@@ -1115,7 +1118,7 @@ object formDemo: TformDemo
       Top = 180
       Width = 151
       Height = 30
-      TabOrder = 14
+      TabOrder = 8
       OnClick = buttonReloadSettingsClick
       SymbolFont.Charset = DEFAULT_CHARSET
       SymbolFont.Color = clWindowText
@@ -1138,7 +1141,7 @@ object formDemo: TformDemo
       Left = 60
       Top = 180
       Width = 151
-      TabOrder = 15
+      TabOrder = 7
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772
@@ -1180,7 +1183,7 @@ object formDemo: TformDemo
       Left = 60
       Top = 140
       Width = 151
-      TabOrder = 16
+      TabOrder = 5
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772
@@ -1221,7 +1224,7 @@ object formDemo: TformDemo
       Left = 60
       Top = 100
       Width = 151
-      TabOrder = 17
+      TabOrder = 3
       BackColors.Enabled = False
       BackColors.LightColor = 13421772
       BackColors.LightHover = 13421772

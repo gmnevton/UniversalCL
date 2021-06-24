@@ -69,7 +69,8 @@ contains
   UCL.Colors in 'Sources\UCL.Colors.pas',
   UCL.FormOverlay in 'Sources\UCL.FormOverlay.pas',
   UCL.FontIcons in 'Sources\UCL.FontIcons.pas',
-  UCL.DragReorder in 'Sources\UCL.DragReorder.pas';
+  UCL.DragReorder in 'Sources\UCL.DragReorder.pas',
+  UCL.GraphicSlider in 'Sources\UCL.GraphicSlider.pas';
 
 end.
 

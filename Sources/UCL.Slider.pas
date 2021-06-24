@@ -14,7 +14,7 @@ uses
   UCL.Colors;
 
 type
-  TUSlider = class(TUGraphicControl)
+  TUSlider = class(TUCustomControl)
   private var
     LCurWidth: Integer;
     LCurHeight: Integer;
@@ -55,6 +55,7 @@ type
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
+    procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
@@ -103,7 +104,7 @@ uses
 constructor TUSlider.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  ControlStyle := ControlStyle - [csDoubleClicks];
+  ControlStyle := ControlStyle - [csDoubleClicks{, csOpaque}];
 
   //  New properties
   LCurWidth := 8;
@@ -128,6 +129,7 @@ begin
   FCurColor.OnChange := ColorsChange;
 
   //  Common properties
+  ParentColor := True;
   Height := 25;
   Width := 100;
 
@@ -157,6 +159,7 @@ procedure TUSlider.UpdateColors;
 var
   TM: TUCustomThemeManager;
 begin
+  ParentColor := True;
   TM := SelectThemeManager(Self);
   if not Enabled then begin
     if TM.ThemeUsed = utLight then
@@ -288,15 +291,19 @@ procedure TUSlider.Paint;
 begin
 //  inherited;
 
-  //  Paint active part
+  // Paint background
+  Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
+  Canvas.FillRect(Rect(0, 0, Width, Height));
+
+  // Paint active part
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(LAccentColor, 255);
   Canvas.FillRect(LActiveRect);
 
-  //  Paint normal part
+  // Paint normal part
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(LBackColor, 255);
   Canvas.FillRect(LNormalRect);
 
-  //  Paint cursor
+  // Paint cursor
   Canvas.Pen.Color := LCurColor;
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(LCurColor, 255);
   Canvas.RoundRect(LCurRect, LCurCorner, LCurCorner);
@@ -351,6 +358,12 @@ begin
   inherited;
 end;
 
+procedure TUSlider.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
+begin
+//  inherited;
+  Msg.Result := 1;
+end;
+
 procedure TUSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
@@ -362,15 +375,15 @@ begin
   UpdateColors;
   FIsSliding := True;
 
-  //  If press in cursor
+  // If press in cursor
   if (Msg.XPos < LCurRect.Left) or (Msg.XPos > LCurRect.Right) or (Msg.YPos < LCurRect.Top) or (Msg.YPos > LCurRect.Bottom) then begin
-    //  Change Value by click position, click point is center of cursor
+    // Change Value by click position, click point is center of cursor
     if Orientation = oHorizontal then
       TempValue := Min + Round((Msg.XPos - LCurWidth div 2) * (Max - Min) / (Width - LCurWidth))
     else
       TempValue := Max - Round((Msg.YPos - LCurHeight div 2) * (Max - Min) / (Height - LCurHeight));
 
-    //  Keep value in range [Min..Max]
+    // Keep value in range [Min..Max]
     if TempValue < Min then
       TempValue := Min
     else if TempValue > Max then
@@ -397,7 +410,7 @@ begin
     else
       TempValue := Max - Round((Msg.YPos - LCurHeight div 2) * (Max - Min) / (Height - LCurHeight));
 
-    //  Keep value in range [Min..Max]
+    // Keep value in range [Min..Max]
     if TempValue < Min then
       TempValue := Min
     else if TempValue > Max then
