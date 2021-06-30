@@ -51,6 +51,7 @@ type
     procedure SetValue(const Value: Integer);
 
     // Messages
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
     procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
     procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
     procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
@@ -290,7 +291,7 @@ end;
 procedure TUSlider.Paint;
 begin
 //  inherited;
-
+  ParentColor := True;
   // Paint background
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
   Canvas.FillRect(Rect(0, 0, Width, Height));
@@ -330,6 +331,12 @@ begin
 end;
 
 //  MESSAGES
+
+procedure TUSlider.CMColorChanged(var Message: TMessage);
+begin
+  UpdateColors;
+  inherited; // calls Invalidate;
+end;
 
 procedure TUSlider.CMEnabledChanged(var Msg: TMessage);
 begin

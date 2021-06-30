@@ -495,6 +495,7 @@ object formDemo: TformDemo
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
+    ParentColor = True
     ShowCaption = False
     TabOrder = 4
     object textTitle: TUText
