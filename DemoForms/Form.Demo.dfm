@@ -656,6 +656,7 @@ object formDemo: TformDemo
       Width = 25
       Height = 70
       TabOrder = 29
+      TabStop = True
       BackColor.Enabled = False
       BackColor.LightColor = 10066329
       BackColor.LightHover = 6710886
@@ -687,6 +688,7 @@ object formDemo: TformDemo
       Width = 140
       Enabled = False
       TabOrder = 30
+      TabStop = True
       BackColor.Enabled = False
       BackColor.LightColor = 10066329
       BackColor.LightHover = 6710886
@@ -719,6 +721,7 @@ object formDemo: TformDemo
       ParentShowHint = False
       ShowHint = False
       TabOrder = 31
+      TabStop = True
       BackColor.Enabled = False
       BackColor.LightColor = 10066329
       BackColor.LightHover = 6710886

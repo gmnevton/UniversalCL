@@ -51,15 +51,16 @@ type
     procedure SetValue(const Value: Integer);
 
     // Messages
-    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
-    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
-    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
-    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-
+    procedure WMSetFocus(var Msg: TWMSetFocus); message WM_SETFOCUS;
+    procedure WMKillFocus(var Msg: TWMKillFocus); message WM_KILLFOCUS;
     procedure WMEraseBkgnd(var Msg: TWMEraseBkgnd); message WM_ERASEBKGND;
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMMouseMove(var Msg: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMLButtonUp(var Msg: TWMLButtonUp); message WM_LBUTTONUP;
+    procedure CMColorChanged(var Message: TMessage); message CM_COLORCHANGED;
+    procedure CMEnabledChanged(var Msg: TMessage); message CM_ENABLEDCHANGED;
+    procedure CMMouseEnter(var Msg: TMessage); message CM_MOUSEENTER;
+    procedure CMMouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
 
   protected
     procedure Paint; override;
@@ -89,6 +90,8 @@ type
 
     property Height default 25;
     property Width default 100;
+    property TabOrder;
+    property TabStop;
   end;
 
 implementation
@@ -96,7 +99,8 @@ implementation
 uses
   SysUtils,
   UITypes,
-  UCL.ThemeManager;
+  UCL.ThemeManager,
+  UCL.Graphics;
 
 { TUSlider }
 
@@ -293,6 +297,7 @@ begin
 //  inherited;
   ParentColor := True;
   // Paint background
+  Canvas.Brush.Style := bsSolid;
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(Color, 255);
   Canvas.FillRect(Rect(0, 0, Width, Height));
 
@@ -309,6 +314,11 @@ begin
   Canvas.Brush.Handle := CreateSolidBrushWithAlpha(LCurColor, 255);
   Canvas.RoundRect(LCurRect, LCurCorner, LCurCorner);
   Canvas.FloodFill(LCurRect.Left + LCurRect.Width div 2, LCurRect.Top + LCurRect.Height div 2, LCurColor, fsSurface);
+
+  // Paint focus rect
+  Canvas.Brush.Style := bsClear;
+  if not IsDesigning and (Focused or MouseInClient) then
+    DrawFocusRect(Canvas, Rect(0, 0, Width, Height), Color);
 end;
 
 procedure TUSlider.Resize;
@@ -365,6 +375,25 @@ begin
   inherited;
 end;
 
+procedure TUSlider.WMSetFocus(var Msg: TWMSetFocus);
+var
+  LFocused: Boolean;
+begin
+  LFocused:=Enabled and CanFocus;
+  inherited;
+  if LFocused then begin
+    UpdateColors;
+    Invalidate;
+  end;
+end;
+
+procedure TUSlider.WMKillFocus(var Msg: TWMKillFocus);
+begin
+  inherited;
+  UpdateColors;
+  Invalidate;
+end;
+
 procedure TUSlider.WMEraseBkgnd(var Msg: TWMEraseBkgnd);
 begin
 //  inherited;
@@ -375,7 +404,12 @@ procedure TUSlider.WMLButtonDown(var Msg: TWMLButtonDown);
 var
   TempValue: Integer;
 begin
-  if not Enabled then
+  if Enabled then begin
+    if not Focused and CanFocus then
+      SetFocus;
+//    inherited;
+  end
+  else
     Exit;
 
   FControlState := csPress;
