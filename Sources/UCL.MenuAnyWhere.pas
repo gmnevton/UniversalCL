@@ -142,6 +142,7 @@ type
     FMenu: TMainMenu;
     FPos: TPoint;
     //FBackColor: TColor;
+    FEnabled: Boolean;
     FTransparent: Boolean;
     FButtons: TList;
     FButtonWidth: Integer;
@@ -169,6 +170,7 @@ type
     procedure SetButtonSizeAutoCalc(Value: Boolean);
     procedure SetPos(Index: Integer; Value: Integer);
     //procedure SetBackColor(Value: TColor);
+    procedure SetEnabled(Value: Boolean);
     procedure SetTransparent(Value: Boolean);
     procedure SetFont(Value: TFont);
     procedure SetButtonBackColors(Value: TUThemeControlStateHoveredDisabledColors);
@@ -243,6 +245,7 @@ type
     property PosX: Integer index 0 read FPos.X write SetPos default 0;
     property PosY: Integer index 1 read FPos.Y write SetPos default 0;
     //property BackColor: TColor read FBackColor write SetBackColor default clNone;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
     property Transparent: Boolean read FTransparent write SetTransparent default True;
     property Font: TFont read FFont write SetFont;
     property ButtonBackColors: TUThemeControlStateHoveredDisabledColors read FButtonBackColors write SetButtonBackColors;
@@ -449,7 +452,7 @@ begin
   end;
   if DrawGlyph then
     Inc(AWidth, 15);
-  Inc(AHeight, 4);
+  Inc(AHeight, 8);
   R := Rect(0, 0, 0, 0);
   if AItem.ShortCut <> 0 then
     Text := Concat(AItem.Caption, ShortCutToText(AItem.ShortCut))
@@ -457,7 +460,7 @@ begin
     Text := AItem.Caption;
   DrawStyle := Alignments[Alignment] or DT_EXPANDTABS or DT_SINGLELINE or DT_NOCLIP or DT_CALCRECT;
   DoDrawText(AItem, ACanvas, Text, R, False, DrawStyle);
-  Inc(AWidth, R.Right - R.Left + 7 + TriangleSize);
+  Inc(AWidth, R.Right - R.Left + 7 + TriangleSize + 20);
 end;
 
 function MenuWindowProc(Wnd: HWND; uMsg: Integer; WParam: WPARAM; LParam: LPARAM): LRESULT; stdcall;
@@ -1547,6 +1550,14 @@ begin
   FMenuTextColors.Assign(Value);
 end;
 
+procedure TUMenuAnyWhere.SetEnabled(Value: Boolean);
+begin
+  if FEnabled <> Value then begin
+    FEnabled := Value;
+    ColorsChange(Nil);
+  end;
+end;
+
 procedure TUMenuAnyWhere.SetTransparent(Value: Boolean);
 begin
   if FTransparent <> Value then begin
@@ -1890,7 +1901,7 @@ var
   LMonitor: TMonitor;
 begin
   Result := False;
-  if (Button = Nil) or (Button.Parent = Nil){ or (FInMenuLoop and FMenuDropped)} then
+  if not FEnabled or (Button = Nil) or (Button.Parent = Nil){ or (FInMenuLoop and FMenuDropped)} then
     Exit;
 //  OutputDebugString(PChar(GetTimeStamp + 'CheckMenuDropdown (FMenuDropped: ' + BoolToStr(FMenuDropped, True) + ')'));
   FCaptureChangeCancels := False;
@@ -2192,6 +2203,8 @@ begin
       if not FInMenuLoop and FControl.Enabled and FControl.Showing and IsMenuAvailable then begin
         WMSysCommand := TWMSysCommand(Message);
         if (WMSysCommand.CmdType and $FFF0 = SC_KEYMENU) and (WMSysCommand.Key <> VK_SPACE) and (WMSysCommand.Key <> Word('-')) and (GetCapture = 0) then begin
+          if not FEnabled then
+            Exit;
           if WMSysCommand.Key = 0 then
             Button := Nil
           else
@@ -2514,6 +2527,11 @@ begin
     btn := Buttons[i];
     if (btn = Nil) or not (btn is TUMenuButton) then
       Continue;
+//    if FEnabled then
+//      btn.Enabled := (btn.MenuItem = Nil) and btn.MenuItem.Enabled
+//    else
+//      btn.Enabled := False;
+    btn.Enabled := FEnabled;
     if RemakeShortCuts then begin
       if btn.MenuItem <> Nil then begin
         btn.MenuItem.AutoHotkeys := maAutomatic;

@@ -593,12 +593,12 @@ procedure TUForm.Paint;
 begin
   inherited;
 
-  if CanDrawBorder{ and not IsLEWin7} then
-    DoDrawBorder;
-
   Canvas.Brush.Style := bsSolid;
   Canvas.Brush.Color := Self.Color;
   Canvas.FillRect(ClientRect);
+
+  if CanDrawBorder{ and not IsLEWin7} then
+    DoDrawBorder;
 end;
 
 procedure TUForm.PaintWindow(DC: HDC);

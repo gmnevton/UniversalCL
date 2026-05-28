@@ -34,6 +34,7 @@ type
     FTransparent,
     FTextOnGlass: Boolean;
     FUpdating: Boolean;
+    FOnChange: TNotifyEvent;
 
     //  Internal
     procedure UpdateColors;
@@ -89,6 +90,7 @@ type
     property Multiline: Boolean read FMultiline write SetMultiline default False;
     property Transparent: Boolean read FTransparent write SetTransparent default True;
     property TextOnGlass: Boolean read FTextOnGlass write SetTextOnGlass default False;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
     //
     property Caption;
     property Color;
@@ -132,6 +134,7 @@ begin
   FTransparent := True;
   FTextOnGlass := False;
   FUpdating := False;
+  FOnChange := Nil;
 
   FIconFont := TFont.Create;
   FIconFont.Name := 'Segoe MDL2 Assets';
@@ -273,8 +276,8 @@ begin
     Invalidate;
     //
     Click;
-//    if Assigned(FOnChange) then
-//      FOnChange(Self);
+    if Assigned(FOnChange) then
+      FOnChange(Self);
   end;
 end;
 

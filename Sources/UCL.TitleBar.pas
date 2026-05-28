@@ -18,6 +18,7 @@ type
   private
     FTextPosition: Integer;
     FAlignment: TAlignment;
+    FDoubleClick: Boolean;
     FDragMovement: Boolean;
     FEnableSystemMenu: Boolean;
 
@@ -40,6 +41,7 @@ type
   published
     property TextPosition: Integer read FTextPosition write FTextPosition default 12;
     property Alignment: TAlignment read FAlignment write FAlignment default taLeftJustify;
+    property DoubleClick: Boolean read FDoubleClick write FDoubleClick default True;
     property DragMovement: Boolean read FDragMovement write FDragMovement default True;
     property EnableSystemMenu: Boolean read FEnableSystemMenu write FEnableSystemMenu default True;
 
@@ -66,6 +68,7 @@ begin
 
   FTextPosition := 12;
   FAlignment := taLeftJustify;
+  FDoubleClick := True;
   FDragMovement := True;
   FEnableSystemMenu := True;
 
@@ -118,13 +121,15 @@ var
 begin
   inherited;
 
-  ParentForm := GetParentForm(Self, True);
-  if (ParentForm <> Nil) and (ParentForm is TForm) then begin
-    if biMaximize in (ParentForm as TForm).BorderIcons then begin
-      if ParentForm.WindowState = wsMaximized then
-        ParentForm.WindowState := wsNormal
-      else if ParentForm.WindowState = wsNormal then
-        ParentForm.WindowState := wsMaximized;
+  if DoubleClick then begin
+    ParentForm := GetParentForm(Self, True);
+    if (ParentForm <> Nil) and (ParentForm is TForm) then begin
+      if biMaximize in (ParentForm as TForm).BorderIcons then begin
+        if ParentForm.WindowState = wsMaximized then
+          ParentForm.WindowState := wsNormal
+        else if ParentForm.WindowState = wsNormal then
+          ParentForm.WindowState := wsMaximized;
+      end;
     end;
   end;
 end;

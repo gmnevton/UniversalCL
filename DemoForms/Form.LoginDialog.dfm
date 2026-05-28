@@ -46,7 +46,7 @@ object formLoginDialog: TformLoginDialog
       AlignWithMargins = True
       Left = 40
       Top = 50
-      Width = 137
+      Width = 330
       Height = 38
       Margins.Left = 0
       Margins.Top = 50
@@ -63,12 +63,13 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       TextKind = tkTitle
       UseAccentColor = True
+      ExplicitWidth = 137
     end
     object headingSignin: TUText
       AlignWithMargins = True
       Left = 40
       Top = 88
-      Width = 197
+      Width = 330
       Height = 28
       Margins.Left = 0
       Margins.Top = 0
@@ -84,11 +85,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkHeading
+      ExplicitWidth = 197
     end
     object entryPassword: TUText
       Left = 40
       Top = 208
-      Width = 58
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Password'
@@ -99,11 +101,12 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 58
     end
     object entryEmail: TUText
       Left = 40
       Top = 136
-      Width = 32
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Email'
@@ -114,12 +117,13 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 32
     end
     object textShowMoreOptions: TUText
       AlignWithMargins = True
       Left = 40
       Top = 352
-      Width = 103
+      Width = 330
       Height = 15
       Cursor = crHandPoint
       Margins.Left = 0
@@ -136,11 +140,12 @@ object formLoginDialog: TformLoginDialog
       ParentFont = False
       OnClick = textShowMoreOptionsClick
       TextKind = tkDescription
+      ExplicitWidth = 103
     end
     object entryDescription: TUText
       Left = 40
       Top = 280
-      Width = 130
+      Width = 330
       Height = 17
       Align = alTop
       Caption = 'Description (optional)'
@@ -151,6 +156,7 @@ object formLoginDialog: TformLoginDialog
       Font.Style = []
       ParentFont = False
       TextKind = tkEntry
+      ExplicitWidth = 130
     end
     object panelMoreOptions: TUPanel
       Left = 40
@@ -438,39 +444,39 @@ object formLoginDialog: TformLoginDialog
       Align = alRight
       TabOrder = 0
       OnClick = buttonOkClick
-      BackColors.Enabled = False
-      BackColors.LightColor = 13421772
-      BackColors.LightHover = 13421772
-      BackColors.LightPress = 10066329
-      BackColors.LightDisabled = 13421772
-      BackColors.LightFocused = 13421772
-      BackColors.DarkColor = 3355443
-      BackColors.DarkHover = 3355443
-      BackColors.DarkPress = 6710886
-      BackColors.DarkDisabled = 3355443
-      BackColors.DarkFocused = 3355443
-      BorderColors.Enabled = False
-      BorderColors.LightColor = 13421772
-      BorderColors.LightHover = 8026746
-      BorderColors.LightPress = 10066329
-      BorderColors.LightDisabled = 8026746
-      BorderColors.LightFocused = 8026746
-      BorderColors.DarkColor = 3355443
-      BorderColors.DarkHover = 8750469
-      BorderColors.DarkPress = 6710886
-      BorderColors.DarkDisabled = 8750469
-      BorderColors.DarkFocused = 8750469
-      TextColors.Enabled = False
-      TextColors.LightColor = clBlack
-      TextColors.LightHover = clBlack
-      TextColors.LightPress = clBlack
-      TextColors.LightDisabled = clGray
-      TextColors.LightFocused = clBlack
-      TextColors.DarkColor = clWhite
-      TextColors.DarkHover = clWhite
-      TextColors.DarkPress = clWhite
-      TextColors.DarkDisabled = clGray
-      TextColors.DarkFocused = clWhite
+      CustomColors.BackColors.Enabled = False
+      CustomColors.BackColors.LightColor = 13421772
+      CustomColors.BackColors.LightHover = 13421772
+      CustomColors.BackColors.LightPress = 10066329
+      CustomColors.BackColors.LightDisabled = 13421772
+      CustomColors.BackColors.LightFocused = 13421772
+      CustomColors.BackColors.DarkColor = 3355443
+      CustomColors.BackColors.DarkHover = 3355443
+      CustomColors.BackColors.DarkPress = 6710886
+      CustomColors.BackColors.DarkDisabled = 3355443
+      CustomColors.BackColors.DarkFocused = 3355443
+      CustomColors.BorderColors.Enabled = False
+      CustomColors.BorderColors.LightColor = 13421772
+      CustomColors.BorderColors.LightHover = 8026746
+      CustomColors.BorderColors.LightPress = 10066329
+      CustomColors.BorderColors.LightDisabled = 8026746
+      CustomColors.BorderColors.LightFocused = 8026746
+      CustomColors.BorderColors.DarkColor = 3355443
+      CustomColors.BorderColors.DarkHover = 8750469
+      CustomColors.BorderColors.DarkPress = 6710886
+      CustomColors.BorderColors.DarkDisabled = 8750469
+      CustomColors.BorderColors.DarkFocused = 8750469
+      CustomColors.TextColors.Enabled = False
+      CustomColors.TextColors.LightColor = clBlack
+      CustomColors.TextColors.LightHover = clBlack
+      CustomColors.TextColors.LightPress = clBlack
+      CustomColors.TextColors.LightDisabled = clGray
+      CustomColors.TextColors.LightFocused = clBlack
+      CustomColors.TextColors.DarkColor = clWhite
+      CustomColors.TextColors.DarkHover = clWhite
+      CustomColors.TextColors.DarkPress = clWhite
+      CustomColors.TextColors.DarkDisabled = clGray
+      CustomColors.TextColors.DarkFocused = clWhite
       Highlight = True
       Caption = 'Ok'
     end
@@ -487,39 +493,39 @@ object formLoginDialog: TformLoginDialog
       Align = alRight
       TabOrder = 1
       OnClick = buttonCancelClick
-      BackColors.Enabled = False
-      BackColors.LightColor = 13421772
-      BackColors.LightHover = 13421772
-      BackColors.LightPress = 10066329
-      BackColors.LightDisabled = 13421772
-      BackColors.LightFocused = 13421772
-      BackColors.DarkColor = 3355443
-      BackColors.DarkHover = 3355443
-      BackColors.DarkPress = 6710886
-      BackColors.DarkDisabled = 3355443
-      BackColors.DarkFocused = 3355443
-      BorderColors.Enabled = False
-      BorderColors.LightColor = 13421772
-      BorderColors.LightHover = 8026746
-      BorderColors.LightPress = 10066329
-      BorderColors.LightDisabled = 8026746
-      BorderColors.LightFocused = 8026746
-      BorderColors.DarkColor = 3355443
-      BorderColors.DarkHover = 8750469
-      BorderColors.DarkPress = 6710886
-      BorderColors.DarkDisabled = 8750469
-      BorderColors.DarkFocused = 8750469
-      TextColors.Enabled = False
-      TextColors.LightColor = clBlack
-      TextColors.LightHover = clBlack
-      TextColors.LightPress = clBlack
-      TextColors.LightDisabled = clGray
-      TextColors.LightFocused = clBlack
-      TextColors.DarkColor = clWhite
-      TextColors.DarkHover = clWhite
-      TextColors.DarkPress = clWhite
-      TextColors.DarkDisabled = clGray
-      TextColors.DarkFocused = clWhite
+      CustomColors.BackColors.Enabled = False
+      CustomColors.BackColors.LightColor = 13421772
+      CustomColors.BackColors.LightHover = 13421772
+      CustomColors.BackColors.LightPress = 10066329
+      CustomColors.BackColors.LightDisabled = 13421772
+      CustomColors.BackColors.LightFocused = 13421772
+      CustomColors.BackColors.DarkColor = 3355443
+      CustomColors.BackColors.DarkHover = 3355443
+      CustomColors.BackColors.DarkPress = 6710886
+      CustomColors.BackColors.DarkDisabled = 3355443
+      CustomColors.BackColors.DarkFocused = 3355443
+      CustomColors.BorderColors.Enabled = False
+      CustomColors.BorderColors.LightColor = 13421772
+      CustomColors.BorderColors.LightHover = 8026746
+      CustomColors.BorderColors.LightPress = 10066329
+      CustomColors.BorderColors.LightDisabled = 8026746
+      CustomColors.BorderColors.LightFocused = 8026746
+      CustomColors.BorderColors.DarkColor = 3355443
+      CustomColors.BorderColors.DarkHover = 8750469
+      CustomColors.BorderColors.DarkPress = 6710886
+      CustomColors.BorderColors.DarkDisabled = 8750469
+      CustomColors.BorderColors.DarkFocused = 8750469
+      CustomColors.TextColors.Enabled = False
+      CustomColors.TextColors.LightColor = clBlack
+      CustomColors.TextColors.LightHover = clBlack
+      CustomColors.TextColors.LightPress = clBlack
+      CustomColors.TextColors.LightDisabled = clGray
+      CustomColors.TextColors.LightFocused = clBlack
+      CustomColors.TextColors.DarkColor = clWhite
+      CustomColors.TextColors.DarkHover = clWhite
+      CustomColors.TextColors.DarkPress = clWhite
+      CustomColors.TextColors.DarkDisabled = clGray
+      CustomColors.TextColors.DarkFocused = clWhite
       Caption = 'Cancel'
     end
   end

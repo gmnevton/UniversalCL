@@ -56,6 +56,9 @@ implementation
 uses
   Themes,
   Dwmapi,
+  Menus,
+  UCL.Form,
+  UCL.CaptionBar,
   UCL.Utils;
 
 const
@@ -120,6 +123,7 @@ end;
 procedure TUFormOverlay.SetOverlayType(const Value: TUOverlayType);
 var
   LParent: TWinControl;
+//  LMenu: TMainMenu;
 begin
   if Value <> FOverlayType then begin
     FOverlayType := Value;
@@ -144,9 +148,15 @@ begin
       otNone: begin
         AlphaBlend := False;
         Visible := False;
+        if (LParent is TUForm) and (TUForm(LParent).CaptionBar is TUCaptionBar) and (TUCaptionBar(TUForm(LParent).CaptionBar).Menu <> Nil) then begin
+          TUCaptionBar(TUForm(LParent).CaptionBar).MenuController.Enabled := True;
+        end;
       end;
 
       otTransparent: begin
+        if (LParent is TUForm) and (TUForm(LParent).CaptionBar is TUCaptionBar) and (TUCaptionBar(TUForm(LParent).CaptionBar).Menu <> Nil) then begin
+          TUCaptionBar(TUForm(LParent).CaptionBar).MenuController.Enabled := False;
+        end;
         //AlphaBlendValue := 220;
         SetTransparent;
         AlphaBlend := True;
