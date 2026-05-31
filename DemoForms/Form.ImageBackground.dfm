@@ -14551,7 +14551,7 @@ object formImageBackground: TformImageBackground
     Top = 0
     Width = 520
     Anchors = [akLeft, akTop, akRight]
-    Color = clWhite
+    Color = 2829099
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -14559,6 +14559,12 @@ object formImageBackground: TformImageBackground
     Font.Style = []
     ParentColor = False
     ParentFont = False
+    BackColors.Enabled = False
+    BackColors.Color = clBlack
+    BackColors.LightColor = 15921906
+    BackColors.DarkColor = 2829099
+    BackColors.FocusedLightColor = 14120960
+    BackColors.FocusedDarkColor = 1525760
     Caption = 'Transparent caption bar form'
   end
   object sliderMain: TUSlider
