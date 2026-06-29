@@ -7,6 +7,7 @@ uses
   Windows,
   Classes,
   Controls,
+  Forms,
   Menus,
   Messages,
   Types,
@@ -162,6 +163,7 @@ type
     FHotItem: Integer;
     FMenuAnchorHighLight: Boolean;
     FGlobalHook: HHOOK;
+    FOnShortCut: TShortCutEvent;
 
     // Setters
     procedure SetControl(Value: TWinControl);
@@ -209,7 +211,7 @@ type
   protected
     procedure DoButtonSizeCalc; virtual;
     procedure DoChangeScale(M, D: Integer); virtual;
-
+    function IsShortCut(var Message: TWMKey): Boolean; dynamic;
     //
     procedure InitMenu(Button: TUMenuButton); dynamic;
     function  TrackMenu(Button: TUMenuButton): Boolean; dynamic;
@@ -255,6 +257,7 @@ type
     property MenuTextColors: TUThemeControlStateHoveredDisabledColors read FMenuTextColors write SetMenuTextColors;
 
     property OnButtonSizeCalc: TUMenuButtonSizeCalcEvent read FOnButtonSizeCalc write FOnButtonSizeCalc;
+    property OnShortCut: TShortCutEvent read FOnShortCut write FOnShortCut;
   end;
 
   TUCustomMenuAnyWhereController = class(TUCustomComponent)
@@ -273,7 +276,6 @@ implementation
 uses
   StrUtils,
   GraphUtil,
-  Forms,
   ActnList,
   CommCtrl,
   UCL.ThemeManager; //,
@@ -1371,6 +1373,7 @@ begin
 //  SetSubComponent(True);
   inherited Create; // (AOwner);
 //  Name := {FControl.Name +} 'UMenuAnyWhere';
+  FEnabled := True;
   FButtons := TList.Create;
   FButtonWidth := 0;
   FButtonHeight := 0;
@@ -2062,6 +2065,7 @@ var
   end;
 
 var
+  WMKey: TWMKey;
   WMKeyDown: TWMKeyDown;
   WMSysCommand: TWMSysCommand;
   WMChar: TWMChar;
@@ -2225,6 +2229,16 @@ begin
       if FControl.Enabled and FControl.Showing and ContainsActiveControl then begin
         CMDialogChar := TCMDialogChar(Message);
         Button := FindButtonFromAccel(CMDialogChar.CharCode);
+        if Button = Nil then begin // check short-cuts
+          WMKey := TWMKey(Message);
+          WMKey.CharCode := WMKey.CharCode + $40; // start from 'A'
+          if IsShortCut(WMKey) then begin
+            Message.Result := 1;
+            Exit;
+          end;
+//          else
+//            Message.Result := 0;
+        end;
         if (Button <> Nil) then begin
           if Button.MenuItem <> Nil then
             TrackMenu(Button)
@@ -2292,6 +2306,17 @@ begin
       else
         RemoveButton(CMControlChange.Control);
     end;
+//    CM_ISSHORTCUT: begin
+//      WMKey := TWMKey(Message);
+//      if IsShortCut(WMKey) then
+//        Message.Result := 1
+//      else
+//        Message.Result := 0;
+//    end;
+//    CM_APPKEYDOWN: begin
+//      if IsShortCut(TWMKey(Message)) then
+//        Message.Result := 1;
+//    end;
   end;
   DefaultProc;
 end;
@@ -2605,6 +2630,38 @@ begin
   end
   else
     FButtons.Add(AControl);
+end;
+
+function TUMenuAnyWhere.IsShortCut(var Message: TWMKey): Boolean;
+
+  function DispatchShortCut(const Owner: TComponent) : Boolean;
+  var
+    I: Integer;
+    Component: TComponent;
+  begin
+    Result := False;
+    { Dispatch to all children }
+    for I := 0 to Owner.ComponentCount - 1 do begin
+      Component := Owner.Components[I];
+      if Component is TCustomActionList then begin
+        if TCustomActionList(Component).IsShortCut(Message) then begin
+          Result := True;
+          Exit;
+        end
+      end
+      else begin
+        Result := DispatchShortCut(Component);
+        if Result then
+          Break;
+      end;
+    end;
+  end;
+
+begin
+  Result := False;
+  if Assigned(FOnShortCut) then
+    FOnShortCut(Message, Result);
+  Result := Result or ((Menu <> Nil) and Menu.IsShortCut(Message)) or DispatchShortCut(GetParentForm(Control, False));
 end;
 
 procedure TUMenuAnyWhere.RemoveButton(AControl: TControl);
