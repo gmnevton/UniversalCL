@@ -271,7 +271,7 @@ begin
           BackColor := TM.AccentColor
         else
           //BackColor := BUTTON_BACK.GetColor(TM.ThemeUsed, ButtonState);
-          TM.Colors.ButtonColors.BackColors.GetColor(TM.ThemeUsed, ButtonState);
+          BackColor := TM.Colors.ButtonColors.BackColors.GetColor(TM.ThemeUsed, ButtonState);
 
         //TextColor := BUTTON_TEXT.GetColor(TempTheme, ButtonState);
         TextColor := GetTextColorFromBackground(BackColor);

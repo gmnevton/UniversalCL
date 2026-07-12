@@ -125,11 +125,13 @@ type
     constructor Create(AOwner: TComponent); override;
     constructor CreateNew(aOwner: TComponent; Dummy: Integer = 0); override;
     destructor Destroy; override;
+    //
     procedure AfterConstruction; override;
   {$IF CompilerVersion < 30}
     procedure ScaleForPPI(NewPPI: Integer); virtual;
   {$IFEND}
     procedure FormScale(Value: Integer); // 0 - 4: 0 - 100%; 1 - 125%; 2 - 150%; 3 - 175%; 4 - 200%;
+    function IsShortCut(var Message: TWMKey): Boolean; override;
 
     // IUThemedControl
     procedure UpdateTheme; virtual;
@@ -421,6 +423,14 @@ begin
 
   Self.PPI := NewPPI;
   Self.ScaleForPPI(NewPPI);
+end;
+
+function TUForm.IsShortCut(var Message: TWMKey): Boolean;
+begin
+  Result := (CaptionBar <> Nil) and
+            (CaptionBar is TUCaptionBar) and
+            (TUCaptionBar(CaptionBar).Menu <> Nil) and
+            TUCaptionBar(CaptionBar).Menu.IsShortCut(Message);
 end;
 
 procedure TUForm.DisableWindowPaint(var dwStyle: DWORD);

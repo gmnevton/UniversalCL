@@ -211,6 +211,7 @@ type
   protected
     procedure DoButtonSizeCalc; virtual;
     procedure DoChangeScale(M, D: Integer); virtual;
+    function IsMenuKey(var Message: TWMKey): Boolean; dynamic;
     function IsShortCut(var Message: TWMKey): Boolean; dynamic;
     //
     procedure InitMenu(Button: TUMenuButton); dynamic;
@@ -2232,12 +2233,10 @@ begin
         if Button = Nil then begin // check short-cuts
           WMKey := TWMKey(Message);
           WMKey.CharCode := WMKey.CharCode + $40; // start from 'A'
-          if IsShortCut(WMKey) then begin
+          if IsMenuKey(WMKey) then begin
             Message.Result := 1;
             Exit;
           end;
-//          else
-//            Message.Result := 0;
         end;
         if (Button <> Nil) then begin
           if Button.MenuItem <> Nil then
@@ -2253,6 +2252,12 @@ begin
     end;
     CM_PARENTCOLORCHANGED: begin
     end;
+//    CN_KEYDOWN: begin
+//      if IsMenuKey(TWMKey(Message)) then begin
+//        Message.Result := 1;
+//        Exit;
+//      end;
+//    end;
     CN_CHAR: begin
 //      OutputDebugString(PChar(GetTimeStamp + 'CN_CHAR'));
       // We got here through the installed MenuKeyHook
@@ -2630,6 +2635,17 @@ begin
   end
   else
     FButtons.Add(AControl);
+end;
+
+// extracted from TWinControl.IsMenuKey
+function TUMenuAnyWhere.IsMenuKey(var Message: TWMKey): Boolean;
+begin
+  Result := True;
+  if not (csDesigning in Control.ComponentState) then begin
+    if IsShortCut(Message) then
+      Exit;
+  end;
+  Result := False;
 end;
 
 function TUMenuAnyWhere.IsShortCut(var Message: TWMKey): Boolean;
