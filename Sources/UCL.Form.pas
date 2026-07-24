@@ -42,6 +42,7 @@ type
     FCaptionBar: TControl;
     FOverlay: TUFormOverlay;
     FRoundedCorners: TWindowRoundedCornerType;
+    FOnMove: TNotifyEvent;
 
     FPPI: Integer;
     FIsActive: Boolean;
@@ -71,7 +72,11 @@ type
     // Messages
     procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
     procedure WMActivate(var Msg: TWMActivate); message WM_ACTIVATE;
-    procedure WMSize(var Msg : TWMSize); message WM_SIZE;
+    //procedure WMEnterSizeMove(var Msg: TMessage); message WM_ENTERSIZEMOVE;
+    //procedure WMExitSizeMove(var Msg: TMessage); message WM_EXITSIZEMOVE;
+    procedure WMMove(var Msg: TWMMove); message WM_MOVE;
+    procedure WMSize(var Msg: TWMSize); message WM_SIZE;
+    procedure WMWindowPosChanged(var Msg: TWMWindowPosChanged); message WM_WINDOWPOSCHANGED;
     procedure WMNCActivate(var Msg: TWMNCActivate); message WM_NCACTIVATE;
     procedure WMDPIChanged(var Msg: TWMDpi); message WM_DPICHANGED;
     procedure WMDWMColorizationColorChanged(var Msg: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
@@ -120,6 +125,7 @@ type
     procedure PaintWindow(DC: HDC); override;
     procedure Resize; override;
     procedure Resizing(State: TWindowState); override;
+    procedure FormMoved;
 
   public
     constructor Create(AOwner: TComponent); override;
@@ -152,6 +158,8 @@ type
     property RoundedCorners: TWindowRoundedCornerType read FRoundedCorners write SetRoundedCorners default rctDefault;
 
     property Padding stored False;
+
+    property OnMove: TNotifyEvent read FOnMove write FOnMove;
   end;
 
 implementation
@@ -565,6 +573,7 @@ begin
   FFitDesktopSize := True;
   FFullScreen := False;
   FRoundedCorners := rctDefault;
+  FOnMove := Nil;
 
   //  Common props
   Font.Name := 'Segoe UI';
@@ -688,6 +697,12 @@ begin
   inherited;
 end;
 
+procedure TUForm.FormMoved;
+begin
+  if Assigned(FOnMove) then
+    FOnMove(Self);
+end;
+
 procedure TUForm.SetThemeManager(const Value: TUThemeManager);
 begin
   if (Value <> Nil) and (FThemeManager = Nil) then
@@ -774,9 +789,23 @@ begin
   UpdateBorder;
 end;
 
+procedure TUForm.WMMove(var Msg: TWMMove);
+begin
+  inherited;
+  FormMoved;
+end;
+
 procedure TUForm.WMSize(var Msg: TWMSize);
 begin
   inherited;
+end;
+
+procedure TUForm.WMWindowPosChanged(var Msg: TWMWindowPosChanged);
+begin
+  inherited;
+  if (Msg.WindowPos^.flags and SWP_NOMOVE) = 0 then begin
+    FormMoved;
+  end;
 end;
 
 procedure TUForm.WMNCActivate(var Msg: TWMNCActivate);
