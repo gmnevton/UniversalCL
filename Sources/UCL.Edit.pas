@@ -34,6 +34,7 @@ type
     FBackColor: TUThemeControlWithFocusColorSet;
     FBorderColor: TUThemeControlWithFocusColorSet;
     FControlState: TUControlState;
+    FErrorState: Boolean;
     //
     FTransparent: Boolean;
 
@@ -76,7 +77,11 @@ type
 
     // IUThemedComponent
     procedure UpdateTheme; override;
+    //
+    procedure SetErrorState;
+    procedure ResetErrorState;
 
+    property ErrorState: Boolean read FErrorState;
   published
     property BorderThickness: Byte read FBorderThickness write SetBorderThickness;
     property BackColor: TUThemeControlWithFocusColorSet read FBackColor write SetBackColor;
@@ -157,7 +162,8 @@ begin
   if Font.Color <> LTextColor then
     Font.Color := LTextColor;
 
-  Repaint;
+//  Repaint;
+  RedrawWindow(Self.Handle, Nil, 0, RDW_FRAME or RDW_INVALIDATE or RDW_UPDATENOW);
 end;
 
 //  INTERNAL
@@ -175,7 +181,18 @@ begin
   // Disabled edit
   if ControlState = csDisabled then begin
     LBorderColor := $CCCCCC;
-    LBackColor := $D8D8D8;
+//    LBackColor := $D8D8D8;
+    BackColorSet := BackColor;
+    case ControlState of
+      csHover, csFocused: begin
+        if BackColor.Enabled then
+          LBackColor := BackColor.Color
+        else
+          LBackColor := BackColorSet.GetColor(TM, Focused);
+      end
+    else
+      LBackColor := BackColorSet.GetColor(TM, Focused);
+    end;
     LTextColor := clGray;
     Exit;
   end;
@@ -195,24 +212,41 @@ begin
           LBackColor := BackColorSet.GetColor(TM, Focused);
       end
     else
-      LBorderColor := BackColorSet.GetColor(TM, Focused);
+      LBackColor := BackColorSet.GetColor(TM, Focused);
     end;
   end;
   //
-  BorderColorSet := BorderColor;
-  case ControlState of
-    csHover, csFocused: begin
-      if BorderColor.Enabled then
-        LBorderColor := BorderColor.Color
-      else
-        LBorderColor := AccentColor;
-    end
-  else
-    LBorderColor := BorderColorSet.GetColor(TM, Focused);
+  if FErrorState then begin
+    LBorderColor := clRed;
+  end
+  else begin
+    BorderColorSet := BorderColor;
+    case ControlState of
+      csHover, csFocused: begin
+        if BorderColor.Enabled then
+          LBorderColor := BorderColor.Color
+        else
+          LBorderColor := AccentColor;
+      end
+    else
+      LBorderColor := BorderColorSet.GetColor(TM, Focused);
+    end;
   end;
   //
   // Text color
   LTextColor := GetTextColorFromBackground(LBackColor);
+end;
+
+procedure TUEdit.SetErrorState;
+begin
+  FErrorState := True;
+  UpdateTheme;
+end;
+
+procedure TUEdit.ResetErrorState;
+begin
+  FErrorState := False;
+  UpdateTheme;
 end;
 
 //  SETTERS
