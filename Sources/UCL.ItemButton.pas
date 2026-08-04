@@ -27,6 +27,8 @@ type
   TUItemButtonCanToggleEvent = procedure (Sender: TUItemButton; var ToggleAllowed: Boolean) of object;
   TUItemButtonToggleEvent = procedure (Sender: TUItemButton; State: Boolean) of object;
 
+  TUItemButtonDrawTextEvent = procedure (Sender: TUItemButton; const TargetCanvas: TCanvas; TargetRect: TRect; TargetText: String) of object;
+
   TUItemButton = class(TUCustomControl)
   private var
     FBorderThickness: Integer;
@@ -70,12 +72,16 @@ type
     FAcceptControls: Boolean;
     FCheckType: TUItemButtonCheckType;
     FRadioGroup: String;
+    FDrawDetailEvent: TUItemButtonDrawTextEvent;
+    FDrawTextEvent: TUItemButtonDrawTextEvent;
 
     // Internal
     procedure UpdateColors;
     procedure UpdateRects;
     function  DoCanToggle: Boolean;
     procedure DoToggle;
+    procedure DoDrawDetail(const ACanvas: TCanvas; ARect: TRect; AText: String);
+    procedure DoDrawText(const ACanvas: TCanvas; ARect: TRect; AText: String);
 
     // Setters
     procedure SetCustomColors(Value: TUItemButtonColorSet);
@@ -191,6 +197,8 @@ type
 
     property OnCanToggle: TUItemButtonCanToggleEvent read FCanToggleEvent write FCanToggleEvent;
     property OnToggle: TUItemButtonToggleEvent read FToggleEvent write FToggleEvent;
+    property OnDrawText: TUItemButtonDrawTextEvent read FDrawTextEvent write FDrawTextEvent;
+    property OnDrawDetail: TUItemButtonDrawTextEvent read FDrawDetailEvent write FDrawDetailEvent;
   end;
 
 implementation
@@ -332,6 +340,7 @@ end;
 procedure TUItemButton.UpdateColors;
 var
   TM: TUCustomThemeManager;
+  Delta: Integer;
 begin
   TM:=SelectThemeManager(Self);
 
@@ -376,9 +385,19 @@ begin
     //DetailColor := $808080;
   end;
   //
+  Delta := +128;
+  if (TM.Theme = ttSystem) then begin
+    if TM.ThemeUsed = utDark then
+      Delta := -128;
+  end
+  else if (TM.Theme = ttDark) then
+    Delta := -128;
+  DetailColor := BrightenColor(TextColor, Delta);
+  //
 //  BorderColor := BackColor;
 //  if (ButtonState in [csHover, csFocused]) then
 //    BorderColor := $AAAAAA;
+
   //  Active color
   if not TM.UseSystemAccentColor and TM.Colors.ItemButtonColors.AllowCustomColors and CustomColors.ActiveColors.Enabled then
     ActiveColor := CustomColors.ActiveColors.GetColor(TM.ThemeUsed, ButtonState)
@@ -389,7 +408,8 @@ end;
 procedure TUItemButton.UpdateRects;
 var
   LPos, RPos: Integer;
-  TempWidth: Integer;
+  TextWidth: Integer;
+  DetailWidth: Integer;
 begin
   if not HandleAllocated then
     Exit;
@@ -415,10 +435,21 @@ begin
     RightIconRect := TRect.Empty;
   Dec(RPos, RightIconRect.Width);
 
+  Canvas.Font.Assign(Font);
+  TextWidth := Canvas.TextWidth(Text);
+
   if iokDetail in ObjectsVisible then begin
     Canvas.Font.Assign(DetailFont);
-    TempWidth := Canvas.TextWidth(Detail);
-    DetailRect := Rect(RPos - AlignSpace - TempWidth, 0, RPos, Height);
+    DetailWidth := Canvas.TextWidth(Detail);
+    if TextWidth + DetailWidth > RPos - AlignSpace then begin
+      DetailWidth := RPos - AlignSpace - TextWidth;
+      if DetailWidth < 0 then
+        DetailWidth := 0;
+    end;
+    if DetailWidth > 0 then
+      DetailRect := Rect(RPos - AlignSpace - DetailWidth, 0, RPos, Height)
+    else
+      DetailRect := TRect.Empty;
   end
   else
     DetailRect := TRect.Empty;
@@ -441,6 +472,18 @@ procedure TUItemButton.DoToggle;
 begin
   if Assigned(FToggleEvent) then
     FToggleEvent(Self, FIsToggled);
+end;
+
+procedure TUItemButton.DoDrawDetail(const ACanvas: TCanvas; ARect: TRect; AText: String);
+begin
+  if Assigned(FDrawDetailEvent) then
+    FDrawDetailEvent(Self, ACanvas, ARect, AText);
+end;
+
+procedure TUItemButton.DoDrawText(const ACanvas: TCanvas; ARect: TRect; AText: String);
+begin
+  if Assigned(FDrawTextEvent) then
+    FDrawTextEvent(Self, ACanvas, ARect, AText);
 end;
 
 function TUItemButton.GetDragImages: TDragImageList;
@@ -765,17 +808,23 @@ begin
     end;
 
     //  Paint detail
-    if iokDetail in ObjectsVisible then begin
+    if (iokDetail in ObjectsVisible) and not DetailRect.IsEmpty then begin
       bmp.Canvas.Font.Assign(DetailFont);
       bmp.Canvas.Font.Color := DetailColor;
-      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, False, False);
+      if Assigned(FDrawDetailEvent) then
+        DoDrawDetail(bmp.Canvas, DetailRect, Detail)
+      else
+        DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, DetailRect, Detail, Pos(#13#10, Detail) > 0, False);
     end;
 
     //  Paint text
     if iokText in ObjectsVisible then begin
       bmp.Canvas.Font.Assign(Font);
       bmp.Canvas.Font.Color := TextColor;
-      DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, False, False);
+      if Assigned(FDrawTextEvent) then
+        DoDrawText(bmp.Canvas, TextRect, Text)
+      else
+        DrawTextRect(bmp.Canvas, taLeftJustify, taVerticalCenter, TextRect, Text, Pos(#13#10, Text) > 0, False);
     end;
 
     //

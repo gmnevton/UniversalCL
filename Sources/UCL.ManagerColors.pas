@@ -270,11 +270,11 @@ begin
   inherited Create(Owner);
 
   FBackColors := TUThemeButtonStateColorSet.Create;
-  //FBackColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FBackColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
 //  FBackColors.Assign(BUTTON_BACK);
 
   FBorderColors := TUThemeButtonStateColorSet.Create;
-//  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
+  FBorderColors.SetColors(utLight, $F2F2F2, $E6E6E6, $CCCCCC, $F2F2F2, $F2F2F2);
 //  FBorderColors.Assign(BUTTON_BORDER);
 
   FTextColors := TUThemeButtonStateColorSet.Create;
