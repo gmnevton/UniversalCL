@@ -103,6 +103,7 @@ end;
 
 destructor TUTitleBar.Destroy;
 begin
+  FBackColors.Free;
   inherited;
 end;
 

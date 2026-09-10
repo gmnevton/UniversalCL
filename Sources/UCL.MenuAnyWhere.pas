@@ -2344,7 +2344,7 @@ var
 begin
   AWidth := 0;
   AHeight := FControl.Height;
-  canvas:=ControlCanvas;
+  canvas := ControlCanvas;
   try
     for i:=0 to FButtons.Count - 1 do begin
       btn := Buttons[i];
@@ -2356,6 +2356,7 @@ begin
     end;
     Inc(AWidth, 16);
   finally
+    ReleaseDC(FControl.Handle, canvas.Handle);
     canvas.Free;
   end;
 end;

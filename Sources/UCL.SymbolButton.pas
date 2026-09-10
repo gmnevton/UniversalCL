@@ -22,8 +22,8 @@ type
   TUSymbolButton = class(TUCustomControl)
   private var
     BorderThickness: Integer;
-    BackColor, BorderColor, TextColor, DetailColor: TColor;
-    IconRect, TextRect, DetailRect: TRect;
+    BackColor, BorderColor, TextColor, DetailColor, CloseBackColor, CloseColor: TColor;
+    IconRect, TextRect, DetailRect, CloseRect: TRect;
   
   private
     FSymbolFont: TFont;
@@ -35,11 +35,14 @@ type
 
     FButtonState: TUControlState;
     FOrientation: TUOrientation;
-    FSymbolChar: string;
-    FText: string;
+    FSymbolChar: String;
+    FText: String;
     FTextOffset: Integer;
-    FDetail: string;
+    FDetail: String;
     FDetailRightOffset: Integer;
+    FRightCloseVisible: Boolean;
+    FCloseSize: TPoint;
+    FCloseClicked: Boolean;
 
     FShowIcon: Boolean;
     FShowDetail: Boolean;
@@ -50,6 +53,7 @@ type
     FUpdating: Boolean;
     FToggleEvent: TUSymbolButtonToggleEvent;
     FAcceptControls: Boolean;
+    FMouseInClose: Boolean;
 
     // Internal
     procedure UpdateColors;
@@ -75,6 +79,7 @@ type
     procedure SetImageIndex(const Value: Integer);
     procedure SetImageKind(const Value: TUImageKind);
     procedure SetKeepOrginalColor(const Value: Boolean);
+    procedure SetRightCloseVisible(const Value: Boolean);
 
     // Messages
     procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
@@ -124,6 +129,8 @@ type
     property IsToggleButton: Boolean read FIsToggleButton write FIsToggleButton default False;
     property IsToggled: Boolean read FIsToggled write SetIsToggled default False;
     property KeepOrginalColor: Boolean read FKeepOrginalColor write SetKeepOrginalColor;
+    property RightCloseVisible: Boolean read FRightCloseVisible write SetRightCloseVisible;
+    property CloseClicked: Boolean read FCloseClicked;
 
     property Caption;
 //    property Color;
@@ -178,6 +185,10 @@ begin
   FTextOffset := 40;
   FDetail := 'Detail';
   FDetailRightOffset := 10;
+  FRightCloseVisible := False;
+  FCloseSize := Point(12, 12);
+  FCloseClicked := False;
+  FMouseInClose := False;
   FShowIcon := True;
   FShowDetail := True;
   FTransparent := False;
@@ -231,6 +242,8 @@ begin
     BorderColor := BackColor;
     TextColor := clGray;
     DetailColor := clGray;
+    CloseBackColor := BackColor;
+    CloseColor := TextColor;
     Exit;
   end
   else if Enabled and FKeepOrginalColor and (Color <> clNone) and (Color <> clDefault) then begin
@@ -244,6 +257,12 @@ begin
       else
         BackColor := BrightenColor(BackColor, -25);
     end;
+    //CloseBackColor := BackColor;
+    CloseBackColor := clRed;
+    CloseColor := TextColor;
+    if FMouseInClose then begin
+      CloseColor := GetTextColorFromBackground(CloseBackColor);
+    end;
   end
   else begin
     // Transparent enabled
@@ -252,12 +271,24 @@ begin
       BackColor := Color;
       TextColor := GetTextColorFromBackground(Color);
       DetailColor := $808080;
+      //CloseBackColor := BackColor;
+      CloseBackColor := clRed;
+      CloseColor := TextColor;
+      if FMouseInClose then begin
+        CloseColor := GetTextColorFromBackground(CloseBackColor);
+      end;
     end
     // Highlight enabled
     else if (IsToggleButton and IsToggled) and (ButtonState in [csNone, csHover, csFocused]) then begin
       BackColor := TM.AccentColor;
       TextColor := GetTextColorFromBackground(BackColor);
       DetailColor := clSilver;
+      //CloseBackColor := BackColor;
+      CloseBackColor := clRed;
+      CloseColor := TextColor;
+      if FMouseInClose then begin
+        CloseColor := GetTextColorFromBackground(CloseBackColor);
+      end;
     end
     // Default colors
     else begin
@@ -265,6 +296,12 @@ begin
         BackColor := TUCaptionBar(ParentControl).Color;
         TextColor := GetTextColorFromBackground(BackColor);
         DetailColor := $808080;
+        //CloseBackColor := BackColor;
+        CloseBackColor := clRed;
+        CloseColor := TextColor;
+        if FMouseInClose then begin
+          CloseColor := GetTextColorFromBackground(CloseBackColor);
+        end;
       end
       else begin
         if IsToggled then
@@ -276,6 +313,12 @@ begin
         //TextColor := BUTTON_TEXT.GetColor(TempTheme, ButtonState);
         TextColor := GetTextColorFromBackground(BackColor);
         DetailColor := $808080;
+        //CloseBackColor := BackColor;
+        CloseBackColor := clRed;
+        CloseColor := TextColor;
+        if FMouseInClose then begin
+          CloseColor := GetTextColorFromBackground(CloseBackColor);
+        end;
       end;
     end;
   end;
@@ -290,6 +333,12 @@ begin
     else
       BackColor := BrightenColor(BackColor, -25);
     TextColor := GetTextColorFromBackground(BackColor);
+    //CloseBackColor := BackColor;
+    CloseBackColor := clRed;
+    CloseColor := TextColor;
+    if FMouseInClose then begin
+      CloseColor := GetTextColorFromBackground(CloseBackColor);
+    end;
   end;
 end;
 
@@ -310,14 +359,22 @@ begin
   else
     IconRect := TRect.Empty;
 
+  CloseRect := Rect(Width, Height, 0, 0);
+  if RightCloseVisible then begin
+    if Orientation = oHorizontal then
+      CloseRect := Rect(Width - DetailRightOffset - FCloseSize.X, 0, Width - DetailRightOffset, Height)
+    else
+      CloseRect := Rect(0, Height - DetailRightOffset - FCloseSize.Y, Width, Height - DetailRightOffset);
+  end;
+
   if ShowDetail then begin
     Canvas.Font := DetailFont;
     TempW := Canvas.TextWidth(Detail);
     TempH := Canvas.TextHeight(Detail);
     if Orientation = oHorizontal then
-      DetailRect := Rect(Width - TempW - DetailRightOffset, 0, Width - DetailRightOffset, Height)
+      DetailRect := Rect(CloseRect.Left - TempW - DetailRightOffset, 0, CloseRect.Left - DetailRightOffset, Height)
     else
-      DetailRect := Rect(0, Height - TempH - DetailRightOffset, Width, Height - DetailRightOffset);
+      DetailRect := Rect(0, CloseRect.Top - TempH - DetailRightOffset, Width, CloseRect.Top - DetailRightOffset);
   end
   else
     DetailRect := TRect.Empty;
@@ -492,6 +549,16 @@ begin
   end;
 end;
 
+procedure TUSymbolButton.SetRightCloseVisible(const Value: Boolean);
+begin
+  if Value <> FRightCloseVisible then begin
+    FRightCloseVisible := Value;
+    UpdateRects;
+    UpdateColors;
+    Repaint;
+  end;
+end;
+
 //  CUSTOM METHODS
 
 procedure TUSymbolButton.Paint;
@@ -555,6 +622,25 @@ begin
     else
       DrawTextRect(bmp.Canvas, taCenter, taAlignTop, TextRect, Text, False, False);
 
+    if RightCloseVisible then begin
+      bmp.Canvas.Brush.Color := CloseBackColor;
+      bmp.Canvas.Brush.Style := bsSolid;
+      bmp.Canvas.Pen.Color := DetailColor;
+      if FMouseInClose then
+//        bmp.Canvas.Brush.Style := bsSolid;
+        bmp.Canvas.Pen.Color := CloseColor;
+      bmp.Canvas.Pen.Mode := pmCopy;
+      bmp.Canvas.Pen.Style := psSolid;
+      bmp.Canvas.Pen.Width := 2;
+
+      bmp.Canvas.FillRect(Rect(CloseRect.Left, CloseRect.Height div 2 - 8, CloseRect.Right, CloseRect.Height div 2 + 8));
+
+      bmp.Canvas.MoveTo(CloseRect.Left  + 1, CloseRect.Height div 2 - 5);
+      bmp.Canvas.LineTo(CloseRect.Right - 2, CloseRect.Height div 2 + 4);
+      bmp.Canvas.MoveTo(CloseRect.Right - 2, CloseRect.Height div 2 - 5);
+      bmp.Canvas.LineTo(CloseRect.Left  + 1, CloseRect.Height div 2 + 4);
+    end;
+
     //
     Canvas.Draw(0, 0, bmp);
   finally
@@ -601,6 +687,7 @@ end;
 procedure TUSymbolButton.WMLButtonDown(var Msg: TWMLButtonDown);
 begin
   if Enabled then begin
+    FCloseClicked := FRightCloseVisible and FMouseInClose;
     ButtonState := csPress;
     inherited;
   end;
@@ -609,6 +696,7 @@ end;
 procedure TUSymbolButton.WMLButtonUp(var Msg: TWMLButtonUp);
 begin
   if Enabled then begin
+    FCloseClicked := FRightCloseVisible and FMouseInClose;
     if IsToggleButton then
       FIsToggled := not FIsToggled;
     if MouseInClient then
@@ -623,6 +711,7 @@ end;
 
 procedure TUSymbolButton.WMMouseMove(var Msg: TWMMouseMove);
 begin
+  FMouseInClose := RightCloseVisible and PtInRect(CloseRect, Point(Msg.XPos, Msg.YPos));
   if Enabled and not IsDesigning then
     Repaint;
   inherited;

@@ -281,6 +281,7 @@ destructor TUItemButton.Destroy;
 begin
   FIconFont.Free;
   FDetailFont.Free;
+  FCustomColors.Free;
   inherited;
 end;
 
