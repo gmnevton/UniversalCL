@@ -133,7 +133,7 @@ type
     property CloseClicked: Boolean read FCloseClicked;
 
     property Caption;
-//    property Color;
+    property Color;
     property TabOrder;
     property TabStop default true;
     property Height default 40;
@@ -235,9 +235,11 @@ begin
       ParentColor := True;
       BackColor := Color;
     end
+    else if FKeepOrginalColor then
+      BackColor := Color
     else
       //BackColor := BUTTON_BACK.GetColor(TM.ThemeUsed, csDisabled);
-      TM.Colors.ButtonColors.BackColors.GetColor(TM.ThemeUsed, csDisabled);
+      BackColor := TM.Colors.ButtonColors.BackColors.GetColor(TM.ThemeUsed, csDisabled);
 
     BorderColor := BackColor;
     TextColor := clGray;
@@ -266,11 +268,17 @@ begin
   end
   else begin
     // Transparent enabled
-    if (ButtonState = csNone) and Transparent then begin
+    if {(ButtonState = csNone) and} Transparent then begin
       ParentColor := True;
       BackColor := Color;
       TextColor := GetTextColorFromBackground(Color);
       DetailColor := $808080;
+      if ButtonState in [{csNone,} csHover, csFocused] then begin
+        if TM.ThemeUsed = utLight then
+          BackColor := BrightenColor(BackColor, -25)
+        else
+          BackColor := BrightenColor(BackColor, 25);
+      end;
       //CloseBackColor := BackColor;
       CloseBackColor := clRed;
       CloseColor := TextColor;
@@ -623,12 +631,12 @@ begin
       DrawTextRect(bmp.Canvas, taCenter, taAlignTop, TextRect, Text, False, False);
 
     if RightCloseVisible then begin
-      bmp.Canvas.Brush.Color := CloseBackColor;
-      bmp.Canvas.Brush.Style := bsSolid;
+      bmp.Canvas.Brush.Color := BackColor; // CloseBackColor;
+      bmp.Canvas.Brush.Style := bsClear; // bsSolid;
       bmp.Canvas.Pen.Color := DetailColor;
       if FMouseInClose then
 //        bmp.Canvas.Brush.Style := bsSolid;
-        bmp.Canvas.Pen.Color := CloseColor;
+        bmp.Canvas.Pen.Color := CloseBackColor; // CloseColor;
       bmp.Canvas.Pen.Mode := pmCopy;
       bmp.Canvas.Pen.Style := psSolid;
       bmp.Canvas.Pen.Width := 2;
@@ -741,8 +749,12 @@ begin
 end;
 
 procedure TUSymbolButton.CMMouseEnter(var Msg: TMessage);
+var
+  P: TPoint;
 begin
   if Enabled then begin
+    P := Self.ScreenToClient(Mouse.CursorPos);
+    FMouseInClose := RightCloseVisible and PtInRect(CloseRect, P);
     ButtonState := csHover;
     inherited;
   end;
@@ -751,6 +763,7 @@ end;
 procedure TUSymbolButton.CMMouseLeave(var Msg: TMessage);
 begin
   if Enabled then begin
+    FMouseInClose := False;
     ButtonState := csNone;
     Repaint;
     inherited;

@@ -162,6 +162,15 @@ type
     property OnMove: TNotifyEvent read FOnMove write FOnMove;
   end;
 
+  TUPopupForm = class(TUForm)
+  private
+    procedure CMShowingChanged(var Msg: TMessage); message CM_SHOWINGCHANGED;
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+    procedure WMMouseActivate(var Msg: TMessage); message WM_MOUSEACTIVATE;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+  end;
+
 implementation
 
 uses
@@ -1094,5 +1103,114 @@ begin
 end;
 {$IFEND}
 {$ENDREGION}
+
+{ TUPopupForm }
+
+var
+  TaskActiveWindow: HWnd = 0;
+  TaskFirstWindow: HWnd = 0;
+  TaskFirstTopMost: HWnd = 0;
+
+function DoFindWindow(Window: HWnd; Param: LPARAM): Bool; stdcall;
+begin
+  if (Window <> TaskActiveWindow) and (Window <> Application.Handle) and IsWindowVisible(Window) and IsWindowEnabled(Window) then begin
+    if GetWindowLong(Window, GWL_EXSTYLE) and WS_EX_TOPMOST = 0 then begin
+      if TaskFirstWindow = 0 then
+        TaskFirstWindow := Window;
+    end
+    else begin
+      if TaskFirstTopMost = 0 then
+        TaskFirstTopMost := Window;
+    end;
+  end;
+  Result := True;
+end;
+
+function FindTopMostWindow(ActiveWindow: HWnd): HWnd;
+var
+  EnumProc: TFNWndEnumProc; // keep a reference to the delegate!
+begin
+  TaskActiveWindow := ActiveWindow;
+  TaskFirstWindow := 0;
+  TaskFirstTopMost := 0;
+  EnumProc := @DoFindWindow;
+  EnumThreadWindows(GetCurrentThreadID, EnumProc, 0);
+  if TaskFirstWindow <> 0 then
+    Result := TaskFirstWindow
+  else
+    Result := TaskFirstTopMost;
+end;
+
+procedure TUPopupForm.CMShowingChanged(var Msg: TMessage);
+const
+  ShowCommands: array[TWindowState] of Integer =
+    (SW_SHOWNOACTIVATE, SW_SHOWMINNOACTIVE, SW_SHOWMAXIMIZED);
+var
+  LRect: TRect;
+  X, Y: Integer;
+  NewActiveWindow: HWnd;
+  CenterForm: TCustomForm;
+  WindowPlacement: TWindowPlacement;
+begin
+  if not (csDesigning in ComponentState) and (fsShowing in FFormState) then
+    //raise EInvalidOperation.Create(SVisibleChanged);
+    Exit;
+//  Application.UpdateVisible;
+  Include(FFormState, fsShowing);
+  try
+    if not (csDesigning in ComponentState) then begin
+      if Showing then begin
+        try
+          DoShow;
+        except
+          Application.HandleException(Self);
+        end;
+        ShowWindow(Handle, ShowCommands[WindowState]);
+        SetCapture(Handle);
+      end
+      else begin
+        try
+          DoHide;
+        except
+          Application.HandleException(Self);
+        end;
+        NewActiveWindow := 0;
+        if (GetActiveWindow = Handle) and not IsIconic(Handle) then
+          NewActiveWindow := FindTopMostWindow(Handle);
+        if NewActiveWindow <> 0 then begin
+          SetWindowPos(Handle, 0, 0, 0, 0, 0, SWP_HIDEWINDOW or SWP_NOSIZE or SWP_NOMOVE or SWP_NOZORDER or SWP_NOACTIVATE);
+          SetActiveWindow(NewActiveWindow);
+        end
+        else
+          ShowWindow(Handle, SW_HIDE);
+      end;
+    end
+    else if (csDesigning in ComponentState) and (Parent <> nil) and Showing then
+      ShowWindow(Handle, SW_SHOWNOACTIVATE);
+  finally
+    Exclude(FFormState, fsShowing);
+  end;
+end;
+
+procedure TUPopupForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.ExStyle := Params.ExStyle or WS_EX_NOACTIVATE or WS_EX_TOOLWINDOW;
+end;
+
+procedure TUPopupForm.WMMouseActivate(var Msg: TMessage);
+begin
+  Msg.Result := MA_NOACTIVATE;
+end;
+
+procedure TUPopupForm.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if not PtInRect(ClientRect, Point(X, Y)) then begin
+    ReleaseCapture;
+    Close;
+  end;
+
+  inherited MouseDown(Button, Shift, X, Y);
+end;
 
 end.
